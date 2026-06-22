@@ -7,7 +7,7 @@ This monorepo uses [Changesets](https://github.com/changesets/changesets) for ve
 After making a user-facing change:
 
 ```bash
-npm run changeset
+pnpm run changeset
 ```
 
 Select the package(s), choose semver bump, and write a short summary.
@@ -21,6 +21,6 @@ Select the package(s), choose semver bump, and write a short summary.
 Manual release:
 
 ```bash
-npm run version
-npm run release
+pnpm run version
+pnpm run release
 ```

@@ -57,4 +57,96 @@ describe("@ailuracode/alpine-scroll", () => {
     expect(store.showToTop).toBe(false);
     store.unlock();
   });
+
+  it("tracks scroll direction and bottom edge", () => {
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 200,
+    });
+    store.refresh();
+    expect(store.direction).toBe("down");
+    expect(store.isScrollingDown).toBe(true);
+
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 100,
+    });
+    store.refresh();
+    expect(store.direction).toBe("up");
+    expect(store.isScrollingUp).toBe(true);
+
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 100,
+    });
+    store.refresh();
+    expect(store.direction).toBe("none");
+
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 799,
+    });
+    store.refresh();
+    expect(store.isAtBottom).toBe(true);
+    expect(store.atBottom).toBe(true);
+  });
+
+  it("toggles lock and scrolls when unlocked", () => {
+    const scrollTo = vi.mocked(window.scrollTo);
+
+    store.toggleLock();
+    expect(store.isLocked).toBe(true);
+
+    store.toggleLock();
+    expect(store.isLocked).toBe(false);
+
+    scrollTo.mockClear();
+    store.toTop("auto");
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "auto" });
+
+    store.toBottom();
+    expect(scrollTo).toHaveBeenCalledWith({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  });
+
+  it("skips programmatic scroll while locked", () => {
+    const scrollTo = vi.mocked(window.scrollTo);
+
+    store.lock();
+    scrollTo.mockClear();
+    store.toTop();
+    store.toBottom();
+    expect(scrollTo).not.toHaveBeenCalled();
+    store.unlock();
+  });
+
+  it("returns false when refresh state is unchanged", () => {
+    store.refresh();
+    expect(store.refresh()).toBe(false);
+  });
+
+  it("handles zero-height documents", () => {
+    Object.defineProperty(document.documentElement, "scrollHeight", {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 800,
+    });
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 0,
+    });
+
+    store.refresh();
+    expect(store.progress).toBe(0);
+    expect(store.atBottom).toBe(true);
+  });
+
+  it("ignores unlock when not locked", () => {
+    expect(store.unlock()).toBe(false);
+  });
 });

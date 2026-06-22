@@ -10,7 +10,7 @@ const workspaces = [
 ];
 
 for (const workspace of workspaces) {
-  execSync(`npm pack -w ${workspace} --dry-run`, { stdio: "inherit" });
+  execSync(`pnpm --filter ${workspace} pack --dry-run`, { stdio: "inherit" });
 }
 
 console.log(`Packed ${workspaces.length} workspaces successfully.`);

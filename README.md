@@ -50,13 +50,13 @@ Install only the packages you need. Each one is a separate dependency.
 ## Development
 
 ```bash
-npm install
-npm test              # all packages
-npm run lint          # biome check (strict)
-npm run lint:fix      # auto-fix
-npm run test:coverage # coverage thresholds
-npm run pack:check    # validate npm tarballs
-npm run changeset     # after user-facing changes
+pnpm install
+pnpm test              # all packages
+pnpm run lint          # biome check (strict)
+pnpm run lint:fix      # auto-fix
+pnpm run test:coverage # coverage thresholds
+pnpm run pack:check    # validate npm tarballs
+pnpm run changeset     # after user-facing changes
 ```
 
 ## Versioning & release
@@ -64,9 +64,9 @@ npm run changeset     # after user-facing changes
 Uses [Changesets](https://github.com/changesets/changesets) for independent package versions.
 
 ```bash
-npm run changeset   # create a changeset
-npm run version     # bump versions + changelogs
-npm run release     # test + publish to npm
+pnpm run changeset   # create a changeset
+pnpm run version     # bump versions + changelogs
+pnpm run release     # test + publish to npm
 ```
 
 GitHub Actions opens a **Version Packages** PR on merge to `master`, then publishes when merged. Set the `NPM_TOKEN` repository secret for automated npm publish.
@@ -77,7 +77,7 @@ Requires npm 2FA and access to `@ailuracode`:
 
 ```bash
 npm login
-npm run release
+pnpm run release
 ```
 
 Each package under `packages/*` has its own version, tests, and README.

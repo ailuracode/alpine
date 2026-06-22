@@ -3,9 +3,7 @@
   "private": true,
   "author": "ailuracode",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
+  "packageManager": "pnpm@11.8.0",
   "scripts": {
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -15,20 +13,20 @@
     "test:watch": "vitest",
     "pack:check": "node scripts/pack-check.mjs",
     "changeset:check": "changeset status",
-    "test:packages": "npm run test --workspaces --if-present",
+    "test:packages": "pnpm -r --if-present test",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "npm test && changeset publish",
+    "release": "pnpm test && changeset publish",
     "publish:ci": "changeset publish",
-    "publish:packages": "npm run release"
+    "publish:packages": "pnpm run release"
   },
   "devDependencies": {
-    "@types/alpinejs": "^3.13.0",
+    "@types/alpinejs": "^3.13.11",
     "@biomejs/biome": "^2.5.0",
-    "@changesets/cli": "^2.29.4",
-    "@vitest/coverage-v8": "^3.2.4",
-    "alpinejs": "^3.14.9",
+    "@changesets/cli": "^2.31.0",
+    "@vitest/coverage-v8": "^4.1.9",
+    "alpinejs": "^3.15.12",
     "happy-dom": "^20.10.6",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.9"
   }
 }

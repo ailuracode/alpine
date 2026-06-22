@@ -30,18 +30,18 @@ test/                            # shared test setup (setup.js, helpers.js, mock
 ## Commands
 
 ```bash
-npm install          # install all workspaces
-npm test             # run full test suite (required before release)
-npm run lint         # biome check (strict)
-npm run lint:fix     # biome check --write
-npm run format       # biome format --write
-npm run test:coverage # vitest with coverage thresholds
-npm run pack:check   # npm pack dry-run for all workspaces
-npm run changeset:check # verify pending changesets
-npm run test:watch   # vitest watch mode
-npm run changeset    # create a changeset after user-facing changes
-npm run version      # apply changesets → bump package.json versions + CHANGELOGs
-npm run release      # test + publish changed packages to npm
+pnpm install          # install all workspaces
+pnpm test             # run full test suite (required before release)
+pnpm run lint         # biome check (strict)
+pnpm run lint:fix     # biome check --write
+pnpm run format       # biome format --write
+pnpm run test:coverage # vitest with coverage thresholds
+pnpm run pack:check   # pnpm pack dry-run for all workspaces
+pnpm run changeset:check # verify pending changesets
+pnpm run test:watch   # vitest watch mode
+pnpm run changeset    # create a changeset after user-facing changes
+pnpm run version      # apply changesets → bump package.json versions + CHANGELOGs
+pnpm run release      # test + publish changed packages to npm
 ```
 
 Do **not** bump `version` in `package.json` manually for releases — use Changesets.
@@ -91,21 +91,21 @@ export default function themePlugin(options = {}) {
 - Magic plugins: use `createMagicHarness()` from `test/mock-alpine.js`
 - `matchMedia`: use `setMatchMedia()` from `test/setup.js`
 
-Every change to plugin behavior must include or update tests. Run `npm test` and `npm run lint` before finishing.
+Every change to plugin behavior must include or update tests. Run `pnpm test` and `pnpm run lint` before finishing.
 
 ## Linting & formatting
 
 [Biome](https://biomejs.dev/) with strict rules (`biome.json`):
 
 ```bash
-npm run lint       # check only (CI)
-npm run lint:fix   # auto-fix safe issues
-npm run format     # format all files
+pnpm run lint       # check only (CI)
+pnpm run lint:fix   # auto-fix safe issues
+pnpm run format     # format all files
 ```
 
 ## Versioning (Changesets)
 
-1. After a user-facing change, run `npm run changeset`.
+1. After a user-facing change, run `pnpm run changeset`.
 2. Select affected package(s) and semver bump (`patch`, `minor`, `major`).
 3. Write a short changelog summary (English).
 4. On merge to `master`, the **Release** workflow opens a "Version Packages" PR or publishes to npm.
@@ -117,7 +117,7 @@ Packages are versioned **independently**. One changeset can touch multiple packa
 - Registry: npm, scope `@ailuracode`, public access
 - Requires npm 2FA or granular token with publish permission
 - GitHub secret: `NPM_TOKEN` for automated publish
-- Manual: `npm login` then `npm run release`
+- Manual: `npm login` then `pnpm run release`
 
 ## Documentation
 

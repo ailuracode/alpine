@@ -28,4 +28,25 @@ describe("@ailuracode/alpine-clipboard", () => {
 
     expect(writeText).toHaveBeenCalledWith("42");
   });
+
+  it("falls back to execCommand when the clipboard API is unavailable", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: undefined,
+    });
+    const execCommand = vi.fn().mockReturnValue(true);
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      writable: true,
+      value: execCommand,
+    });
+    const select = vi.spyOn(HTMLTextAreaElement.prototype, "select").mockImplementation(vi.fn());
+
+    const { clipboard } = createMagicHarness(clipboardPlugin);
+    await clipboard("fallback");
+
+    expect(execCommand).toHaveBeenCalledWith("copy", false);
+    expect(select).toHaveBeenCalled();
+    select.mockRestore();
+  });
 });

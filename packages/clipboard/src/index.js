@@ -5,6 +5,17 @@
  */
 
 /**
+ * Legacy copy fallback for non-secure contexts without `navigator.clipboard`.
+ *
+ * @param {Document} doc
+ * @returns {boolean}
+ */
+function copyViaLegacyCommand(doc) {
+  const run = Reflect.get(doc, "execCommand");
+  return typeof run === "function" && run.call(doc, "copy", false);
+}
+
+/**
  * @param {string} text
  * @returns {Promise<void>}
  */
@@ -23,7 +34,7 @@ async function writeClipboard(text) {
   area.style.opacity = "0";
   document.body.appendChild(area);
   area.select();
-  document.execCommand("copy");
+  copyViaLegacyCommand(document);
   document.body.removeChild(area);
 }
 

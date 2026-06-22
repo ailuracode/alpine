@@ -30,7 +30,7 @@
   "types": "./src/index.d.ts",
   "peerDependencies": {
     "alpinejs": "^3.0.0",
-    "@types/alpinejs": "^3.13.0"
+    "@types/alpinejs": "^3.13.11"
   },
   "peerDependenciesMeta": {
     "@types/alpinejs": {

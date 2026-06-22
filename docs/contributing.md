@@ -24,31 +24,31 @@ Each package contains:
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## CI checks
 
 | Job | Command | When |
 |-----|---------|------|
-| Lint | `npm run lint` | every push / PR |
-| Test | `npm test` | Node 20 + 22 |
-| Coverage | `npm run test:coverage` | Node 22 (≥80% lines, ≥70% functions) |
-| Pack | `npm run pack:check` | validates npm tarballs |
-| Audit | `npm audit --audit-level=critical` | blocks on critical CVEs |
-| Changeset | `npm run changeset:check` | PRs only — requires changeset when `packages/*` changes |
+| Lint | `pnpm run lint` | every push / PR |
+| Test | `pnpm test` | Node 20 + 22 |
+| Coverage | `pnpm run test:coverage` | Node 22 (≥80% lines, ≥70% functions) |
+| Pack | `pnpm run pack:check` | validates npm tarballs |
+| Audit | `pnpm audit --audit-level critical` | blocks on critical CVEs |
+| Changeset | `pnpm run changeset:check` | PRs only — requires changeset when `packages/*` changes |
 
-Dependabot opens weekly PRs for npm and GitHub Actions updates.
+Dependabot opens weekly PRs for pnpm and GitHub Actions updates.
 
 ## Running tests
 
 ```bash
-npm test                    # all tests
-npm run test:coverage       # with coverage thresholds
-npm run lint                # biome check (strict)
-npm run lint:fix            # auto-fix
-npm run pack:check          # validate publish tarballs
-npm run changeset:check -- --since=origin/master
+pnpm test                    # all tests
+pnpm run test:coverage       # with coverage thresholds
+pnpm run lint                # biome check (strict)
+pnpm run lint:fix            # auto-fix
+pnpm run pack:check          # validate publish tarballs
+pnpm run changeset:check -- --since=origin/master
 ```
 
 Tests use [Vitest](https://vitest.dev/) with [happy-dom](https://github.com/capricorn86/happy-dom).
@@ -81,7 +81,7 @@ Plugins must stay CSS-framework agnostic. DOM styling belongs in the consumer ap
 1. Create `packages/my-feature/` with `src/index.js`, `package.json`, `test/`, `README.md`
 2. Add `"name": "@ailuracode/alpine-my-feature"` with `peerDependencies.alpinejs`
 3. Add docs in `docs/my-feature.md` and link from root README
-4. Ensure `npm test` passes
+4. Ensure `pnpm test` passes
 
 ## Versioning
 
@@ -92,7 +92,7 @@ This repo uses [Changesets](https://github.com/changesets/changesets) for indepe
 After a user-facing change:
 
 ```bash
-npm run changeset
+pnpm run changeset
 ```
 
 Select package(s), semver bump (`patch` / `minor` / `major`), and write a short summary in English.
@@ -112,8 +112,8 @@ Requires a repository secret:
 ### Manual release
 
 ```bash
-npm run version   # apply pending changesets
-npm run release   # test + publish to npm
+pnpm run version   # apply pending changesets
+pnpm run release   # test + publish to npm
 ```
 
 Do not bump `version` in `package.json` manually for releases.
@@ -122,7 +122,7 @@ Do not bump `version` in `package.json` manually for releases.
 
 ```bash
 npm login
-npm run release
+pnpm run release
 ```
 
 Requires npm 2FA or a granular access token with publish permissions.

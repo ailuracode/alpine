@@ -1,6 +1,40 @@
+/** @typedef {'up' | 'down' | 'none'} ScrollDirection */
+/** @typedef {ScrollBehavior} ScrollToBehavior */
+
+/**
+ * @typedef {Object} ScrollSnapshot
+ * @property {number} x Horizontal scroll offset (`window.scrollX`).
+ * @property {number} y Vertical scroll offset (`window.scrollY`).
+ * @property {ScrollDirection} direction Scroll direction since the last update.
+ * @property {boolean} atTop Whether the viewport is at the top of the page.
+ * @property {boolean} atBottom Whether the viewport is at the bottom of the page.
+ * @property {number} progress Vertical scroll progress from 0 to 100.
+ */
+
+/**
+ * @typedef {ScrollSnapshot & Object} ScrollStore
+ * @property {boolean} locked Whether body scroll is locked.
+ * @property {() => boolean} refresh Sync state from the viewport; returns whether anything changed.
+ * @property {() => boolean} lock Increment lock count and freeze body scroll.
+ * @property {() => boolean} unlock Decrement lock count and restore scroll when count reaches zero.
+ * @property {() => boolean} toggleLock Toggle body scroll lock.
+ * @property {boolean} isLocked Alias for `locked`.
+ * @property {boolean} isAtTop Alias for `atTop`.
+ * @property {boolean} isAtBottom Alias for `atBottom`.
+ * @property {boolean} isScrollingDown Whether `direction` is `down`.
+ * @property {boolean} isScrollingUp Whether `direction` is `up`.
+ * @property {boolean} showToTop Whether a "back to top" control should be visible.
+ * @property {(behavior?: ScrollToBehavior) => void} toTop Scroll to the top unless locked.
+ * @property {(behavior?: ScrollToBehavior) => void} toBottom Scroll to the bottom unless locked.
+ */
+
 let savedScrollY = 0;
 let lockCount = 0;
 
+/**
+ * @param {number} previousY
+ * @returns {ScrollSnapshot}
+ */
 function readScrollState(previousY) {
   const x = window.scrollX;
   const y = window.scrollY;
@@ -30,6 +64,11 @@ function removeLock() {
   window.scrollTo(0, savedScrollY);
 }
 
+/**
+ * Alpine.js scroll plugin. Registers `$store.scroll`.
+ *
+ * @param {import('alpinejs').Alpine} Alpine
+ */
 export default function scrollPlugin(Alpine) {
   Alpine.store("scroll", {
     x: 0,
@@ -40,6 +79,7 @@ export default function scrollPlugin(Alpine) {
     progress: 0,
     locked: false,
 
+    /** @returns {boolean} */
     refresh() {
       const next = readScrollState(this.y);
       const unchanged =
@@ -58,6 +98,7 @@ export default function scrollPlugin(Alpine) {
       return true;
     },
 
+    /** @returns {boolean} */
     lock() {
       if (lockCount === 0) {
         applyLock();
@@ -68,6 +109,7 @@ export default function scrollPlugin(Alpine) {
       return this.locked;
     },
 
+    /** @returns {boolean} */
     unlock() {
       if (lockCount === 0) {
         return this.locked;
@@ -84,6 +126,7 @@ export default function scrollPlugin(Alpine) {
       return this.locked;
     },
 
+    /** @returns {boolean} */
     toggleLock() {
       return this.locked ? this.unlock() : this.lock();
     },
@@ -112,6 +155,7 @@ export default function scrollPlugin(Alpine) {
       return !(this.atTop || this.locked);
     },
 
+    /** @param {ScrollToBehavior} [behavior='smooth'] */
     toTop(behavior = "smooth") {
       if (this.locked) {
         return;
@@ -119,6 +163,7 @@ export default function scrollPlugin(Alpine) {
       window.scrollTo({ top: 0, behavior });
     },
 
+    /** @param {ScrollToBehavior} [behavior='smooth'] */
     toBottom(behavior = "smooth") {
       if (this.locked) {
         return;

@@ -22,10 +22,20 @@
     "README.md"
   ],
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
   },
+  "types": "./src/index.d.ts",
   "peerDependencies": {
-    "alpinejs": "^3.0.0"
+    "alpinejs": "^3.0.0",
+    "@types/alpinejs": "^3.13.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/alpinejs": {
+      "optional": true
+    }
   },
   "scripts": {
     "test": "vitest run --config ../../vitest.config.js test"

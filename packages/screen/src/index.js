@@ -1,7 +1,35 @@
+/** @typedef {'mobile' | 'tablet' | 'desktop'} DeviceType */
+
+/**
+ * @typedef {Object} DeviceBreakpoints
+ * @property {number} [mobileMax] Max viewport width (px) treated as mobile.
+ * @property {number} [tabletMax] Max viewport width (px) treated as tablet.
+ */
+
+/**
+ * @typedef {Object} DeviceStore
+ * @property {number} mobileMax Upper bound (px) for the mobile breakpoint.
+ * @property {number} tabletMax Upper bound (px) for the tablet breakpoint.
+ * @property {number} width Current `window.innerWidth`.
+ * @property {DeviceType} type Current device category from media queries.
+ * @property {(name: DeviceType) => boolean} is Whether `type` matches `name`.
+ * @property {boolean} isMobile Whether `type` is `mobile`.
+ * @property {boolean} isTablet Whether `type` is `tablet`.
+ * @property {boolean} isDesktop Whether `type` is `desktop`.
+ * @property {() => void} refreshType Update `type` from media queries.
+ * @property {() => void} refreshWidth Update `width` from `window.innerWidth`.
+ * @property {() => void} refresh Update both `type` and `width`.
+ * @property {(breakpoints?: DeviceBreakpoints) => void} setBreakpoints Rebind media queries with new bounds.
+ */
+
 const DEFAULT_MOBILE_MAX = 767;
 const DEFAULT_TABLET_MAX = 1023;
 const WIDTH_DEBOUNCE_MS = 100;
 
+/**
+ * @param {number} mobileMax
+ * @param {number} tabletMax
+ */
 function createQueries(mobileMax, tabletMax) {
   return {
     mobile: window.matchMedia(`(max-width: ${mobileMax}px)`),
@@ -9,6 +37,10 @@ function createQueries(mobileMax, tabletMax) {
   };
 }
 
+/**
+ * @param {ReturnType<typeof createQueries>} queries
+ * @returns {DeviceType}
+ */
 function resolveType(queries) {
   if (queries.mobile.matches) {
     return "mobile";
@@ -19,6 +51,11 @@ function resolveType(queries) {
   return "desktop";
 }
 
+/**
+ * @param {Pick<DeviceStore, 'type'>} target
+ * @param {ReturnType<typeof createQueries>} queries
+ * @returns {boolean} Whether `type` changed.
+ */
 function applyType(target, queries) {
   const type = resolveType(queries);
   if (target.type === type) {
@@ -29,6 +66,10 @@ function applyType(target, queries) {
   return true;
 }
 
+/**
+ * @param {Pick<DeviceStore, 'width'>} target
+ * @returns {boolean} Whether `width` changed.
+ */
 function applyWidth(target) {
   const width = window.innerWidth;
   if (target.width === width) {
@@ -39,6 +80,11 @@ function applyWidth(target) {
   return true;
 }
 
+/**
+ * Alpine.js screen plugin. Registers `$store.device`.
+ *
+ * @param {import('alpinejs').Alpine} Alpine
+ */
 export default function screenPlugin(Alpine) {
   let queries = createQueries(DEFAULT_MOBILE_MAX, DEFAULT_TABLET_MAX);
   let typeHandler = null;
@@ -50,6 +96,7 @@ export default function screenPlugin(Alpine) {
     width: window.innerWidth,
     type: "desktop",
 
+    /** @param {DeviceType} name */
     is(name) {
       return this.type === name;
     },
@@ -80,6 +127,7 @@ export default function screenPlugin(Alpine) {
       applyWidth(this);
     },
 
+    /** @param {DeviceBreakpoints} [breakpoints] */
     setBreakpoints({ mobileMax, tabletMax } = {}) {
       unbindListeners();
       if (mobileMax != null) {

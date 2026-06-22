@@ -1,3 +1,15 @@
+/**
+ * @typedef {Object} TouchSnapshot
+ * @property {boolean} isTouch Whether the device supports touch input.
+ * @property {boolean} isCoarse Whether the primary pointer is coarse (e.g. finger).
+ * @property {boolean} isFine Whether a fine pointer (e.g. mouse) is available.
+ * @property {boolean} canHover Whether the primary input can hover.
+ * @property {number} maxTouchPoints Maximum simultaneous touch points reported by the browser.
+ */
+
+/** @typedef {TouchSnapshot} TouchMagic */
+
+/** @returns {TouchSnapshot} */
 function readTouchState() {
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const hover = window.matchMedia("(hover: hover)").matches;
@@ -13,7 +25,13 @@ function readTouchState() {
   };
 }
 
+/**
+ * Alpine.js touch plugin. Registers reactive magic `$touch`.
+ *
+ * @param {import('alpinejs').Alpine} Alpine
+ */
 export default function touchPlugin(Alpine) {
+  /** @type {TouchMagic} */
   const state = Alpine.reactive(readTouchState());
 
   Alpine.magic("touch", () => state);

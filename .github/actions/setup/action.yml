@@ -1,0 +1,28 @@
+name: Setup Node and pnpm
+description: Install Node.js 22 and pnpm via corepack
+inputs:
+  pnpm-version:
+    description: pnpm version to activate with corepack
+    required: false
+    default: "11.8.0"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+
+        NODE_DIR=$(ls -d /usr/local/share/nvm/versions/node/v22.* 2>/dev/null | tail -1 || true)
+        if [ -n "$NODE_DIR" ]; then
+          echo "${NODE_DIR}/bin" >> "$GITHUB_PATH"
+        else
+          NODE_VERSION=22.16.0
+          curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o /tmp/node.tar.xz
+          tar -xJf /tmp/node.tar.xz -C /tmp
+          echo "/tmp/node-v${NODE_VERSION}-linux-x64/bin" >> "$GITHUB_PATH"
+        fi
+
+        corepack enable
+        corepack prepare "pnpm@${{ inputs.pnpm-version }}" --activate
+        node --version
+        pnpm --version

@@ -91,14 +91,65 @@ Alpine.start();
 </button>
 ```
 
+## CDN
+
+Load plugins from a CDN (e.g. [esm.sh](https://esm.sh)) with native ES modules:
+
+```html
+<script type="module">
+  import Alpine from "https://esm.sh/alpinejs";
+  import clipboard from "https://esm.sh/@ailuracode/alpine-clipboard";
+
+  Alpine.plugin(clipboard);
+  Alpine.start();
+</script>
+```
+
+[esm.sh](https://esm.sh) serves the `X-TypeScript-Types` header for editor support when you import from it.
+
 ## TypeScript
 
-These packages ship as plain JavaScript modules. For TypeScript projects, add declarations in your project or use JSDoc:
+Install `@types/alpinejs` (or add it as a dev dependency). Each package ships two declaration files:
 
-```js
-/** @type {import('alpinejs').Alpine} */
-const Alpine = window.Alpine;
+| File | Purpose |
+|------|---------|
+| `dist/index.d.ts` | Module import (`import clipboard from "…"`) |
+| `dist/global.d.ts` | Ambient augmentations for `$clipboard`, `$store.theme`, etc. |
+
+### npm projects
+
+Reference plugin types in your app entry (e.g. `src/env.d.ts`):
+
+```ts
+/// <reference types="@types/alpinejs" />
+/// <reference types="@ailuracode/alpine-clipboard" />
+/// <reference types="@ailuracode/alpine-theme" />
 ```
+
+Or import the plugin module — the generated `index.d.ts` also augments Alpine globals:
+
+```ts
+import clipboard from "@ailuracode/alpine-clipboard";
+```
+
+### CDN projects (no runtime npm install)
+
+**Option A — esm.sh (recommended):** import from [esm.sh](https://esm.sh). VS Code reads the `X-TypeScript-Types` response header automatically.
+
+**Option B — types as dev dependencies** (CDN for runtime, npm only for the editor):
+
+```bash
+npm install -D @types/alpinejs @ailuracode/alpine-clipboard
+```
+
+```ts
+/// <reference types="@types/alpinejs" />
+/// <reference types="@ailuracode/alpine-clipboard" />
+```
+
+**Option C — copy `global.d.ts`** from unpkg into your project (e.g. `src/types/alpine-clipboard.d.ts`) and reference it with `/// <reference path="./types/alpine-clipboard.d.ts" />`.
+
+`global.d.ts` has no `import` statements, so it resolves without pulling the full package into `node_modules` at runtime.
 
 ## Next steps
 

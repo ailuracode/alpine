@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-download",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpine.js file download magic",
   "type": "module",
   "license": "MIT",

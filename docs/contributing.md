@@ -6,7 +6,7 @@
 packages/
   theme/       @ailuracode/alpine-theme
   screen/      @ailuracode/alpine-screen
-  online/      @ailuracode/alpine-online
+  network/     @ailuracode/alpine-network
   clipboard/   @ailuracode/alpine-clipboard
   scroll/      @ailuracode/alpine-scroll
   touch/       @ailuracode/alpine-touch

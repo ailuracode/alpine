@@ -28,7 +28,8 @@
     },
     "./global": {
       "types": "./dist/global.d.ts"
-    }
+    },
+    "./notify-sw.js": "./dist/notify-sw.js"
   },
   "types": "./dist/global.d.ts",
   "peerDependencies": {
@@ -41,7 +42,7 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist && cp src/global.d.ts dist/global.d.ts",
+    "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist && cp src/global.d.ts dist/global.d.ts && cp src/notify-sw.js dist/notify-sw.js",
     "prepublishOnly": "pnpm run build",
     "test": "vitest run --config ../../vitest.config.js test"
   },

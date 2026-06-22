@@ -54,6 +54,14 @@ jobs:
           done
 
           if [ "$has_changesets" = true ]; then
+            case "${GITHUB_REF_NAME}" in
+              main|master) ;;
+              *)
+                echo "Pending changesets on ${GITHUB_REF_NAME}. Versioning runs only on main/master."
+                exit 0
+                ;;
+            esac
+
             pnpm run version
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

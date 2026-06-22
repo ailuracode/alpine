@@ -1,0 +1,112 @@
+# Architecture: stores vs magics
+
+This monorepo follows Alpine.js conventions and splits plugins into two categories.
+
+## Stores (`Alpine.store`)
+
+Use a **store** when you need:
+
+- **Shared mutable state** across multiple components
+- **Actions** that change global state or the DOM (`set`, `lock`, `cycle`)
+- **Coordination** between distant parts of the UI (e.g. modal + scroll lock)
+
+| Package | Store name | Purpose |
+|---------|------------|---------|
+| `@airluracode/alpine-theme` | `$store.theme` | User theme preference + persistence |
+| `@airluracode/alpine-screen` | `$store.device` | Breakpoints and viewport width |
+| `@airluracode/alpine-scroll` | `$store.scroll` | Scroll metrics + body lock |
+
+### Template usage
+
+```html
+<p x-text="$store.theme.mode"></p>
+<p x-text="$store.device.width"></p>
+<button @click="$store.scroll.lock()">Lock scroll</button>
+```
+
+### Getters vs methods
+
+Boolean derived state uses **getters** (no parentheses):
+
+```html
+<div x-show="$store.theme.isDark"></div>
+<div x-show="$store.scroll.showToTop"></div>
+```
+
+Actions and parameterized checks use **methods**:
+
+```html
+<button @click="$store.theme.set('light')">Light</button>
+<span x-show="$store.device.is('tablet')"></span>
+```
+
+## Magics (`Alpine.magic`)
+
+Use a **magic** when you need:
+
+- **Read-only environment state** (connectivity, pointer type)
+- **One-off utilities** without global UI state (copy to clipboard)
+- No cross-component write coordination
+
+| Package | Magic | Purpose |
+|---------|-------|---------|
+| `@airluracode/alpine-online` | `$online` | `navigator.onLine` |
+| `@airluracode/alpine-touch` | `$touch` | Pointer / touch capabilities |
+| `@airluracode/alpine-clipboard` | `$clipboard` | Async copy function |
+
+### Template usage
+
+```html
+<div x-show="!$online.isOnline">Offline</div>
+<p x-text="$touch.maxTouchPoints"></p>
+<button @click="await $clipboard(url)">Copy URL</button>
+```
+
+### Naming convention
+
+Magics expose a namespace object with descriptive boolean properties:
+
+- `$online.isOnline` — not `$online.online`
+- `$touch.isTouch` — consistent `is*` pattern
+
+## CSS framework agnostic
+
+Plugins do **not** assume Tailwind, shadcn, or any CSS framework.
+
+- **Theme** — only manages state; you apply styles via `onChange`
+- **Scroll lock** — adds `.scroll-locked` classes; you define the CSS
+- **Screen / online / touch** — no DOM styling
+
+### Theme example (Tailwind)
+
+```js
+Alpine.plugin(theme({
+  onChange({ resolved }) {
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+  },
+}));
+```
+
+### Theme example (data attribute)
+
+```js
+Alpine.plugin(theme({
+  onChange({ resolved }) {
+    document.documentElement.dataset.theme = resolved;
+  },
+}));
+```
+
+```css
+[data-theme="dark"] {
+  --bg: #09090b;
+}
+```
+
+## What is not included
+
+These packages intentionally avoid React-style patterns:
+
+- No `use*` hook naming
+- No framework-specific DOM attributes baked into plugins
+- Each package is independently installable and tree-shakeable by import

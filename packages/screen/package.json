@@ -1,0 +1,30 @@
+{
+  "name": "@airluracode/alpine-screen",
+  "version": "0.1.0",
+  "description": "Alpine.js responsive device and viewport store",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "peerDependencies": {
+    "alpinejs": "^3.0.0"
+  },
+  "scripts": {
+    "test": "vitest run --config ../../vitest.config.js test"
+  },
+  "keywords": [
+    "alpinejs",
+    "alpine",
+    "plugin",
+    "responsive",
+    "breakpoint",
+    "device"
+  ]
+}

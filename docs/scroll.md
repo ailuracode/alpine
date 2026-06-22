@@ -1,0 +1,123 @@
+# Scroll
+
+Package: `@airluracode/alpine-scroll`
+
+Tracks scroll position, direction, and progress. Provides reference-counted body scroll lock for modals and overlays.
+
+## Install
+
+```bash
+npm install @airluracode/alpine-scroll alpinejs
+```
+
+## Setup
+
+```js
+import Alpine from "alpinejs";
+import scroll from "@airluracode/alpine-scroll";
+
+Alpine.plugin(scroll);
+Alpine.start();
+```
+
+## Required CSS
+
+The plugin adds `.scroll-locked` to `html` and `body`. Define styles in your project:
+
+```css
+html.scroll-locked {
+  overflow: hidden;
+}
+
+body.scroll-locked {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+```
+
+Optional: `scrollbar-gutter: stable` on `html` reduces layout shift when locking.
+
+## Store API
+
+Store name: `$store.scroll`
+
+### State
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `x` | `number` | Horizontal scroll offset |
+| `y` | `number` | Vertical scroll offset |
+| `direction` | `string` | `up`, `down`, or `none` |
+| `progress` | `number` | Scroll progress `0–100` |
+| `atTop` | `boolean` | At top of page |
+| `atBottom` | `boolean` | At bottom of page |
+| `locked` | `boolean` | Body scroll locked |
+
+### Getters
+
+| Getter | Description |
+|--------|-------------|
+| `isLocked` | Same as `locked` |
+| `isAtTop` | Same as `atTop` |
+| `isAtBottom` | Same as `atBottom` |
+| `isScrollingDown` | `direction === 'down'` |
+| `isScrollingUp` | `direction === 'up'` |
+| `showToTop` | Scrolled down and not locked — ideal for back-to-top buttons |
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `lock()` | Lock body scroll (reference counted) |
+| `unlock()` | Release one lock |
+| `toggleLock()` | Toggle lock state |
+| `toTop(behavior?)` | Scroll to top (`behavior` default: `'smooth'`) |
+| `toBottom(behavior?)` | Scroll to bottom |
+| `refresh()` | Manually refresh metrics |
+
+## HTML examples
+
+### Progress bar
+
+```html
+<div
+  class="scroll-progress"
+  :style="`width: ${$store.scroll.progress}%`"
+></div>
+```
+
+### Back to top
+
+```html
+<button x-show="$store.scroll.showToTop" @click="$store.scroll.toTop()">
+  ↑ Top
+</button>
+```
+
+### Modal with scroll lock
+
+```html
+<div x-data="{ open: false }">
+  <button @click="open = true; $store.scroll.lock()">Open modal</button>
+
+  <div x-show="open" @keydown.escape.window="open = false; $store.scroll.unlock()">
+    <div @click.outside="open = false; $store.scroll.unlock()">
+      <p>Modal content</p>
+      <button @click="open = false; $store.scroll.unlock()">Close</button>
+    </div>
+  </div>
+</div>
+```
+
+## Reference counting
+
+Multiple components can call `lock()` independently. Scroll is restored only when all locks are released via `unlock()`. Safe for nested modals.
+
+## Behavior while locked
+
+- Scroll metrics pause updates while locked
+- `toTop()` / `toBottom()` are no-ops while locked

@@ -1,0 +1,29 @@
+{
+  "name": "@airluracode/alpine-touch",
+  "version": "0.1.0",
+  "description": "Alpine.js touch and pointer capability magic",
+  "type": "module",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "peerDependencies": {
+    "alpinejs": "^3.0.0"
+  },
+  "scripts": {
+    "test": "vitest run --config ../../vitest.config.js test"
+  },
+  "keywords": [
+    "alpinejs",
+    "alpine",
+    "plugin",
+    "touch",
+    "pointer"
+  ]
+}

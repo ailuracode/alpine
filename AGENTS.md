@@ -135,7 +135,7 @@ All docs in **English**.
 
 ## Example app
 
-`example/` is a standalone Astro demo (npm, not pnpm workspace). It is **private** and excluded from publish, lint, and changesets. Do not add it to `pnpm-workspace.yaml`.
+`example/` is the Astro demo app in the pnpm workspace. It is **private** and excluded from publish and changesets. Run it with `pnpm run dev:example` from the repo root.
 
 ## Do not
 

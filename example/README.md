@@ -1,14 +1,20 @@
 # Alpine.js plugins example
 
-Interactive [Astro](https://astro.build) demo for all `@ailuracode/alpine-*` packages. This folder is **not** part of the pnpm workspace and is **not** published to npm.
+Interactive [Astro](https://astro.build) demo for all `@ailuracode/alpine-*` packages. Part of the pnpm workspace (`example/`). **Private** — not published to npm.
 
 ## Run locally
 
-From this directory:
+From the repo root:
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev:example
+```
+
+Or from this directory:
+
+```bash
+pnpm dev
 ```
 
 Open [http://localhost:4321](http://localhost:4321).
@@ -16,8 +22,8 @@ Open [http://localhost:4321](http://localhost:4321).
 ## Build
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 ## Alpine setup

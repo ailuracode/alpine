@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
-import visibilityPlugin, { readVisibilityState, type VisibilityMagic } from "../src/index.js";
+import visibilityPlugin, {
+  readVisibilityState,
+  type VisibilityMagic,
+  type VisibilityState,
+} from "../src/index.js";
 
-function setDocumentVisibility(hidden: boolean, visibilityState: DocumentVisibilityState): void {
+function setDocumentVisibility(hidden: boolean, visibilityState: VisibilityState): void {
   Object.defineProperty(document, "hidden", {
     configurable: true,
     value: hidden,

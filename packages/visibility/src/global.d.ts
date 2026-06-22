@@ -1,6 +1,6 @@
 /// <reference types="@types/alpinejs" />
 
-export type VisibilityState = DocumentVisibilityState;
+export type VisibilityState = "visible" | "hidden" | "prerender";
 
 export interface VisibilityMagic {
   isVisible: boolean;

@@ -100,8 +100,8 @@ Select package(s), semver bump (`patch` / `minor` / `major`), and write a short 
 ### Automated release (GitHub)
 
 1. Merge changesets to `master`.
-2. The **Release** workflow opens a **Version Packages** PR (bumps versions + generates CHANGELOGs).
-3. Merge that PR → changed packages publish to npm.
+2. The **Release** workflow applies pending changesets on the same branch (bumps versions + generates CHANGELOGs) and pushes the commit back.
+3. When `master` has no pending changesets, changed packages publish to npm automatically.
 
 Requires a repository secret:
 

@@ -10,7 +10,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
 
       - uses: ./.github/actions/setup
 
@@ -26,7 +32,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
 
       - uses: ./.github/actions/setup
 
@@ -45,7 +57,13 @@ jobs:
   pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
 
       - uses: ./.github/actions/setup
 
@@ -58,7 +76,13 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth=1 --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
 
       - uses: ./.github/actions/setup
 
@@ -72,9 +96,14 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/checkout
-        with:
-          fetch-depth: "0"
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
+          git fetch --no-tags origin "${GITHUB_BASE_REF}"
 
       - uses: ./.github/actions/setup
 

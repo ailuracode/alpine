@@ -14,9 +14,13 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: ./.github/actions/checkout
-        with:
-          fetch-depth: "0"
+      - name: Checkout
+        run: |
+          set -euo pipefail
+          git init
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD
 
       - uses: ./.github/actions/setup
 

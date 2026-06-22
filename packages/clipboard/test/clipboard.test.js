@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import clipboardPlugin from "../src/index.js";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
+import clipboardPlugin from "../src/index.js";
 
 describe("@ailuracode/alpine-clipboard", () => {
   it("copies text via navigator.clipboard", async () => {

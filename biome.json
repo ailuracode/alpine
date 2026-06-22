@@ -1,0 +1,109 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.0/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["**/*.js", "**/*.json", "!**/package-lock.json", "!**/.changeset/*.json"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "error",
+        "noForEach": "error",
+        "useFlatMap": "error",
+        "useSimplifiedLogicExpression": "error"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "performance": {
+        "noDelete": "error"
+      },
+      "security": {
+        "noGlobalEval": "error"
+      },
+      "style": {
+        "noDefaultExport": "off",
+        "noNonNullAssertion": "error",
+        "useBlockStatements": "error",
+        "useCollapsedElseIf": "error",
+        "useConst": "error",
+        "useExportType": "error",
+        "useForOf": "error",
+        "useNodejsImportProtocol": "error",
+        "useNumberNamespace": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "useTemplate": "error"
+      },
+      "suspicious": {
+        "noApproximativeNumericConstant": "error",
+        "noAssignInExpressions": "error",
+        "noConfusingVoidType": "error",
+        "noConsole": "warn",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noEmptyBlockStatements": "error",
+        "noExplicitAny": "error",
+        "noGlobalAssign": "error",
+        "noImplicitAnyLet": "error",
+        "noRedeclare": "error",
+        "noShadowRestrictedNames": "error",
+        "useAwait": "error",
+        "useDefaultSwitchClauseLast": "error",
+        "useIsArray": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5",
+      "arrowParentheses": "always"
+    },
+    "globals": [
+      "vi",
+      "beforeEach",
+      "beforeAll",
+      "afterEach",
+      "afterAll",
+      "describe",
+      "it",
+      "expect"
+    ]
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/test/**", "**/*.test.js"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
+}

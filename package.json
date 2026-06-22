@@ -7,6 +7,9 @@
     "packages/*"
   ],
   "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:packages": "npm run test --workspaces --if-present",
@@ -17,6 +20,7 @@
     "publish:packages": "npm run release"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.0",
     "@changesets/cli": "^2.29.4",
     "alpinejs": "^3.14.9",
     "happy-dom": "^17.4.4",

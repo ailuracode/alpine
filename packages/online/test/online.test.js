@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import onlinePlugin from "../src/index.js";
+import { describe, expect, it } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
+import onlinePlugin from "../src/index.js";
 
 describe("@ailuracode/alpine-online", () => {
   it("registers $online with isOnline state", () => {

@@ -32,6 +32,9 @@ test/                            # shared test setup (setup.js, helpers.js, mock
 ```bash
 npm install          # install all workspaces
 npm test             # run full test suite (required before release)
+npm run lint         # biome check (strict)
+npm run lint:fix     # biome check --write
+npm run format       # biome format --write
 npm run test:watch   # vitest watch mode
 npm run changeset    # create a changeset after user-facing changes
 npm run version      # apply changesets → bump package.json versions + CHANGELOGs
@@ -85,7 +88,17 @@ export default function themePlugin(options = {}) {
 - Magic plugins: use `createMagicHarness()` from `test/mock-alpine.js`
 - `matchMedia`: use `setMatchMedia()` from `test/setup.js`
 
-Every change to plugin behavior must include or update tests. Run `npm test` before finishing.
+Every change to plugin behavior must include or update tests. Run `npm test` and `npm run lint` before finishing.
+
+## Linting & formatting
+
+[Biome](https://biomejs.dev/) with strict rules (`biome.json`):
+
+```bash
+npm run lint       # check only (CI)
+npm run lint:fix   # auto-fix safe issues
+npm run format     # format all files
+```
 
 ## Versioning (Changesets)
 

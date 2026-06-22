@@ -1,7 +1,7 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
-import screenPlugin from "../src/index.js";
+import { beforeAll, describe, expect, it } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
+import screenPlugin from "../src/index.js";
 
 describe("@ailuracode/alpine-screen", () => {
   let store;

@@ -5,21 +5,25 @@ const WIDTH_DEBOUNCE_MS = 100;
 function createQueries(mobileMax, tabletMax) {
   return {
     mobile: window.matchMedia(`(max-width: ${mobileMax}px)`),
-    tablet: window.matchMedia(
-      `(min-width: ${mobileMax + 1}px) and (max-width: ${tabletMax}px)`
-    ),
+    tablet: window.matchMedia(`(min-width: ${mobileMax + 1}px) and (max-width: ${tabletMax}px)`),
   };
 }
 
 function resolveType(queries) {
-  if (queries.mobile.matches) return "mobile";
-  if (queries.tablet.matches) return "tablet";
+  if (queries.mobile.matches) {
+    return "mobile";
+  }
+  if (queries.tablet.matches) {
+    return "tablet";
+  }
   return "desktop";
 }
 
 function applyType(target, queries) {
   const type = resolveType(queries);
-  if (target.type === type) return false;
+  if (target.type === type) {
+    return false;
+  }
 
   target.type = type;
   return true;
@@ -27,7 +31,9 @@ function applyType(target, queries) {
 
 function applyWidth(target) {
   const width = window.innerWidth;
-  if (target.width === width) return false;
+  if (target.width === width) {
+    return false;
+  }
 
   target.width = width;
   return true;
@@ -76,8 +82,12 @@ export default function screenPlugin(Alpine) {
 
     setBreakpoints({ mobileMax, tabletMax } = {}) {
       unbindListeners();
-      if (mobileMax != null) this.mobileMax = mobileMax;
-      if (tabletMax != null) this.tabletMax = tabletMax;
+      if (mobileMax != null) {
+        this.mobileMax = mobileMax;
+      }
+      if (tabletMax != null) {
+        this.tabletMax = tabletMax;
+      }
       queries = createQueries(this.mobileMax, this.tabletMax);
       bindListeners();
       this.refresh();
@@ -97,9 +107,9 @@ export default function screenPlugin(Alpine) {
   function bindListeners() {
     unbindListeners();
     typeHandler = () => store.refreshType();
-    Object.values(queries).forEach((media) => {
+    for (const media of Object.values(queries)) {
       media.addEventListener("change", typeHandler);
-    });
+    }
     window.addEventListener("resize", scheduleWidthUpdate, { passive: true });
   }
 
@@ -107,11 +117,13 @@ export default function screenPlugin(Alpine) {
     clearTimeout(widthTimer);
     widthTimer = null;
 
-    if (!typeHandler) return;
+    if (!typeHandler) {
+      return;
+    }
 
-    Object.values(queries).forEach((media) => {
+    for (const media of Object.values(queries)) {
       media.removeEventListener("change", typeHandler);
-    });
+    }
     window.removeEventListener("resize", scheduleWidthUpdate);
     typeHandler = null;
   }

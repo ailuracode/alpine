@@ -1,9 +1,7 @@
 const MODES = ["light", "dark", "system"];
 
 function getSystemTheme() {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 function resolveTheme(mode) {
@@ -70,7 +68,9 @@ export default function themePlugin(options = {}) {
       },
 
       set(mode) {
-        if (!MODES.includes(mode) || this.mode === mode) return;
+        if (!MODES.includes(mode) || this.mode === mode) {
+          return;
+        }
 
         this.mode = mode;
         localStorage.setItem(config.storageKey, mode);
@@ -84,7 +84,9 @@ export default function themePlugin(options = {}) {
 
       refresh() {
         const resolved = resolveTheme(this.mode);
-        if (this.resolved === resolved) return false;
+        if (this.resolved === resolved) {
+          return false;
+        }
 
         this.resolved = resolved;
         notify(config, this.mode, resolved);

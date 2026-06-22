@@ -1,4 +1,4 @@
-import { vi, beforeEach } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 const mediaListeners = new Map();
 
@@ -17,7 +17,9 @@ function createMediaQueryList(query, matches = false) {
     },
     dispatch(matches) {
       this.matches = matches;
-      listeners.forEach((listener) => listener());
+      for (const listener of listeners) {
+        listener();
+      }
     },
   };
 }

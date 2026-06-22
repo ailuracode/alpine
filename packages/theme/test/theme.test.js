@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import themePlugin from "../src/index.js";
 import { startAlpine } from "../../../test/helpers.js";
+import themePlugin from "../src/index.js";
 
 describe("@ailuracode/alpine-theme", () => {
   const onChange = vi.fn();
@@ -8,9 +8,7 @@ describe("@ailuracode/alpine-theme", () => {
 
   beforeAll(() => {
     localStorage.setItem("test-theme", "light");
-    const Alpine = startAlpine(
-      themePlugin({ onChange, storageKey: "test-theme" })
-    );
+    const Alpine = startAlpine(themePlugin({ onChange, storageKey: "test-theme" }));
     store = Alpine.store("theme");
   });
 

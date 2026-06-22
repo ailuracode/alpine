@@ -31,9 +31,9 @@ npm install
 
 ```bash
 npm test                    # all tests
+npm run lint                # biome check (strict)
+npm run lint:fix            # auto-fix
 npm run test:watch          # watch mode
-npm run test:packages       # each workspace
-npm test -w @ailuracode/alpine-theme  # single package
 ```
 
 Tests use [Vitest](https://vitest.dev/) with [happy-dom](https://github.com/capricorn86/happy-dom).

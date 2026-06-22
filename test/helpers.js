@@ -5,7 +5,7 @@ export function startAlpine(...plugins) {
     Alpine.plugin(plugin);
   }
 
-  document.body.innerHTML = '<div x-data x-init></div>';
+  document.body.innerHTML = "<div x-data x-init></div>";
   Alpine.start();
 
   return Alpine;

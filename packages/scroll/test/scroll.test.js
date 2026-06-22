@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import scrollPlugin from "../src/index.js";
 import { startAlpine } from "../../../test/helpers.js";
+import scrollPlugin from "../src/index.js";
 
 describe("@ailuracode/alpine-scroll", () => {
   let store;

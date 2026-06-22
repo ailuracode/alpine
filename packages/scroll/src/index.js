@@ -4,10 +4,7 @@ let lockCount = 0;
 function readScrollState(previousY) {
   const x = window.scrollX;
   const y = window.scrollY;
-  const maxY = Math.max(
-    document.documentElement.scrollHeight - window.innerHeight,
-    0
-  );
+  const maxY = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
 
   return {
     x,
@@ -53,7 +50,9 @@ export default function scrollPlugin(Alpine) {
         this.atBottom === next.atBottom &&
         this.progress === next.progress;
 
-      if (unchanged) return false;
+      if (unchanged) {
+        return false;
+      }
 
       Object.assign(this, next);
       return true;
@@ -70,7 +69,9 @@ export default function scrollPlugin(Alpine) {
     },
 
     unlock() {
-      if (lockCount === 0) return this.locked;
+      if (lockCount === 0) {
+        return this.locked;
+      }
 
       lockCount--;
 
@@ -108,16 +109,20 @@ export default function scrollPlugin(Alpine) {
     },
 
     get showToTop() {
-      return !this.atTop && !this.locked;
+      return !(this.atTop || this.locked);
     },
 
     toTop(behavior = "smooth") {
-      if (this.locked) return;
+      if (this.locked) {
+        return;
+      }
       window.scrollTo({ top: 0, behavior });
     },
 
     toBottom(behavior = "smooth") {
-      if (this.locked) return;
+      if (this.locked) {
+        return;
+      }
       window.scrollTo({
         top: document.documentElement.scrollHeight,
         behavior,
@@ -129,7 +134,9 @@ export default function scrollPlugin(Alpine) {
   let ticking = false;
 
   function scheduleRefresh() {
-    if (ticking || store.locked) return;
+    if (ticking || store.locked) {
+      return;
+    }
     ticking = true;
     requestAnimationFrame(() => {
       store.refresh();

@@ -8,7 +8,9 @@ export function createMagicHarness(plugin) {
     magic(name, factory) {
       magics[name] = factory();
     },
-    store() {},
+    store(_name, _value) {
+      // mock stub
+    },
   };
 
   plugin(Alpine);

@@ -52,7 +52,8 @@ Install only the packages you need. Each one is a separate dependency.
 ```bash
 npm install
 npm test              # all packages
-npm run test:watch    # watch mode
+npm run lint          # biome check (strict)
+npm run lint:fix      # auto-fix
 npm run changeset     # after user-facing changes
 ```
 

@@ -1,0 +1,97 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "Alpine.js Plugins Demo",
+	description = "Demostración interactiva de los plugins @ailuracode para Alpine.js",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<style is:inline>
+			[data-theme="dark"] body {
+				background: #0b1120;
+				color: #f8fafc;
+			}
+		</style>
+	</head>
+	<body>
+		<div
+			class="scroll-progress"
+			:style="`width: ${$store.scroll.progress}%`"
+			aria-hidden="true"
+		></div>
+
+		<header class="site-header">
+			<div class="container header-inner">
+				<div class="brand">
+					<strong>@ailuracode/alpine</strong>
+					<span>Plugins para Alpine.js</span>
+				</div>
+				<nav class="theme-toggle" aria-label="Tema">
+					<button
+						type="button"
+						class="btn"
+						:class="{ active: $store.theme.isLight }"
+						@click="$store.theme.set('light')"
+					>
+						Claro
+					</button>
+					<button
+						type="button"
+						class="btn"
+						:class="{ active: $store.theme.isDark }"
+						@click="$store.theme.set('dark')"
+					>
+						Oscuro
+					</button>
+					<button
+						type="button"
+						class="btn"
+						:class="{ active: $store.theme.isSystem }"
+						@click="$store.theme.set('system')"
+					>
+						Sistema
+					</button>
+				</nav>
+			</div>
+		</header>
+
+		<slot />
+
+		<div x-show="!$network.isOnline" x-cloak class="offline-banner">
+			<div>Sin conexión — los cambios se guardarán cuando vuelvas a estar online</div>
+		</div>
+
+		<button
+			type="button"
+			class="btn btn-primary to-top"
+			x-show="$store.scroll.showToTop"
+			x-cloak
+			@click="$store.scroll.toTop()"
+			aria-label="Volver arriba"
+		>
+			↑
+		</button>
+
+		<style>
+			[x-cloak] {
+				display: none !important;
+			}
+		</style>
+	</body>
+</html>

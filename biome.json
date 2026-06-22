@@ -13,7 +13,8 @@
       "**/*.mjs",
       "**/*.json",
       "!**/pnpm-lock.yaml",
-      "!**/.changeset/*.json"
+      "!**/.changeset/*.json",
+      "!example"
     ]
   },
   "formatter": {

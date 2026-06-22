@@ -35,6 +35,16 @@ Alpine.start();
 
 Install only the packages you need. Each one is a separate dependency.
 
+## Example app
+
+The [`example/`](./example/) directory contains an Astro + Alpine.js demo for all plugins. It uses npm (not pnpm workspace) and is not published to npm.
+
+```bash
+cd example
+npm install
+npm run dev
+```
+
 ## Documentation
 
 - [Getting started](./docs/getting-started.md)

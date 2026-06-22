@@ -133,9 +133,13 @@ When changing public API or behavior, update:
 
 All docs in **English**.
 
+## Example app
+
+`example/` is a standalone Astro demo (npm, not pnpm workspace). It is **private** and excluded from publish, lint, and changesets. Do not add it to `pnpm-workspace.yaml`.
+
 ## Do not
 
-- Add demo apps or Vite entry points to this repo unless requested
+- Add more demo apps or Vite entry points unless requested
 - Publish the private root package
 - Introduce `@airluracode` typo (correct: `@ailuracode`)
 - Couple plugins to a specific CSS framework

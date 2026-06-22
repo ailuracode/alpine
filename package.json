@@ -1,6 +1,7 @@
 {
-  "name": "@airluracode/alpine",
+  "name": "@ailuracode/alpine",
   "private": true,
+  "author": "ailuracode",
   "type": "module",
   "workspaces": [
     "packages/*"
@@ -8,7 +9,8 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:packages": "npm run test --workspaces --if-present"
+    "test:packages": "npm run test --workspaces --if-present",
+    "publish:packages": "npm publish --workspaces --access public"
   },
   "devDependencies": {
     "alpinejs": "^3.14.9",

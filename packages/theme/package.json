@@ -1,14 +1,25 @@
 {
-  "name": "@airluracode/alpine-theme",
+  "name": "@ailuracode/alpine-theme",
   "version": "0.1.0",
   "description": "Alpine.js theme store with light, dark and system modes",
   "type": "module",
   "license": "MIT",
+  "author": "ailuracode",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/theme"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/theme#readme",
   "files": [
-    "src"
+    "src",
+    "README.md"
   ],
   "exports": {
     ".": "./src/index.js"

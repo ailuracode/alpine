@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import scrollPlugin from "../src/index.js";
 import { startAlpine } from "../../../test/helpers.js";
 
-describe("@airluracode/alpine-scroll", () => {
+describe("@ailuracode/alpine-scroll", () => {
   let store;
 
   beforeAll(() => {

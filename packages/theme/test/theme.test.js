@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import themePlugin from "../src/index.js";
 import { startAlpine } from "../../../test/helpers.js";
 
-describe("@airluracode/alpine-theme", () => {
+describe("@ailuracode/alpine-theme", () => {
   const onChange = vi.fn();
   let store;
 

@@ -1,4 +1,4 @@
-# @airluracode/alpine-touch
+# @ailuracode/alpine-touch
 
 Touch and pointer capability detection for Alpine.js.
 
@@ -7,14 +7,14 @@ Touch and pointer capability detection for Alpine.js.
 ## Install
 
 ```bash
-npm install @airluracode/alpine-touch alpinejs
+npm install @ailuracode/alpine-touch alpinejs
 ```
 
 ## Quick example
 
 ```js
 import Alpine from "alpinejs";
-import touch from "@airluracode/alpine-touch";
+import touch from "@ailuracode/alpine-touch";
 
 Alpine.plugin(touch);
 Alpine.start();

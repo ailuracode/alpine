@@ -3,7 +3,7 @@ import screenPlugin from "../src/index.js";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
 
-describe("@airluracode/alpine-screen", () => {
+describe("@ailuracode/alpine-screen", () => {
   let store;
 
   beforeAll(() => {

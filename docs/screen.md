@@ -1,20 +1,20 @@
 # Screen
 
-Package: `@airluracode/alpine-screen`
+Package: `@ailuracode/alpine-screen`
 
 Responsive device detection and live viewport width. Uses `matchMedia` for device type and debounced `resize` for width.
 
 ## Install
 
 ```bash
-npm install @airluracode/alpine-screen alpinejs
+npm install @ailuracode/alpine-screen alpinejs
 ```
 
 ## Setup
 
 ```js
 import Alpine from "alpinejs";
-import screen from "@airluracode/alpine-screen";
+import screen from "@ailuracode/alpine-screen";
 
 Alpine.plugin(screen);
 Alpine.start();

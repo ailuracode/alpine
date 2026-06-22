@@ -1,27 +1,27 @@
-# @airluracode/alpine
+# @ailuracode/alpine
 
-Alpine.js plugin monorepo by **airluracode**. Independent npm packages for common UI utilities — theme, viewport, connectivity, clipboard, scroll, and touch detection.
+Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common UI utilities — theme, viewport, connectivity, clipboard, scroll, and touch detection.
 
 ## Packages
 
 | Package | Type | Description |
 |---------|------|-------------|
-| [`@airluracode/alpine-theme`](./packages/theme/README.md) | Store | Light / dark / system theme preference |
-| [`@airluracode/alpine-screen`](./packages/screen/README.md) | Store | Responsive device type and viewport width |
-| [`@airluracode/alpine-online`](./packages/online/README.md) | Magic | Network online / offline state |
-| [`@airluracode/alpine-clipboard`](./packages/clipboard/README.md) | Magic | Copy text to clipboard |
-| [`@airluracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
-| [`@airluracode/alpine-touch`](./packages/touch/README.md) | Magic | Touch and pointer capabilities |
+| [`@ailuracode/alpine-theme`](./packages/theme/README.md) | Store | Light / dark / system theme preference |
+| [`@ailuracode/alpine-screen`](./packages/screen/README.md) | Store | Responsive device type and viewport width |
+| [`@ailuracode/alpine-online`](./packages/online/README.md) | Magic | Network online / offline state |
+| [`@ailuracode/alpine-clipboard`](./packages/clipboard/README.md) | Magic | Copy text to clipboard |
+| [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
+| [`@ailuracode/alpine-touch`](./packages/touch/README.md) | Magic | Touch and pointer capabilities |
 
 ## Quick start
 
 ```bash
-npm install @airluracode/alpine-theme alpinejs
+npm install @ailuracode/alpine-theme alpinejs
 ```
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@airluracode/alpine-theme";
+import theme from "@ailuracode/alpine-theme";
 
 Alpine.plugin(theme({
   onChange({ resolved }) {
@@ -57,10 +57,10 @@ npm run test:packages # run tests in each workspace
 
 ## Publishing
 
-Requires an npm account with access to the `@airluracode` scope:
+Requires an npm account with access to the `@ailuracode` scope:
 
 ```bash
-npm publish -w @airluracode/alpine-theme
+npm publish -w @ailuracode/alpine-theme
 ```
 
 Each package under `packages/*` has its own version, tests, and README.

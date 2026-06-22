@@ -1,14 +1,25 @@
 {
-  "name": "@airluracode/alpine-touch",
+  "name": "@ailuracode/alpine-touch",
   "version": "0.1.0",
   "description": "Alpine.js touch and pointer capability magic",
   "type": "module",
   "license": "MIT",
+  "author": "ailuracode",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/touch"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/touch#readme",
   "files": [
-    "src"
+    "src",
+    "README.md"
   ],
   "exports": {
     ".": "./src/index.js"

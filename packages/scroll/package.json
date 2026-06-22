@@ -1,14 +1,25 @@
 {
-  "name": "@airluracode/alpine-scroll",
+  "name": "@ailuracode/alpine-scroll",
   "version": "0.1.0",
   "description": "Alpine.js scroll position and body lock store",
   "type": "module",
   "license": "MIT",
+  "author": "ailuracode",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/scroll"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/scroll#readme",
   "files": [
-    "src"
+    "src",
+    "README.md"
   ],
   "exports": {
     ".": "./src/index.js"

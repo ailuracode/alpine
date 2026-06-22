@@ -12,9 +12,9 @@ Use a **store** when you need:
 
 | Package | Store name | Purpose |
 |---------|------------|---------|
-| `@airluracode/alpine-theme` | `$store.theme` | User theme preference + persistence |
-| `@airluracode/alpine-screen` | `$store.device` | Breakpoints and viewport width |
-| `@airluracode/alpine-scroll` | `$store.scroll` | Scroll metrics + body lock |
+| `@ailuracode/alpine-theme` | `$store.theme` | User theme preference + persistence |
+| `@ailuracode/alpine-screen` | `$store.device` | Breakpoints and viewport width |
+| `@ailuracode/alpine-scroll` | `$store.scroll` | Scroll metrics + body lock |
 
 ### Template usage
 
@@ -50,9 +50,9 @@ Use a **magic** when you need:
 
 | Package | Magic | Purpose |
 |---------|-------|---------|
-| `@airluracode/alpine-online` | `$online` | `navigator.onLine` |
-| `@airluracode/alpine-touch` | `$touch` | Pointer / touch capabilities |
-| `@airluracode/alpine-clipboard` | `$clipboard` | Async copy function |
+| `@ailuracode/alpine-online` | `$online` | `navigator.onLine` |
+| `@ailuracode/alpine-touch` | `$touch` | Pointer / touch capabilities |
+| `@ailuracode/alpine-clipboard` | `$clipboard` | Async copy function |
 
 ### Template usage
 

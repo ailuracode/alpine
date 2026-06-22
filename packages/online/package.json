@@ -1,14 +1,25 @@
 {
-  "name": "@airluracode/alpine-online",
+  "name": "@ailuracode/alpine-online",
   "version": "0.1.0",
   "description": "Alpine.js online/offline connectivity magic",
   "type": "module",
   "license": "MIT",
+  "author": "ailuracode",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/online"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/online#readme",
   "files": [
-    "src"
+    "src",
+    "README.md"
   ],
   "exports": {
     ".": "./src/index.js"

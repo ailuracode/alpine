@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import onlinePlugin from "../src/index.js";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
 
-describe("@airluracode/alpine-online", () => {
+describe("@ailuracode/alpine-online", () => {
   it("registers $online with isOnline state", () => {
     Object.defineProperty(navigator, "onLine", {
       configurable: true,

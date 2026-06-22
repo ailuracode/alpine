@@ -1,20 +1,20 @@
 # Clipboard
 
-Package: `@airluracode/alpine-clipboard`
+Package: `@ailuracode/alpine-clipboard`
 
 Copy text to the system clipboard via the `$clipboard` magic. Uses the Clipboard API with a `execCommand` fallback.
 
 ## Install
 
 ```bash
-npm install @airluracode/alpine-clipboard alpinejs
+npm install @ailuracode/alpine-clipboard alpinejs
 ```
 
 ## Setup
 
 ```js
 import Alpine from "alpinejs";
-import clipboard from "@airluracode/alpine-clipboard";
+import clipboard from "@ailuracode/alpine-clipboard";
 
 Alpine.plugin(clipboard);
 Alpine.start();

@@ -1,4 +1,4 @@
-# @airluracode/alpine-online
+# @ailuracode/alpine-online
 
 Online/offline connectivity magic for Alpine.js.
 
@@ -7,14 +7,14 @@ Online/offline connectivity magic for Alpine.js.
 ## Install
 
 ```bash
-npm install @airluracode/alpine-online alpinejs
+npm install @ailuracode/alpine-online alpinejs
 ```
 
 ## Quick example
 
 ```js
 import Alpine from "alpinejs";
-import online from "@airluracode/alpine-online";
+import online from "@ailuracode/alpine-online";
 
 Alpine.plugin(online);
 Alpine.start();

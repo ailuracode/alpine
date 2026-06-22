@@ -1,4 +1,4 @@
-# @airluracode/alpine-clipboard
+# @ailuracode/alpine-clipboard
 
 Copy text to the clipboard via Alpine.js magic.
 
@@ -7,14 +7,14 @@ Copy text to the clipboard via Alpine.js magic.
 ## Install
 
 ```bash
-npm install @airluracode/alpine-clipboard alpinejs
+npm install @ailuracode/alpine-clipboard alpinejs
 ```
 
 ## Quick example
 
 ```js
 import Alpine from "alpinejs";
-import clipboard from "@airluracode/alpine-clipboard";
+import clipboard from "@ailuracode/alpine-clipboard";
 
 Alpine.plugin(clipboard);
 Alpine.start();

@@ -10,7 +10,7 @@
 Install Alpine.js and one or more packages:
 
 ```bash
-npm install alpinejs @airluracode/alpine-theme @airluracode/alpine-screen
+npm install alpinejs @ailuracode/alpine-theme @ailuracode/alpine-screen
 ```
 
 ## Registration
@@ -19,9 +19,9 @@ Register plugins **before** `Alpine.start()`:
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@airluracode/alpine-theme";
-import screen from "@airluracode/alpine-screen";
-import online from "@airluracode/alpine-online";
+import theme from "@ailuracode/alpine-theme";
+import screen from "@ailuracode/alpine-screen";
+import online from "@ailuracode/alpine-online";
 
 Alpine.plugin(theme({ onChange: applyTheme }));
 Alpine.plugin(screen);
@@ -67,8 +67,8 @@ Read environment state or call utilities directly:
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@airluracode/alpine-theme";
-import scroll from "@airluracode/alpine-scroll";
+import theme from "@ailuracode/alpine-theme";
+import scroll from "@ailuracode/alpine-scroll";
 
 function applyTheme({ resolved }) {
   document.documentElement.dataset.theme = resolved;

@@ -1,14 +1,25 @@
 {
-  "name": "@airluracode/alpine-screen",
+  "name": "@ailuracode/alpine-screen",
   "version": "0.1.0",
   "description": "Alpine.js responsive device and viewport store",
   "type": "module",
   "license": "MIT",
+  "author": "ailuracode",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/screen"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/screen#readme",
   "files": [
-    "src"
+    "src",
+    "README.md"
   ],
   "exports": {
     ".": "./src/index.js"

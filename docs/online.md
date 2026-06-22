@@ -1,20 +1,20 @@
 # Online
 
-Package: `@airluracode/alpine-online`
+Package: `@ailuracode/alpine-online`
 
 Reactive network connectivity via the `$online` magic. Wraps `navigator.onLine` and browser `online` / `offline` events.
 
 ## Install
 
 ```bash
-npm install @airluracode/alpine-online alpinejs
+npm install @ailuracode/alpine-online alpinejs
 ```
 
 ## Setup
 
 ```js
 import Alpine from "alpinejs";
-import online from "@airluracode/alpine-online";
+import online from "@ailuracode/alpine-online";
 
 Alpine.plugin(online);
 Alpine.start();

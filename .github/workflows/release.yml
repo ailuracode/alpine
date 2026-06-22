@@ -2,7 +2,6 @@ name: Release
 
 on:
   push:
-    branches: [main, master]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -11,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout
@@ -62,24 +60,18 @@ jobs:
             git add .
             git commit -m "Version Packages"
             git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-            git push origin "HEAD:changeset-release/${GITHUB_REF_NAME}" --force
-            echo "Version branch pushed to changeset-release/${GITHUB_REF_NAME}."
-
-            export GH_TOKEN="${GITHUB_TOKEN}"
-            if gh pr view "changeset-release/${GITHUB_REF_NAME}" --json number >/dev/null 2>&1; then
-              echo "Version Packages pull request already exists."
-            else
-              gh pr create \
-                --base "${GITHUB_REF_NAME}" \
-                --head "changeset-release/${GITHUB_REF_NAME}" \
-                --title "Version Packages" \
-                --body "This PR was opened automatically by the Release workflow.
-
-Merge it to publish changed packages to npm."
-              echo "Version Packages pull request created."
-            fi
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+            echo "Version Packages commit pushed to ${GITHUB_REF_NAME}."
             exit 0
           fi
+
+          case "${GITHUB_REF_NAME}" in
+            main|master) ;;
+            *)
+              echo "No pending changesets on ${GITHUB_REF_NAME}. Skipping publish."
+              exit 0
+              ;;
+          esac
 
           if [ -z "${NPM_TOKEN:-}" ]; then
             echo "::error::NPM_TOKEN is not configured. Add an npm publish token in repository secrets before releasing."

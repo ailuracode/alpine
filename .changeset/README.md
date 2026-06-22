@@ -15,8 +15,8 @@ Select the package(s), choose semver bump, and write a short summary.
 ## Release flow
 
 1. Merge changesets to `master`.
-2. GitHub Action **Release** opens a "Version Packages" PR (bumps versions + CHANGELOGs).
-3. Merge that PR → packages publish to npm automatically (requires `NPM_TOKEN` secret).
+2. GitHub Action **Release** applies pending changesets on the same branch (bumps versions + CHANGELOGs).
+3. When `master` has no pending changesets, packages publish to npm automatically (requires `NPM_TOKEN` secret).
 
 Manual release:
 

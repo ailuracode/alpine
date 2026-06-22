@@ -76,6 +76,56 @@ body.scroll-locked {
 	color: var(--muted);
 }
 
+.battery-widget {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+.battery-shell {
+	position: relative;
+	width: 4.5rem;
+	height: 1.5rem;
+	border: 2px solid var(--muted);
+	border-radius: 4px;
+	padding: 2px;
+}
+
+.battery-shell::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: -6px;
+	width: 4px;
+	height: 0.55rem;
+	transform: translateY(-50%);
+	background: var(--muted);
+	border-radius: 0 2px 2px 0;
+}
+
+.battery-fill {
+	height: 100%;
+	border-radius: 2px;
+	background: var(--ok);
+	transition:
+		width 0.3s ease,
+		background 0.3s ease;
+}
+
+.battery-fill--low {
+	background: var(--warn);
+}
+
+.battery-fill--charging {
+	background: var(--accent);
+}
+
+.battery-label {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
 .progress-bar {
 	position: fixed;
 	top: 0;

@@ -4,7 +4,7 @@ Guidance for AI agents and contributors working on **@ailuracode/alpine**.
 
 ## Project
 
-Alpine.js plugin monorepo by **ailuracode**. Eight independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpine` is **private** and never published.
+Alpine.js plugin monorepo by **ailuracode**. Nine independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpine` is **private** and never published.
 
 | Package | Type | Store / Magic |
 |---------|------|---------------|
@@ -12,6 +12,7 @@ Alpine.js plugin monorepo by **ailuracode**. Eight independent npm packages unde
 | `@ailuracode/alpine-screen` | Store | `$store.device` |
 | `@ailuracode/alpine-scroll` | Store | `$store.scroll` |
 | `@ailuracode/alpine-network` | Magic | `$network` |
+| `@ailuracode/alpine-battery` | Magic | `$battery` |
 | `@ailuracode/alpine-clipboard` | Magic | `$clipboard` |
 | `@ailuracode/alpine-touch` | Magic | `$touch` |
 | `@ailuracode/alpine-platform` | Magic | `$platform` |
@@ -116,6 +117,8 @@ pnpm run format     # format all files
 4. On merge to `master`, the **Release** workflow publishes to npm when no pending changesets remain (version bumps land on the PR branch before merge).
 
 Packages are versioned **independently**. One changeset can touch multiple packages.
+
+**New packages:** set `"version": "0.0.0"` in `package.json`. A `minor` changeset then produces the first publishable version (`0.1.0`). Do **not** start at `0.1.0` with a `minor` changeset — Changesets will bump to `0.2.0` before the first npm release.
 
 ## Publishing
 

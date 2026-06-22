@@ -7,6 +7,7 @@ packages/
   theme/       @ailuracode/alpine-theme
   screen/      @ailuracode/alpine-screen
   network/     @ailuracode/alpine-network
+  battery/     @ailuracode/alpine-battery
   clipboard/   @ailuracode/alpine-clipboard
   scroll/      @ailuracode/alpine-scroll
   touch/       @ailuracode/alpine-touch
@@ -98,10 +99,12 @@ pnpm run changeset
 
 Select package(s), semver bump (`patch` / `minor` / `major`), and write a short summary in English.
 
+**New packages** must start at `"version": "0.0.0"` in `package.json`. With a `minor` changeset, the first release becomes `0.1.0`. Starting at `0.1.0` causes an automatic bump to `0.2.0` even though nothing was ever published at `0.1.0`.
+
 ### Automated release (GitHub)
 
 1. Open a PR with your changes and a changeset.
-2. The **Release** workflow applies pending changesets on the **same PR branch** and pushes version bumps + CHANGELOGs back to that PR.
+2. The **Release** workflow applies pending changesets on the **same PR branch** and pushes version bumps + CHANGELOGs back to that PR (only when `changeset version` actually changes files).
 3. Merge the PR to `master` (it already includes the version commit).
 4. The **Release** workflow on `master` publishes only packages whose versions are not yet on npm.
 

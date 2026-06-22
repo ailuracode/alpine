@@ -80,6 +80,52 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 		</section>
 
 		<section class="card">
+			<h2>Battery <code>$battery</code></h2>
+			<template x-if="$battery.isAvailable">
+				<div>
+					<div class="battery-widget" aria-hidden="true">
+						<div class="battery-shell">
+							<div
+								class="battery-fill"
+								x-bind:class="{
+									'battery-fill--low': $battery.level < 0.2 && !$battery.isCharging,
+									'battery-fill--charging': $battery.isCharging,
+								}"
+								x-bind:style="'width: ' + Math.round($battery.level * 100) + '%'"
+							></div>
+						</div>
+						<span class="battery-label" x-text="Math.round($battery.level * 100) + '%'"></span>
+					</div>
+					<p
+						class="status"
+						x-bind:class="$battery.isCharging ? 'status--ok' : 'status--warn'"
+						x-text="$battery.isCharging ? 'Charging' : 'On battery'"
+					></p>
+					<ul class="list">
+						<li x-show="$battery.chargingTime !== null">
+							Time to full:
+							<strong x-text="Math.round($battery.chargingTime / 60) + ' min'"></strong>
+						</li>
+						<li x-show="$battery.dischargingTime !== null">
+							Time to empty:
+							<strong x-text="Math.round($battery.dischargingTime / 60) + ' min'"></strong>
+						</li>
+					</ul>
+					<p
+						class="hint hint--error"
+						x-show="$battery.level < 0.2 && !$battery.isCharging"
+						x-cloak
+					>
+						Low battery — consider plugging in your device.
+					</p>
+				</div>
+			</template>
+			<p class="hint" x-show="!$battery.isAvailable" x-cloak>
+				Battery status is not available on this device or browser.
+			</p>
+		</section>
+
+		<section class="card">
 			<h2>Clipboard <code>$clipboard</code></h2>
 			<button
 				type="button"

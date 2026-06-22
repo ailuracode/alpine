@@ -1,8 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
-import batteryPlugin, { type BatteryMagic, readBatteryState } from "../src/index.js";
+import batteryPlugin, {
+  type BatteryMagic,
+  type BatteryManagerLike,
+  readBatteryState,
+} from "../src/index.js";
 
-function createBatteryManager(overrides: Partial<BatteryManager> = {}): BatteryManager {
+function createBatteryManager(overrides: Partial<BatteryManagerLike> = {}): BatteryManagerLike {
   const listeners = new Map<string, Set<EventListener>>();
 
   return {
@@ -33,11 +37,11 @@ function createBatteryManager(overrides: Partial<BatteryManager> = {}): BatteryM
       return true;
     },
     ...overrides,
-  } as BatteryManager;
+  } as BatteryManagerLike;
 }
 
-function mockGetBattery(implementation: () => Promise<BatteryManager>): () => void {
-  const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManager> };
+function mockGetBattery(implementation: () => Promise<BatteryManagerLike>): () => void {
+  const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManagerLike> };
   const original = nav.getBattery;
 
   Object.defineProperty(navigator, "getBattery", {
@@ -63,7 +67,7 @@ function mockGetBattery(implementation: () => Promise<BatteryManager>): () => vo
 
 describe("@ailuracode/alpine-battery", () => {
   it("registers $battery with unavailable defaults when getBattery is missing", () => {
-    const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManager> };
+    const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryManagerLike> };
     const original = nav.getBattery;
     nav.getBattery = undefined;
 

@@ -8,12 +8,13 @@ export interface BatteryMagic {
   dischargingTime: number | null;
 }
 
-interface BatteryManagerLike {
+export interface BatteryManagerLike {
   charging: boolean;
   chargingTime: number;
   dischargingTime: number;
   level: number;
   addEventListener(type: string, listener: EventListener): void;
+  dispatchEvent(event: Event): boolean;
 }
 
 type NavigatorWithBattery = Navigator & {

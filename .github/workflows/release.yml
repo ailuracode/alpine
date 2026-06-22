@@ -33,18 +33,16 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Configure npm auth
-        if: ${{ secrets.NPM_TOKEN != '' }}
-        uses: ./.github/actions/npm-auth
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Version packages or publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
+
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> "$HOME/.npmrc"
+          fi
 
           shopt -s nullglob
           pending=(.changeset/*.md)

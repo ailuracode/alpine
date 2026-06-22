@@ -1,9 +1,0 @@
-name: Configure npm auth
-description: Write npm registry token for publishing
-runs:
-  using: composite
-  steps:
-    - shell: bash
-      run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> "$HOME/.npmrc"
-      env:
-        NPM_TOKEN: ${{ env.NPM_TOKEN }}

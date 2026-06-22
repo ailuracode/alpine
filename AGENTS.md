@@ -4,7 +4,7 @@ Guidance for AI agents and contributors working on **@ailuracode/alpine**.
 
 ## Project
 
-Alpine.js plugin monorepo by **ailuracode**. Nine independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpine` is **private** and never published.
+Alpine.js plugin monorepo by **ailuracode**. Ten independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpine` is **private** and never published.
 
 | Package | Type | Store / Magic |
 |---------|------|---------------|
@@ -12,6 +12,7 @@ Alpine.js plugin monorepo by **ailuracode**. Nine independent npm packages under
 | `@ailuracode/alpine-screen` | Store | `$store.device` |
 | `@ailuracode/alpine-scroll` | Store | `$store.scroll` |
 | `@ailuracode/alpine-network` | Magic | `$network` |
+| `@ailuracode/alpine-visibility` | Magic | `$visibility` |
 | `@ailuracode/alpine-battery` | Magic | `$battery` |
 | `@ailuracode/alpine-clipboard` | Magic | `$clipboard` |
 | `@ailuracode/alpine-touch` | Magic | `$touch` |
@@ -141,6 +142,18 @@ All docs in **English**.
 
 `example/` is the Astro demo app in the pnpm workspace. It is **private** and excluded from publish and changesets. Run it with `pnpm run dev:example` from the repo root.
 
+**Every new plugin must be wired into the example app.** The demo is the canonical integration reference for all packages.
+
+When adding a new package, update:
+
+1. `example/package.json` — add `"@ailuracode/alpine-<name>": "workspace:*"` to `dependencies`
+2. `example/tsconfig.json` — add a `paths` entry pointing to `../packages/<name>/src/index.ts`
+3. `example/src/env.d.ts` — add `/// <reference path="../../packages/<name>/src/global.d.ts" />`
+4. `example/src/entrypoint.ts` — import the plugin and call `Alpine.plugin(...)`
+5. `example/src/pages/index.astro` — add a demo `<section>` showing the plugin API in use
+
+Also update the package table in this file, root `README.md`, and `docs/architecture.md`.
+
 ## Do not
 
 - Add more demo apps or Vite entry points unless requested
@@ -148,6 +161,7 @@ All docs in **English**.
 - Introduce `@airluracode` typo (correct: `@ailuracode`)
 - Couple plugins to a specific CSS framework
 - Skip tests for plugin logic changes
+- Ship a new plugin without adding it to the Astro example app
 - Manually edit version numbers for releases (use Changesets)
 
 ## References

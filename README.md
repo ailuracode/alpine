@@ -9,6 +9,7 @@ Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common
 | [`@ailuracode/alpine-theme`](./packages/theme/README.md) | Store | Light / dark / system theme preference |
 | [`@ailuracode/alpine-screen`](./packages/screen/README.md) | Store | Responsive device type and viewport width |
 | [`@ailuracode/alpine-network`](./packages/network/README.md) | Magic | Network online / offline state |
+| [`@ailuracode/alpine-visibility`](./packages/visibility/README.md) | Magic | Tab visibility state |
 | [`@ailuracode/alpine-battery`](./packages/battery/README.md) | Magic | Device battery level and charging state |
 | [`@ailuracode/alpine-clipboard`](./packages/clipboard/README.md) | Magic | Copy text to clipboard |
 | [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
@@ -39,12 +40,24 @@ Install only the packages you need. Each one is a separate dependency.
 
 ## Example app
 
-The [`example/`](./example/) directory contains an Astro + Alpine.js demo for all plugins. It is part of the pnpm workspace and is **not** published to npm.
+The [`example/`](./example/) directory contains an Astro + Alpine.js demo for **all** plugins. It is part of the pnpm workspace and is **not** published to npm.
 
 ```bash
 pnpm install
 pnpm run dev:example
 ```
+
+When you add a new plugin package, you must also register it in the example app:
+
+| File | What to add |
+|------|-------------|
+| `example/package.json` | workspace dependency |
+| `example/tsconfig.json` | TypeScript path alias |
+| `example/src/env.d.ts` | `global.d.ts` reference |
+| `example/src/entrypoint.ts` | `Alpine.plugin(...)` registration |
+| `example/src/pages/index.astro` | interactive demo section |
+
+See [AGENTS.md](./AGENTS.md) for the full checklist.
 
 ## Documentation
 
@@ -53,6 +66,7 @@ pnpm run dev:example
 - [Theme](./docs/theme.md)
 - [Screen](./docs/screen.md)
 - [Network](./docs/network.md)
+- [Visibility](./docs/visibility.md)
 - [Battery](./docs/battery.md)
 - [Clipboard](./docs/clipboard.md)
 - [Scroll](./docs/scroll.md)

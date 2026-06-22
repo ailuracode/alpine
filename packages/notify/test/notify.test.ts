@@ -1,13 +1,20 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
 import notifyPlugin, {
   closeNotification,
   createNotifyMagic,
   getNotifyPermission,
+  isIosDevice,
   isNotifySupported,
   type NotifyMagic,
+  registerNotifyServiceWorker,
   requestNotifyPermission,
+  requiresHomeScreenInstall,
+  requiresServiceWorkerNotifications,
+  resetNotifyServiceWorkerRegistrationForTests,
   sendNotification,
+  sendNotificationAsync,
+  supportsDirectNotifications,
 } from "../src/index.js";
 
 interface MockNotificationInstance {
@@ -21,6 +28,10 @@ interface MockNotificationConstructor {
   new (title: string, options?: NotificationOptions): MockNotificationInstance;
   permission: NotificationPermission;
   requestPermission: ReturnType<typeof vi.fn>;
+}
+
+interface MockServiceWorkerRegistration {
+  showNotification: ReturnType<typeof vi.fn>;
 }
 
 function installMockNotification(
@@ -52,18 +63,106 @@ function installMockNotification(
   return MockNotification;
 }
 
-function removeMockNotification(): void {
+function installSecureContext(): void {
+  vi.stubGlobal("isSecureContext", true);
+}
+
+function installDesktopEnvironment(): void {
+  installSecureContext();
+  vi.stubGlobal("navigator", {
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    platform: "Win32",
+    maxTouchPoints: 0,
+    serviceWorker: undefined,
+  });
+}
+
+function installAndroidEnvironment(showNotification = vi.fn(() => Promise.resolve())): {
+  register: ReturnType<typeof vi.fn>;
+  showNotification: ReturnType<typeof vi.fn>;
+} {
+  installSecureContext();
+
+  const registration: MockServiceWorkerRegistration = {
+    showNotification,
+  };
+
+  const register = vi.fn(() => Promise.resolve(registration));
+
+  vi.stubGlobal("navigator", {
+    userAgent:
+      "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36",
+    platform: "Linux armv8l",
+    maxTouchPoints: 5,
+    serviceWorker: {
+      register,
+      ready: Promise.resolve(registration),
+    },
+  });
+
+  return { register, showNotification };
+}
+
+function installIosBrowserEnvironment(): void {
+  installSecureContext();
+  vi.stubGlobal("window", {
+    matchMedia: vi.fn(() => ({ matches: false })),
+  });
+  vi.stubGlobal("navigator", {
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
+    platform: "iPhone",
+    maxTouchPoints: 5,
+    standalone: false,
+    serviceWorker: {
+      register: vi.fn(),
+      ready: Promise.resolve({ showNotification: vi.fn() }),
+    },
+  });
+}
+
+function installIosStandaloneEnvironment(): void {
+  installSecureContext();
+  vi.stubGlobal("window", {
+    matchMedia: vi.fn((query: string) => ({
+      matches: query.includes("standalone"),
+    })),
+  });
+  vi.stubGlobal("navigator", {
+    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
+    platform: "iPhone",
+    maxTouchPoints: 5,
+    standalone: true,
+    serviceWorker: {
+      register: vi.fn(() =>
+        Promise.resolve({
+          showNotification: vi.fn(() => Promise.resolve()),
+        })
+      ),
+      ready: Promise.resolve({
+        showNotification: vi.fn(() => Promise.resolve()),
+      }),
+    },
+  });
+}
+
+function removeEnvironmentMocks(): void {
   vi.unstubAllGlobals();
 }
 
 describe("@ailuracode/alpine-notify", () => {
   afterEach(() => {
-    removeMockNotification();
+    resetNotifyServiceWorkerRegistrationForTests();
+    removeEnvironmentMocks();
   });
 
   describe("module helpers", () => {
+    beforeEach(() => {
+      installDesktopEnvironment();
+    });
+
     it("reports unsupported when Notification is missing", () => {
-      removeMockNotification();
+      removeEnvironmentMocks();
+      installDesktopEnvironment();
       Reflect.deleteProperty(globalThis, "Notification");
 
       expect(isNotifySupported()).toBe(false);
@@ -76,7 +175,7 @@ describe("@ailuracode/alpine-notify", () => {
       expect(getNotifyPermission()).toBe("granted");
     });
 
-    it("sends a notification when permission is granted", () => {
+    it("sends a notification when permission is granted on desktop", () => {
       const MockNotification = installMockNotification("granted");
 
       const notification = sendNotification("Hello", { body: "World" });
@@ -154,21 +253,84 @@ describe("@ailuracode/alpine-notify", () => {
     });
   });
 
-  describe("createNotifyMagic", () => {
-    it("exposes the full API surface", () => {
+  describe("mobile service worker delivery", () => {
+    it("detects Android as requiring service worker notifications", () => {
+      installAndroidEnvironment();
       installMockNotification("granted");
+
+      expect(requiresServiceWorkerNotifications()).toBe(true);
+      expect(supportsDirectNotifications()).toBe(false);
+      expect(isNotifySupported()).toBe(true);
+    });
+
+    it("uses showNotification on Android instead of the constructor", async () => {
+      const { showNotification } = installAndroidEnvironment();
+      installMockNotification("granted");
+
+      await expect(sendNotificationAsync("Hello", { body: "World" })).resolves.toBeNull();
+      expect(showNotification).toHaveBeenCalledWith("Hello", { body: "World" });
+    });
+
+    it("registers the default service worker on Android", async () => {
+      const { register } = installAndroidEnvironment();
+      installMockNotification("default");
+
+      await registerNotifyServiceWorker();
+
+      expect(register).toHaveBeenCalledWith("/notify-sw.js");
+    });
+
+    it("registers the service worker before requesting permission on mobile", async () => {
+      const { register } = installAndroidEnvironment();
+      const MockNotification = installMockNotification("default");
+
+      await requestNotifyPermission();
+
+      expect(register).toHaveBeenCalledWith("/notify-sw.js");
+      expect(MockNotification.requestPermission).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("iOS environment detection", () => {
+    it("requires Home Screen install in iOS Safari tabs", () => {
+      installIosBrowserEnvironment();
+      Reflect.deleteProperty(globalThis, "Notification");
+
+      expect(isIosDevice()).toBe(true);
+      expect(requiresHomeScreenInstall()).toBe(true);
+      expect(isNotifySupported()).toBe(false);
+    });
+
+    it("supports notifications in an installed iOS web app", () => {
+      installIosStandaloneEnvironment();
+      installMockNotification("granted");
+
+      expect(requiresHomeScreenInstall()).toBe(false);
+      expect(isNotifySupported()).toBe(true);
+    });
+  });
+
+  describe("createNotifyMagic", () => {
+    beforeEach(() => {
+      installDesktopEnvironment();
+      installMockNotification("granted");
+    });
+
+    it("exposes the full API surface", () => {
       const notify = createNotifyMagic();
 
       expect(notify.isSupported()).toBe(true);
+      expect(typeof notify.requiresHomeScreenInstall).toBe("function");
       expect(notify.permission()).toBe("granted");
       expect(typeof notify.requestPermission).toBe("function");
       expect(typeof notify.send).toBe("function");
+      expect(typeof notify.sendAsync).toBe("function");
       expect(typeof notify.sendIfPermitted).toBe("function");
+      expect(typeof notify.sendIfPermittedAsync).toBe("function");
       expect(typeof notify.close).toBe("function");
     });
 
     it("sendIfPermitted matches send behavior", () => {
-      installMockNotification("granted");
       const notify = createNotifyMagic();
 
       const sent = notify.send("A");
@@ -180,13 +342,29 @@ describe("@ailuracode/alpine-notify", () => {
   });
 
   describe("Alpine plugin", () => {
-    it("registers $notify magic", () => {
+    beforeEach(() => {
+      installDesktopEnvironment();
       installMockNotification("granted");
+    });
 
+    it("registers $notify magic when called directly", () => {
       const { notify } = createMagicHarness(notifyPlugin) as { notify: NotifyMagic };
 
       expect(notify.isSupported()).toBe(true);
       expect(notify.send("Hello")?.title).toBe("Hello");
+    });
+
+    it("registers $notify magic when called as a factory", () => {
+      const register = notifyPlugin({ serviceWorkerUrl: "/custom-sw.js" });
+      if (!register) {
+        throw new Error("Expected notifyPlugin factory to return a register function");
+      }
+
+      const { notify } = createMagicHarness(register) as {
+        notify: NotifyMagic;
+      };
+
+      expect(notify.isSupported()).toBe(true);
     });
   });
 });

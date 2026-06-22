@@ -106,6 +106,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 				<li>Supported: <strong x-text="$notify.isSupported()"></strong></li>
 				<li>Permission: <strong x-text="$notify.permission()"></strong></li>
 			</ul>
+			<p class="hint hint--error" x-show="$notify.requiresHomeScreenInstall()" x-cloak>
+				On iPhone and iPad, add this site to your Home Screen and open it from there to enable notifications.
+			</p>
 			<div class="btn-group">
 				<button
 					type="button"
@@ -119,7 +122,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 					type="button"
 					x-show="$notify.isSupported() && $notify.permission() === 'granted'"
 					x-cloak
-					@click="$notify.send('Task complete', { body: 'Plugins are working correctly.' })"
+					@click="await $notify.sendAsync('Task complete', { body: 'Plugins are working correctly.' })"
 				>
 					Send notification
 				</button>
@@ -127,13 +130,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 					type="button"
 					x-show="$notify.isSupported()"
 					x-cloak
-					@click="$notify.sendIfPermitted('Silent notification')"
+					@click="await $notify.sendIfPermittedAsync('Silent notification')"
 				>
 					sendIfPermitted
 				</button>
 			</div>
-			<p class="hint hint--error" x-show="$notify.permission() === 'denied'" x-cloak>
-				Permission denied — enable it in your browser settings.
+			<p class="hint hint--error" x-show="$notify.isSupported() && $notify.permission() === 'denied'" x-cloak>
+				Permission denied — enable notifications in your browser settings.
 			</p>
 		</section>
 	</main>

@@ -20,8 +20,14 @@ Alpine.plugin(notify);
 Alpine.start();
 ```
 
+Copy the service worker to your public folder:
+
+```bash
+cp node_modules/@ailuracode/alpine-notify/dist/notify-sw.js public/notify-sw.js
+```
+
 ```html
-<button @click="$notify.send('Hello')">Notify</button>
+<button @click="await $notify.sendAsync('Hello')">Notify</button>
 
 <button
   x-show="$notify.isSupported() && $notify.permission() === 'default'"
@@ -29,31 +35,31 @@ Alpine.start();
 >
   Enable notifications
 </button>
-
-<button @click="$notify.sendIfPermitted('Background job finished')">
-  Notify if allowed
-</button>
 ```
 
 ## API summary
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `isSupported()` | `boolean` | Whether `Notification` exists |
+| `isSupported()` | `boolean` | Whether notifications can be shown |
+| `requiresHomeScreenInstall()` | `boolean` | iOS/iPadOS Safari tab limitation |
 | `permission()` | `NotificationPermission` | Current permission state |
 | `requestPermission()` | `Promise<NotificationPermission>` | Prompt when `default` |
-| `send(title, options?)` | `Notification \| null` | Show when `granted` |
+| `send(title, options?)` | `Notification \| null` | Desktop synchronous delivery |
+| `sendAsync(title, options?)` | `Promise<Notification \| null>` | Mobile-safe delivery |
 | `sendIfPermitted(title, options?)` | `Notification \| null` | Same as `send` |
+| `sendIfPermittedAsync(title, options?)` | `Promise<Notification \| null>` | Same as `sendAsync` |
 | `close(notification)` | `void` | Close without throwing |
 
 ## Browser compatibility
 
 | Feature | Support |
 |---------|---------|
-| Chrome / Edge | Full |
-| Firefox | Full |
+| Chrome / Edge (desktop) | Full |
+| Firefox (desktop) | Full |
 | Safari (macOS 16.4+) | Full |
-| Safari (iOS) | Not supported for page context |
+| Chrome (Android) | Service worker + `sendAsync()` |
+| Safari (iOS) | Home Screen web app only |
 | Secure context (HTTPS) | Required |
 | Unsupported browsers | API returns `null` / `denied`; never throws |
 

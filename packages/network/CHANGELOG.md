@@ -1,5 +1,11 @@
 # @ailuracode/alpine-network
 
+## 1.0.0
+
+### Major Changes
+
+- 7542ede: Rename package from `@ailuracode/alpine-online` to `@ailuracode/alpine-network`. Magic renamed from `$online` to `$network`.
+
 ## 0.2.0
 
 ### Minor Changes

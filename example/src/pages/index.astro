@@ -1,0 +1,264 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout>
+	<main class="container">
+		<section class="hero">
+			<h1>Demostración de plugins Alpine.js</h1>
+			<p>
+				Sitio de ejemplo con
+				<a href="https://astro.build" target="_blank" rel="noreferrer">Astro</a>
+				y los siete paquetes publicados por
+				<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer"
+					>siddharthagf</a
+				>
+				en npm bajo el scope <code>@ailuracode</code>.
+			</p>
+		</section>
+
+		<div class="grid">
+			<article class="card">
+				<h2>Theme</h2>
+				<p class="package">@ailuracode/alpine-theme</p>
+				<p>Store <code>$store.theme</code> — preferencia claro / oscuro / sistema con persistencia.</p>
+				<div class="demo-box">
+					<div class="stat-row">
+						<span class="stat"
+							>Preferencia: <strong x-text="$store.theme.mode"></strong></span
+						>
+						<span class="stat"
+							>Aplicado: <strong x-text="$store.theme.resolved"></strong></span
+						>
+					</div>
+					<button type="button" class="btn" @click="$store.theme.cycle()">
+						Ciclar tema
+					</button>
+				</div>
+			</article>
+
+			<article class="card">
+				<h2>Screen</h2>
+				<p class="package">@ailuracode/alpine-screen</p>
+				<p>Store <code>$store.device</code> — tipo de dispositivo y ancho del viewport.</p>
+				<div class="demo-box">
+					<div class="stat-row">
+						<span class="stat"
+							>Tipo: <strong x-text="$store.device.type"></strong></span
+						>
+						<span class="stat"
+							>Ancho: <strong x-text="$store.device.width"></strong>px</span
+						>
+					</div>
+					<p x-show="$store.device.isMobile">Vista móvil activa</p>
+					<p x-show="$store.device.isTablet">Vista tablet activa</p>
+					<p x-show="$store.device.isDesktop">Vista escritorio activa</p>
+				</div>
+			</article>
+
+			<article class="card">
+				<h2>Scroll</h2>
+				<p class="package">@ailuracode/alpine-scroll</p>
+				<p>Store <code>$store.scroll</code> — progreso, dirección y bloqueo del body.</p>
+				<div class="demo-box">
+					<div class="stat-row">
+						<span class="stat"
+							>Progreso: <strong x-text="$store.scroll.progress"></strong>%</span
+						>
+						<span class="stat"
+							>Dirección: <strong x-text="$store.scroll.direction"></strong></span
+						>
+						<span class="stat" x-show="$store.scroll.isLocked"
+							><strong>Scroll bloqueado</strong></span
+						>
+					</div>
+					<div x-data="{ open: false }">
+						<button
+							type="button"
+							class="btn btn-primary"
+							@click="open = true; $store.scroll.lock()"
+						>
+							Abrir modal (lock)
+						</button>
+						<div
+							x-show="open"
+							x-cloak
+							class="modal-backdrop"
+							@keydown.escape.window="open = false; $store.scroll.unlock()"
+						>
+							<div
+								class="modal"
+								role="dialog"
+								aria-modal="true"
+								@click.outside="open = false; $store.scroll.unlock()"
+							>
+								<h3>Modal de ejemplo</h3>
+								<p>El scroll del body está bloqueado mientras este modal está abierto.</p>
+								<div class="modal-actions">
+									<button
+										type="button"
+										class="btn"
+										@click="open = false; $store.scroll.unlock()"
+									>
+										Cerrar
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+
+			<article class="card">
+				<h2>Network</h2>
+				<p class="package">@ailuracode/alpine-network</p>
+				<p>Magic <code>$network</code> — estado online / offline del navegador.</p>
+				<div class="demo-box">
+					<span
+						class="badge"
+						:class="$network.isOnline ? 'online' : 'offline'"
+						x-text="$network.isOnline ? '● Online' : '● Offline'"
+					></span>
+					<p style="margin-top: 1rem">
+						<button type="button" class="btn" :disabled="!$network.isOnline">
+							Guardar (requiere conexión)
+						</button>
+					</p>
+					<p style="font-size: 0.85rem; margin-bottom: 0">
+						Prueba desactivando la red en las DevTools del navegador.
+					</p>
+				</div>
+			</article>
+
+			<article class="card">
+				<h2>Clipboard</h2>
+				<p class="package">@ailuracode/alpine-clipboard</p>
+				<p>Magic <code>$clipboard(text)</code> — copia texto al portapapeles.</p>
+				<div
+					class="demo-box"
+					x-data="{
+						status: 'idle',
+						async copy(text) {
+							try {
+								await $clipboard(text);
+								this.status = 'success';
+							} catch {
+								this.status = 'error';
+							}
+							setTimeout(() => this.status = 'idle', 2000);
+						}
+					}"
+				>
+					<button type="button" class="btn btn-primary" @click="copy('¡Hola desde Alpine!')">
+						Copiar texto
+					</button>
+					<button
+						type="button"
+						class="btn"
+						@click="copy(window.location.href)"
+						style="margin-left: 0.5rem"
+					>
+						Copiar URL
+					</button>
+					<p class="status success" x-show="status === 'success'" x-cloak>¡Copiado!</p>
+					<p class="status error" x-show="status === 'error'" x-cloak>Error al copiar</p>
+				</div>
+			</article>
+
+			<article class="card">
+				<h2>Touch</h2>
+				<p class="package">@ailuracode/alpine-touch</p>
+				<p>Magic <code>$touch</code> — capacidades táctiles y de puntero.</p>
+				<div class="demo-box">
+					<div class="stat-row">
+						<span class="stat"
+							>Touch: <strong x-text="$touch.isTouch"></strong></span
+						>
+						<span class="stat"
+							>Hover: <strong x-text="$touch.canHover"></strong></span
+						>
+						<span class="stat"
+							>Puntero: <strong
+								x-text="$touch.isCoarse ? 'coarse' : 'fine'"
+							></strong></span
+						>
+						<span class="stat"
+							>Puntos: <strong x-text="$touch.maxTouchPoints"></strong></span
+						>
+					</div>
+					<p x-show="$touch.isTouch">Interfaz optimizada para táctil</p>
+					<p x-show="$touch.canHover">Efectos hover disponibles</p>
+				</div>
+			</article>
+
+			<article class="card" style="grid-column: 1 / -1">
+				<h2>Notify</h2>
+				<p class="package">@ailuracode/alpine-notify</p>
+				<p>Magic <code>$notify</code> — Web Notifications API del navegador.</p>
+				<div class="demo-box">
+					<div class="stat-row">
+						<span class="stat"
+							>Soportado:
+							<strong x-text="$notify.isSupported()"></strong></span
+						>
+						<span class="stat"
+							>Permiso: <strong x-text="$notify.permission()"></strong></span
+						>
+					</div>
+					<div style="display: flex; flex-wrap: wrap; gap: 0.5rem">
+						<button
+							type="button"
+							class="btn btn-primary"
+							x-show="$notify.isSupported() && $notify.permission() === 'default'"
+							@click="await $notify.requestPermission()"
+						>
+							Solicitar permiso
+						</button>
+						<button
+							type="button"
+							class="btn"
+							x-show="$notify.isSupported() && $notify.permission() === 'granted'"
+							@click="$notify.send('Tarea completada', { body: 'Los plugins funcionan correctamente.' })"
+						>
+							Enviar notificación
+						</button>
+						<button
+							type="button"
+							class="btn"
+							x-show="$notify.isSupported()"
+							@click="$notify.sendIfPermitted('Notificación silenciosa')"
+						>
+							sendIfPermitted
+						</button>
+					</div>
+					<p x-show="!$notify.isSupported()" style="margin-top: 1rem; margin-bottom: 0">
+						Las notificaciones no están soportadas en este navegador.
+					</p>
+					<p
+						x-show="$notify.permission() === 'denied'"
+						style="margin-top: 1rem; margin-bottom: 0"
+					>
+						Permiso denegado — habilítalo en la configuración del navegador.
+					</p>
+				</div>
+			</article>
+		</div>
+
+		<section class="card" aria-label="Área de scroll">
+			<h2>Área de scroll</h2>
+			<p>Desplázate para ver la barra de progreso superior y el botón “volver arriba”.</p>
+			<div class="spacer">Sigue bajando…</div>
+		</section>
+
+		<footer class="site-footer">
+			<p>
+				Código fuente en
+				<a href="https://github.com/ailuracode/alpine" target="_blank" rel="noreferrer"
+					>github.com/ailuracode/alpine</a
+				>
+				· Paquetes en
+				<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer">npm</a>
+			</p>
+		</footer>
+	</main>
+</BaseLayout>

@@ -67,4 +67,9 @@ jobs:
             exit 0
           fi
 
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN is not configured. Add an npm publish token in repository secrets before releasing."
+            exit 1
+          fi
+
           pnpm run publish:ci

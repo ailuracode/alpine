@@ -1,12 +1,12 @@
 /// <reference types="astro/client" />
 /// <reference types="@types/alpinejs" />
-/// <reference types="@ailuracode/alpine-theme" />
-/// <reference types="@ailuracode/alpine-screen" />
-/// <reference types="@ailuracode/alpine-scroll" />
-/// <reference types="@ailuracode/alpine-network" />
-/// <reference types="@ailuracode/alpine-clipboard" />
-/// <reference types="@ailuracode/alpine-touch" />
-/// <reference types="@ailuracode/alpine-notify" />
+/// <reference path="../../packages/theme/src/global.d.ts" />
+/// <reference path="../../packages/screen/src/global.d.ts" />
+/// <reference path="../../packages/scroll/src/global.d.ts" />
+/// <reference path="../../packages/network/src/global.d.ts" />
+/// <reference path="../../packages/clipboard/src/global.d.ts" />
+/// <reference path="../../packages/touch/src/global.d.ts" />
+/// <reference path="../../packages/notify/src/global.d.ts" />
 
 interface Window {
 	Alpine: import("alpinejs").Alpine;

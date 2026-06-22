@@ -3,262 +3,146 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-	<main class="container">
-		<section class="hero">
-			<h1>Demostración de plugins Alpine.js</h1>
+	<main class="main">
+		<section class="card">
+			<h2>Theme <code>$store.theme</code></h2>
 			<p>
-				Sitio de ejemplo con
-				<a href="https://astro.build" target="_blank" rel="noreferrer">Astro</a>
-				y los siete paquetes publicados por
-				<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer"
-					>siddharthagf</a
-				>
-				en npm bajo el scope <code>@ailuracode</code>.
+				Mode: <strong x-text="$store.theme.mode"></strong> → resolved:
+				<strong x-text="$store.theme.resolved"></strong>
 			</p>
+			<div class="btn-group">
+				<button
+					type="button"
+					x-bind:class="{ active: $store.theme.isLight }"
+					@click="$store.theme.set('light')"
+				>
+					Light
+				</button>
+				<button
+					type="button"
+					x-bind:class="{ active: $store.theme.isDark }"
+					@click="$store.theme.set('dark')"
+				>
+					Dark
+				</button>
+				<button
+					type="button"
+					x-bind:class="{ active: $store.theme.isSystem }"
+					@click="$store.theme.set('system')"
+				>
+					System
+				</button>
+				<button type="button" @click="$store.theme.cycle()">Cycle</button>
+			</div>
 		</section>
 
-		<div class="grid">
-			<article class="card">
-				<h2>Theme</h2>
-				<p class="package">@ailuracode/alpine-theme</p>
-				<p>Store <code>$store.theme</code> — preferencia claro / oscuro / sistema con persistencia.</p>
-				<div class="demo-box">
-					<div class="stat-row">
-						<span class="stat"
-							>Preferencia: <strong x-text="$store.theme.mode"></strong></span
-						>
-						<span class="stat"
-							>Aplicado: <strong x-text="$store.theme.resolved"></strong></span
-						>
-					</div>
-					<button type="button" class="btn" @click="$store.theme.cycle()">
-						Ciclar tema
-					</button>
-				</div>
-			</article>
-
-			<article class="card">
-				<h2>Screen</h2>
-				<p class="package">@ailuracode/alpine-screen</p>
-				<p>Store <code>$store.device</code> — tipo de dispositivo y ancho del viewport.</p>
-				<div class="demo-box">
-					<div class="stat-row">
-						<span class="stat"
-							>Tipo: <strong x-text="$store.device.type"></strong></span
-						>
-						<span class="stat"
-							>Ancho: <strong x-text="$store.device.width"></strong>px</span
-						>
-					</div>
-					<p x-show="$store.device.isMobile">Vista móvil activa</p>
-					<p x-show="$store.device.isTablet">Vista tablet activa</p>
-					<p x-show="$store.device.isDesktop">Vista escritorio activa</p>
-				</div>
-			</article>
-
-			<article class="card">
-				<h2>Scroll</h2>
-				<p class="package">@ailuracode/alpine-scroll</p>
-				<p>Store <code>$store.scroll</code> — progreso, dirección y bloqueo del body.</p>
-				<div class="demo-box">
-					<div class="stat-row">
-						<span class="stat"
-							>Progreso: <strong x-text="$store.scroll.progress"></strong>%</span
-						>
-						<span class="stat"
-							>Dirección: <strong x-text="$store.scroll.direction"></strong></span
-						>
-						<span class="stat" x-show="$store.scroll.isLocked"
-							><strong>Scroll bloqueado</strong></span
-						>
-					</div>
-					<div x-data="{ open: false }">
-						<button
-							type="button"
-							class="btn btn-primary"
-							@click="open = true; $store.scroll.lock()"
-						>
-							Abrir modal (lock)
-						</button>
-						<div
-							x-show="open"
-							x-cloak
-							class="modal-backdrop"
-							@keydown.escape.window="open = false; $store.scroll.unlock()"
-						>
-							<div
-								class="modal"
-								role="dialog"
-								aria-modal="true"
-								@click.outside="open = false; $store.scroll.unlock()"
-							>
-								<h3>Modal de ejemplo</h3>
-								<p>El scroll del body está bloqueado mientras este modal está abierto.</p>
-								<div class="modal-actions">
-									<button
-										type="button"
-										class="btn"
-										@click="open = false; $store.scroll.unlock()"
-									>
-										Cerrar
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</article>
-
-			<article class="card">
-				<h2>Network</h2>
-				<p class="package">@ailuracode/alpine-network</p>
-				<p>Magic <code>$network</code> — estado online / offline del navegador.</p>
-				<div class="demo-box">
-					<span
-						class="badge"
-						:class="$network.isOnline ? 'online' : 'offline'"
-						x-text="$network.isOnline ? '● Online' : '● Offline'"
-					></span>
-					<p style="margin-top: 1rem">
-						<button type="button" class="btn" :disabled="!$network.isOnline">
-							Guardar (requiere conexión)
-						</button>
-					</p>
-					<p style="font-size: 0.85rem; margin-bottom: 0">
-						Prueba desactivando la red en las DevTools del navegador.
-					</p>
-				</div>
-			</article>
-
-			<article class="card">
-				<h2>Clipboard</h2>
-				<p class="package">@ailuracode/alpine-clipboard</p>
-				<p>Magic <code>$clipboard(text)</code> — copia texto al portapapeles.</p>
-				<div
-					class="demo-box"
-					x-data="{
-						status: 'idle',
-						async copy(text) {
-							try {
-								await $clipboard(text);
-								this.status = 'success';
-							} catch {
-								this.status = 'error';
-							}
-							setTimeout(() => this.status = 'idle', 2000);
-						}
-					}"
-				>
-					<button type="button" class="btn btn-primary" @click="copy('¡Hola desde Alpine!')">
-						Copiar texto
-					</button>
-					<button
-						type="button"
-						class="btn"
-						@click="copy(window.location.href)"
-						style="margin-left: 0.5rem"
-					>
-						Copiar URL
-					</button>
-					<p class="status success" x-show="status === 'success'" x-cloak>¡Copiado!</p>
-					<p class="status error" x-show="status === 'error'" x-cloak>Error al copiar</p>
-				</div>
-			</article>
-
-			<article class="card">
-				<h2>Touch</h2>
-				<p class="package">@ailuracode/alpine-touch</p>
-				<p>Magic <code>$touch</code> — capacidades táctiles y de puntero.</p>
-				<div class="demo-box">
-					<div class="stat-row">
-						<span class="stat"
-							>Touch: <strong x-text="$touch.isTouch"></strong></span
-						>
-						<span class="stat"
-							>Hover: <strong x-text="$touch.canHover"></strong></span
-						>
-						<span class="stat"
-							>Puntero: <strong
-								x-text="$touch.isCoarse ? 'coarse' : 'fine'"
-							></strong></span
-						>
-						<span class="stat"
-							>Puntos: <strong x-text="$touch.maxTouchPoints"></strong></span
-						>
-					</div>
-					<p x-show="$touch.isTouch">Interfaz optimizada para táctil</p>
-					<p x-show="$touch.canHover">Efectos hover disponibles</p>
-				</div>
-			</article>
-
-			<article class="card" style="grid-column: 1 / -1">
-				<h2>Notify</h2>
-				<p class="package">@ailuracode/alpine-notify</p>
-				<p>Magic <code>$notify</code> — Web Notifications API del navegador.</p>
-				<div class="demo-box">
-					<div class="stat-row">
-						<span class="stat"
-							>Soportado:
-							<strong x-text="$notify.isSupported()"></strong></span
-						>
-						<span class="stat"
-							>Permiso: <strong x-text="$notify.permission()"></strong></span
-						>
-					</div>
-					<div style="display: flex; flex-wrap: wrap; gap: 0.5rem">
-						<button
-							type="button"
-							class="btn btn-primary"
-							x-show="$notify.isSupported() && $notify.permission() === 'default'"
-							@click="await $notify.requestPermission()"
-						>
-							Solicitar permiso
-						</button>
-						<button
-							type="button"
-							class="btn"
-							x-show="$notify.isSupported() && $notify.permission() === 'granted'"
-							@click="$notify.send('Tarea completada', { body: 'Los plugins funcionan correctamente.' })"
-						>
-							Enviar notificación
-						</button>
-						<button
-							type="button"
-							class="btn"
-							x-show="$notify.isSupported()"
-							@click="$notify.sendIfPermitted('Notificación silenciosa')"
-						>
-							sendIfPermitted
-						</button>
-					</div>
-					<p x-show="!$notify.isSupported()" style="margin-top: 1rem; margin-bottom: 0">
-						Las notificaciones no están soportadas en este navegador.
-					</p>
-					<p
-						x-show="$notify.permission() === 'denied'"
-						style="margin-top: 1rem; margin-bottom: 0"
-					>
-						Permiso denegado — habilítalo en la configuración del navegador.
-					</p>
-				</div>
-			</article>
-		</div>
-
-		<section class="card" aria-label="Área de scroll">
-			<h2>Área de scroll</h2>
-			<p>Desplázate para ver la barra de progreso superior y el botón “volver arriba”.</p>
-			<div class="spacer">Sigue bajando…</div>
+		<section class="card">
+			<h2>Screen <code>$store.device</code></h2>
+			<p>
+				Type: <strong x-text="$store.device.type"></strong> · Width:
+				<strong x-text="$store.device.width"></strong>px
+			</p>
+			<div class="badges">
+				<span class="badge" x-bind:class="{ on: $store.device.isMobile }">Mobile</span>
+				<span class="badge" x-bind:class="{ on: $store.device.isTablet }">Tablet</span>
+				<span class="badge" x-bind:class="{ on: $store.device.isDesktop }">Desktop</span>
+			</div>
 		</section>
 
-		<footer class="site-footer">
-			<p>
-				Código fuente en
-				<a href="https://github.com/ailuracode/alpine" target="_blank" rel="noreferrer"
-					>github.com/ailuracode/alpine</a
+		<section class="card">
+			<h2>Scroll <code>$store.scroll</code></h2>
+			<ul class="list">
+				<li>Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
+				<li>Direction: <strong x-text="$store.scroll.direction || '—'"></strong></li>
+				<li>Progress: <strong x-text="Math.round($store.scroll.progress)"></strong>%</li>
+				<li>Locked: <strong x-text="$store.scroll.isLocked"></strong></li>
+			</ul>
+			<div class="btn-group">
+				<button type="button" @click="$store.scroll.toggleLock()">
+					<span x-text="$store.scroll.isLocked ? 'Unlock scroll' : 'Lock scroll'"></span>
+				</button>
+				<button type="button" x-show="$store.scroll.showToTop" x-cloak @click="$store.scroll.toTop()">
+					Back to top
+				</button>
+			</div>
+		</section>
+
+		<section class="card">
+			<h2>Network <code>$network</code></h2>
+			<p
+				class="status"
+				x-bind:class="$network.isOnline ? 'status--ok' : 'status--warn'"
+				x-text="$network.isOnline ? 'Online' : 'Offline'"
+			></p>
+			<div class="btn-group">
+				<button type="button" x-bind:disabled="!$network.isOnline">Save (requires connection)</button>
+			</div>
+		</section>
+
+		<section class="card">
+			<h2>Clipboard <code>$clipboard</code></h2>
+			<button
+				type="button"
+				@click="await $clipboard('Hello from Alpine!'); copied = true; setTimeout(() => copied = false, 2000)"
+			>
+				Copy text
+			</button>
+			<p class="hint" x-show="copied" x-cloak x-transition>Copied to clipboard!</p>
+		</section>
+
+		<section class="card">
+			<h2>Touch <code>$touch</code></h2>
+			<ul class="list">
+				<li>Touch: <strong x-text="$touch.isTouch"></strong></li>
+				<li>Coarse pointer: <strong x-text="$touch.isCoarse"></strong></li>
+				<li>Hover: <strong x-text="$touch.canHover"></strong></li>
+				<li>Max touch points: <strong x-text="$touch.maxTouchPoints"></strong></li>
+			</ul>
+		</section>
+
+		<section class="card">
+			<h2>Notify <code>$notify</code></h2>
+			<ul class="list">
+				<li>Supported: <strong x-text="$notify.isSupported()"></strong></li>
+				<li>Permission: <strong x-text="$notify.permission()"></strong></li>
+			</ul>
+			<div class="btn-group">
+				<button
+					type="button"
+					x-show="$notify.isSupported() && $notify.permission() === 'default'"
+					x-cloak
+					@click="await $notify.requestPermission()"
 				>
-				· Paquetes en
-				<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer">npm</a>
+					Request permission
+				</button>
+				<button
+					type="button"
+					x-show="$notify.isSupported() && $notify.permission() === 'granted'"
+					x-cloak
+					@click="$notify.send('Task complete', { body: 'Plugins are working correctly.' })"
+				>
+					Send notification
+				</button>
+				<button
+					type="button"
+					x-show="$notify.isSupported()"
+					x-cloak
+					@click="$notify.sendIfPermitted('Silent notification')"
+				>
+					sendIfPermitted
+				</button>
+			</div>
+			<p class="hint hint--error" x-show="$notify.permission() === 'denied'" x-cloak>
+				Permission denied — enable it in your browser settings.
 			</p>
-		</footer>
+		</section>
 	</main>
+
+	<footer class="footer">
+		<p>
+			<a href="https://github.com/ailuracode/alpine" target="_blank" rel="noreferrer">Source</a>
+			·
+			<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer">npm</a>
+		</p>
+	</footer>
 </BaseLayout>

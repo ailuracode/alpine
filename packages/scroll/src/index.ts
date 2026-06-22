@@ -53,10 +53,11 @@ function applyLock(): void {
 }
 
 function removeLock(): void {
+  const y = savedScrollY;
   document.documentElement.classList.remove("scroll-locked");
   document.body.classList.remove("scroll-locked");
   document.body.style.top = "";
-  window.scrollTo(0, savedScrollY);
+  window.scrollTo({ top: y, left: 0, behavior: "instant" });
 }
 
 /** Alpine.js scroll plugin. Registers `$store.scroll`. */
@@ -161,20 +162,21 @@ export default function scrollPlugin(Alpine: AlpineType.Alpine): void {
   };
 
   Alpine.store("scroll", scrollStore);
+  const store = Alpine.store("scroll") as ScrollStore;
   let ticking = false;
 
   function scheduleRefresh() {
-    if (ticking || scrollStore.locked) {
+    if (ticking || store.locked) {
       return;
     }
     ticking = true;
     requestAnimationFrame(() => {
-      scrollStore.refresh();
+      store.refresh();
       ticking = false;
     });
   }
 
-  scrollStore.refresh();
+  store.refresh();
   window.addEventListener("scroll", scheduleRefresh, { passive: true });
   window.addEventListener("resize", scheduleRefresh, { passive: true });
 }

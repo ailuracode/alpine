@@ -122,18 +122,19 @@ export default function screenPlugin(Alpine: AlpineType.Alpine): void {
   };
 
   Alpine.store("device", deviceStore);
+  const store = Alpine.store("device") as DeviceStore;
 
   function scheduleWidthUpdate() {
     clearTimeout(widthTimer ?? undefined);
     widthTimer = setTimeout(() => {
       widthTimer = null;
-      deviceStore.refreshWidth();
+      store.refreshWidth();
     }, WIDTH_DEBOUNCE_MS);
   }
 
   function bindListeners() {
     unbindListeners();
-    typeHandler = () => deviceStore.refreshType();
+    typeHandler = () => store.refreshType();
     for (const media of Object.values(queries)) {
       media.addEventListener("change", typeHandler);
     }
@@ -156,7 +157,7 @@ export default function screenPlugin(Alpine: AlpineType.Alpine): void {
   }
 
   bindListeners();
-  deviceStore.refresh();
+  store.refresh();
 }
 
 declare global {

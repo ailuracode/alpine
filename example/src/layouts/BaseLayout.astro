@@ -1,5 +1,5 @@
 ---
-import "../styles/global.css";
+import globalStyles from "../styles/global.css?raw";
 
 interface Props {
 	title?: string;
@@ -7,96 +7,64 @@ interface Props {
 }
 
 const {
-	title = "Alpine.js Plugins Demo",
-	description = "Demostración interactiva de los plugins @ailuracode para Alpine.js",
+	title = "Alpine.js + @ailuracode",
+	description = "Interactive demo of @ailuracode plugins for Alpine.js",
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<script is:inline>
+			(function () {
+				var key = "theme";
+				var saved = localStorage.getItem(key);
+				var mode =
+					saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+				var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+				var resolved = mode === "system" ? (dark ? "dark" : "light") : mode;
+				document.documentElement.dataset.theme = resolved;
+				document.documentElement.style.colorScheme = resolved;
+			})();
+		</script>
+		<style is:inline set:html={globalStyles}></style>
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
-		<style is:inline>
-			[x-cloak] {
-				display: none !important;
-			}
-			/* Hide Alpine-bound UI until start() so x-show/x-text do not flash */
-			html:not(.alpine-ready) [x-show] {
-				display: none !important;
-			}
-			html:not(.alpine-ready) [x-text] {
-				visibility: hidden;
-			}
-			[data-theme="dark"] body {
-				background: #0b1120;
-				color: #f8fafc;
-			}
-		</style>
 	</head>
-	<body x-data>
-		<div
-			class="scroll-progress"
-			:style="`width: ${$store.scroll.progress}%`"
-			aria-hidden="true"
-		></div>
+	<body>
+		<div class="app" x-data="{ copied: false }" x-cloak>
+			<header class="header">
+				<h1>Alpine.js + @ailuracode</h1>
+				<p class="subtitle">Demo with all seven plugins · Astro</p>
+			</header>
 
-		<header class="site-header">
-			<div class="container header-inner">
-				<div class="brand">
-					<strong>@ailuracode/alpine</strong>
-					<span>Plugins para Alpine.js</span>
-				</div>
-				<nav class="theme-toggle" aria-label="Tema">
-					<button
-						type="button"
-						class="btn"
-						:class="{ active: $store.theme.isLight }"
-						@click="$store.theme.set('light')"
-					>
-						Claro
-					</button>
-					<button
-						type="button"
-						class="btn"
-						:class="{ active: $store.theme.isDark }"
-						@click="$store.theme.set('dark')"
-					>
-						Oscuro
-					</button>
-					<button
-						type="button"
-						class="btn"
-						:class="{ active: $store.theme.isSystem }"
-						@click="$store.theme.set('system')"
-					>
-						Sistema
-					</button>
-				</nav>
+			<div class="progress-bar" aria-hidden="true">
+				<div
+					class="progress-bar-fill"
+					x-bind:style="'width: ' + $store.scroll.progress + '%'"
+				></div>
 			</div>
-		</header>
 
-		<slot />
+			<slot />
 
-		<div x-show="!$network.isOnline" x-cloak class="offline-banner">
-			<div>Sin conexión — los cambios se guardarán cuando vuelvas a estar online</div>
+			<div class="spacer" aria-hidden="true"></div>
+
+			<button
+				type="button"
+				class="fab"
+				x-show="$store.scroll.showToTop"
+				x-cloak
+				@click="$store.scroll.toTop()"
+				aria-label="Back to top"
+			>
+				↑
+			</button>
 		</div>
-
-		<button
-			type="button"
-			class="btn btn-primary to-top"
-			x-show="$store.scroll.showToTop"
-			x-cloak
-			@click="$store.scroll.toTop()"
-			aria-label="Volver arriba"
-		>
-			↑
-		</button>
 
 		<script>
 			import Alpine from "alpinejs";
@@ -105,7 +73,6 @@ const {
 			register(Alpine);
 			window.Alpine = Alpine;
 			Alpine.start();
-			document.documentElement.classList.add("alpine-ready");
 		</script>
 	</body>
 </html>

@@ -42,26 +42,26 @@ importers:
   example:
     dependencies:
       '@ailuracode/alpine-clipboard':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/clipboard
       '@ailuracode/alpine-network':
-        specifier: ^1.0.0
-        version: 1.0.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/network
       '@ailuracode/alpine-notify':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/notify
       '@ailuracode/alpine-screen':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/screen
       '@ailuracode/alpine-scroll':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/scroll
       '@ailuracode/alpine-theme':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/theme
       '@ailuracode/alpine-touch':
-        specifier: ^0.2.0
-        version: 0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)
+        specifier: workspace:*
+        version: link:../packages/touch
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11
@@ -136,69 +136,6 @@ importers:
         version: 3.15.12
 
 packages:
-
-  '@ailuracode/alpine-clipboard@0.2.0':
-    resolution: {integrity: sha512-VxXb7NciVO4gUvRLsICvPbxe7Y7jHN9DmtC9Ituo8Wj5gs58VZap084AUJp/97Sjzj2GzKMtxmwSKTCeFR1wBA==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-network@1.0.0':
-    resolution: {integrity: sha512-iqNPUnP19FCD6VcFFj3gibssVZeJSUjb/Dre8ThYIb7WOS8D3/cmvpKO1AqCLBP62cT8xajAx8jDPFjHKMUITg==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-notify@0.2.0':
-    resolution: {integrity: sha512-jvUx9yOwKEBEaJitLPxmHe7Ji/1F/8+GZvww+VMObNm6pi4lQc9AQjJDuNE7sX6RvnzzeHt5wJPx9/9yvJECcg==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-screen@0.2.0':
-    resolution: {integrity: sha512-DYag7kNDdneMOc/pS8silQezhu/T6HLoqINNsv2g+hlAY4UJPoFD6RxBzsRY+T2QdLtIV8hXpy23hMwC0WkGaw==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-scroll@0.2.0':
-    resolution: {integrity: sha512-rpV+K4wfwRn8hnSpbC0jd7HUzwBqB/LAs1bGfjxTaoHphum6f3MOO4Qr19iun+Kfl7CzFJFP0QoRgTaoOL2PUw==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-theme@0.2.0':
-    resolution: {integrity: sha512-ZhX4Lk+6BhHPwbyBNEqiVdjHrWLqL1xC5HRIOTEpaap2lFQ0k6nD2jeA/0FfOjvyu030qZl51Yk6YW2LKbhRPA==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
-
-  '@ailuracode/alpine-touch@0.2.0':
-    resolution: {integrity: sha512-abnCSySA/PXzScq1MZj3PnxTbnC+BfFqefY+0NnbxqaUM0VDl1hYOdabksV2/R5QrfWZ6lBxjvMjJRRGaIau6g==}
-    peerDependencies:
-      '@types/alpinejs': ^3.13.11
-      alpinejs: ^3.0.0
-    peerDependenciesMeta:
-      '@types/alpinejs':
-        optional: true
 
   '@astrojs/compiler-binding-darwin-arm64@0.2.2':
     resolution: {integrity: sha512-1WxpECx3izz5X4Ha3l6ex79HZlUHpKBTElGJsfOosnhVvXhccfcXAsBlrYPNmUOKJWiG7mcrje0ELSr1KPE69Q==}
@@ -2679,48 +2616,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  '@ailuracode/alpine-clipboard@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-network@1.0.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-notify@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-screen@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-scroll@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-theme@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
-
-  '@ailuracode/alpine-touch@0.2.0(@types/alpinejs@3.13.11)(alpinejs@3.15.12)':
-    dependencies:
-      alpinejs: 3.15.12
-    optionalDependencies:
-      '@types/alpinejs': 3.13.11
 
   '@astrojs/compiler-binding-darwin-arm64@0.2.2':
     optional: true

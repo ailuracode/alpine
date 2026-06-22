@@ -1,5 +1,29 @@
 {
-  "extends": "./node_modules/astro/tsconfigs/strict.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@ailuracode/alpine-clipboard": ["../packages/clipboard/src/index.ts"],
+      "@ailuracode/alpine-network": ["../packages/network/src/index.ts"],
+      "@ailuracode/alpine-notify": ["../packages/notify/src/index.ts"],
+      "@ailuracode/alpine-screen": ["../packages/screen/src/index.ts"],
+      "@ailuracode/alpine-scroll": ["../packages/scroll/src/index.ts"],
+      "@ailuracode/alpine-theme": ["../packages/theme/src/index.ts"],
+      "@ailuracode/alpine-touch": ["../packages/touch/src/index.ts"]
+    },
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "jsx": "preserve",
+    "strict": true
+  },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
 }

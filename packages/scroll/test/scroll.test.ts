@@ -146,6 +146,21 @@ describe("@ailuracode/alpine-scroll", () => {
     expect(store.atBottom).toBe(true);
   });
 
+  it("restores scroll position instantly on unlock", () => {
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 400,
+    });
+    store.refresh();
+    store.lock();
+
+    const scrollTo = vi.mocked(window.scrollTo);
+    scrollTo.mockClear();
+    store.unlock();
+
+    expect(scrollTo).toHaveBeenCalledWith({ top: 400, left: 0, behavior: "instant" });
+  });
+
   it("ignores unlock when not locked", () => {
     expect(store.unlock()).toBe(false);
   });

@@ -135,10 +135,11 @@ export default function themePlugin(options: ThemePluginOptions = {}): AlpineTyp
     };
 
     Alpine.store("theme", themeStore);
+    const store = Alpine.store("theme") as ThemeStore;
 
     systemQuery.addEventListener("change", () => {
-      if (themeStore.isSystem) {
-        themeStore.refresh();
+      if (store.isSystem) {
+        store.refresh();
       }
     });
   };

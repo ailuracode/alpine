@@ -61,6 +61,45 @@ export interface MutationState<TData = unknown, TVariables = void> {
   reset(): void;
 }
 
+export interface QueryDevtoolsEntry {
+  key: QueryKey;
+  keyHash: string;
+  status: QueryStatus;
+  fetchStatus: FetchStatus;
+  observers: number;
+  isStale: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+  isInvalidated: boolean;
+  dataUpdatedAt: number;
+  errorUpdatedAt: number;
+  data: unknown;
+  error: { message: string; name: string } | null;
+  options: QueryOptions;
+}
+
+export interface MutationDevtoolsEntry {
+  id: string;
+  status: MutationStatus;
+  variables: unknown;
+  data: unknown;
+  error: { message: string; name: string } | null;
+  updatedAt: number;
+}
+
+export interface QueryDevtoolsSnapshot {
+  queries: QueryDevtoolsEntry[];
+  mutations: MutationDevtoolsEntry[];
+  updatedAt: number;
+}
+
+export interface QueryDevtoolsApi {
+  subscribe(listener: () => void): () => void;
+  getSnapshot(): QueryDevtoolsSnapshot;
+}
+
 export interface QueryPluginOptions {
   defaultOptions?: {
     queries?: Partial<QueryOptions>;
@@ -72,6 +111,7 @@ export interface QueryPluginOptions {
 }
 
 export interface QueryStore {
+  readonly devtools: QueryDevtoolsApi;
   observe<TData>(
     key: QueryKey,
     queryFn: () => Promise<TData>,

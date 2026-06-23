@@ -21,6 +21,7 @@ Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common
 | [`@ailuracode/alpine-share`](./packages/share/README.md) | Magic | Web Share API wrapper |
 | [`@ailuracode/alpine-attention`](./packages/attention/README.md) | Magic | Screen Wake Lock and Idle Detection |
 | [`@ailuracode/alpine-query`](./packages/query/README.md) | Store | TanStack Query-style async data caching |
+| [`@ailuracode/alpine-query-devtools`](./packages/query-devtools/README.md) | Plugin | Query cache inspector panel |
 
 ## Quick start
 

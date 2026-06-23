@@ -13,6 +13,7 @@ const packageNames = [
   "notify",
   "platform",
   "query",
+  "query-devtools",
   "screen",
   "scroll",
   "share",

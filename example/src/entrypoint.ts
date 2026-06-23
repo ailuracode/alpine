@@ -9,6 +9,7 @@ import visibility from "@ailuracode/alpine-visibility";
 import notify from "@ailuracode/alpine-notify";
 import platform from "@ailuracode/alpine-platform";
 import query from "@ailuracode/alpine-query";
+import queryDevtools from "@ailuracode/alpine-query-devtools";
 import screen from "@ailuracode/alpine-screen";
 import scroll from "@ailuracode/alpine-scroll";
 import share from "@ailuracode/alpine-share";
@@ -37,5 +38,6 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(touch);
 	Alpine.plugin(platform);
 	Alpine.plugin(query());
+	Alpine.plugin(queryDevtools({ position: "bottom" }));
 	Alpine.plugin(notify);
 };

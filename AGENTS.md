@@ -23,6 +23,7 @@ Alpine.js plugin monorepo by **ailuracode**. Twelve independent npm packages und
 | `@ailuracode/alpine-share` | Magic | `$share` |
 | `@ailuracode/alpine-attention` | Magic | `$wakelock`, `$idle` |
 | `@ailuracode/alpine-query` | Store | `$store.query` |
+| `@ailuracode/alpine-query-devtools` | Plugin | Query cache devtools panel |
 
 ## Repository layout
 

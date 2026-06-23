@@ -1,3 +1,5 @@
+import type { QueryDevtoolsApi } from "./devtools.js";
+
 export type QueryKey = readonly unknown[];
 
 export type QueryStatus = "pending" | "error" | "success";
@@ -82,6 +84,7 @@ export interface QueryPluginOptions {
 }
 
 export interface QueryStore {
+  readonly devtools: QueryDevtoolsApi;
   observe<TData>(
     key: QueryKey,
     queryFn: () => Promise<TData>,

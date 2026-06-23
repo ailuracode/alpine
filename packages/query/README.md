@@ -139,6 +139,24 @@ $store.query.invalidate(["todos"]);
 /// <reference types="@ailuracode/alpine-query/global" />
 ```
 
+## Devtools
+
+Use [`@ailuracode/alpine-query-devtools`](../query-devtools/README.md) for a TanStack Query-style inspector panel during development.
+
+```js
+import queryDevtools from "@ailuracode/alpine-query-devtools";
+
+Alpine.plugin(queryDevtools({ position: "bottom" }));
+```
+
+The query store also exposes a headless API:
+
+```js
+const unsubscribe = $store.query.devtools.subscribe(() => {
+  console.log($store.query.devtools.getSnapshot());
+});
+```
+
 ## License
 
 MIT

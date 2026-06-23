@@ -12,6 +12,12 @@ import type {
 import { resolveQueryOptions, resolveRetryCount, resolveRetryDelay } from "./utils.js";
 
 export type {
+  MutationDevtoolsEntry,
+  QueryDevtoolsApi,
+  QueryDevtoolsEntry,
+  QueryDevtoolsSnapshot,
+} from "./devtools.js";
+export type {
   FetchStatus,
   MutationOptions,
   MutationState,
@@ -36,6 +42,7 @@ export default function queryPlugin(options: QueryPluginOptions = {}): AlpineTyp
     });
 
     const queryStore: QueryStore = {
+      devtools: cache.getDevtools(),
       observe<TData>(
         key: QueryKey,
         queryFn: () => Promise<TData>,
@@ -101,14 +108,6 @@ export default function queryPlugin(options: QueryPluginOptions = {}): AlpineTyp
 
     Alpine.store("query", queryStore);
   };
-}
-
-declare global {
-  namespace Alpine {
-    interface Stores {
-      query: QueryStore;
-    }
-  }
 }
 
 export { hashKey, matchesQueryKey } from "./utils.js";

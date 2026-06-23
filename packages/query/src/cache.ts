@@ -1,4 +1,6 @@
 import type AlpineType from "alpinejs";
+import type { QueryEntry } from "./cache-internals.js";
+import { DevtoolsRegistry } from "./devtools-registry.js";
 import type {
   FetchStatus,
   MutationOptions,
@@ -8,23 +10,8 @@ import type {
   QueryOptions,
   QueryState,
   QueryStatus,
-  ResolvedQueryOptions,
 } from "./types.js";
 import { getRetryDelay, hashKey, matchesQueryKey, resolveQueryOptions } from "./utils.js";
-
-type QueryEntry<TData = unknown> = {
-  key: QueryKey;
-  keyHash: string;
-  queryFn: () => Promise<TData>;
-  options: ResolvedQueryOptions<TData>;
-  state: QueryState<TData>;
-  observers: number;
-  gcTimeout: ReturnType<typeof setTimeout> | null;
-  intervalId: ReturnType<typeof setInterval> | null;
-  fetchPromise: Promise<void> | null;
-  abortController: AbortController | null;
-  isInvalidated: boolean;
-};
 
 type QueryCacheConfig = {
   defaultQueryOptions: Partial<QueryOptions>;
@@ -100,11 +87,61 @@ export class QueryCache {
   private readonly entries = new Map<string, QueryEntry>();
   private readonly config: QueryCacheConfig;
   private readonly reactive: AlpineType.Alpine["reactive"];
+  private readonly devtools = new DevtoolsRegistry();
   private focusListenerAttached = false;
 
   constructor(reactive: AlpineType.Alpine["reactive"], config: QueryCacheConfig) {
     this.reactive = reactive;
     this.config = config;
+  }
+
+  getDevtools() {
+    return {
+      subscribe: (listener: () => void) => this.devtools.subscribe(listener),
+      getSnapshot: () => this.devtools.buildSnapshot(this.entries.values()),
+    };
+  }
+
+  getEntries(): QueryEntry[] {
+    return [...this.entries.values()];
+  }
+
+  getEntryByHash(keyHash: string): QueryEntry | undefined {
+    return this.entries.get(keyHash);
+  }
+
+  refetchEntry(keyHash: string): Promise<void> | undefined {
+    const entry = this.entries.get(keyHash);
+    if (!entry) {
+      return undefined;
+    }
+
+    return this.fetchEntry(entry, true);
+  }
+
+  invalidateEntry(keyHash: string): void {
+    const entry = this.entries.get(keyHash);
+    if (!entry) {
+      return;
+    }
+
+    entry.isInvalidated = true;
+    if (entry.observers > 0) {
+      void this.fetchEntry(entry);
+    }
+
+    this.devtools.notify();
+  }
+
+  removeEntry(keyHash: string): void {
+    const entry = this.entries.get(keyHash);
+    if (!entry) {
+      return;
+    }
+
+    this.clearTimers(entry);
+    this.entries.delete(keyHash);
+    this.devtools.notify();
   }
 
   observe<TData>(
@@ -155,6 +192,8 @@ export class QueryCache {
         void this.fetchEntry(entry);
       }
     }
+
+    this.devtools.notify();
   }
 
   remove(key?: QueryKey | QueryKey[]): void {
@@ -164,6 +203,8 @@ export class QueryCache {
       this.clearTimers(entry);
       this.entries.delete(entry.keyHash);
     }
+
+    this.devtools.notify();
   }
 
   setData<TData>(key: QueryKey, data: TData | ((current: TData | undefined) => TData)): void {
@@ -187,6 +228,7 @@ export class QueryCache {
 
     entry.abortController?.abort();
     entry.state.fetchStatus = "idle";
+    this.devtools.notify();
   }
 
   reset(): void {
@@ -195,6 +237,8 @@ export class QueryCache {
     }
 
     this.entries.clear();
+    this.devtools.clearMutations();
+    this.devtools.notify();
   }
 
   mutate<TData, TVariables, TContext>(
@@ -207,6 +251,7 @@ export class QueryCache {
       mutate: async (variables: TVariables) => {
         mutation.status = "pending";
         mutation.error = null;
+        const mutationId = this.devtools.trackMutationStart(variables);
 
         let context: TContext | undefined;
 
@@ -215,6 +260,7 @@ export class QueryCache {
           const data = await this.runMutationWithRetry(options.mutationFn, variables);
           mutation.data = data;
           mutation.status = "success";
+          this.devtools.trackMutationSuccess(mutationId, data);
           options.onSuccess?.(data, variables, context);
           options.onSettled?.(data, null, variables, context);
           return data;
@@ -222,6 +268,7 @@ export class QueryCache {
           const mutationError = error instanceof Error ? error : new Error(String(error));
           mutation.error = mutationError;
           mutation.status = "error";
+          this.devtools.trackMutationError(mutationId, mutationError);
           options.onError?.(mutationError, variables, context);
           options.onSettled?.(undefined, mutationError, variables, context);
           throw mutationError;
@@ -288,6 +335,7 @@ export class QueryCache {
     attachQueryFlags(entry.state, resolvedOptions.staleTime);
 
     this.entries.set(keyHash, entry as QueryEntry);
+    this.devtools.notify();
     return entry;
   }
 
@@ -300,6 +348,7 @@ export class QueryCache {
     entry.observers += 1;
     this.ensureFocusListener();
     this.ensureRefetchInterval(entry);
+    this.devtools.notify();
   }
 
   private unsubscribe<TData>(entry: QueryEntry<TData>): void {
@@ -309,6 +358,8 @@ export class QueryCache {
       this.scheduleGc(entry);
       this.clearRefetchInterval(entry);
     }
+
+    this.devtools.notify();
   }
 
   private scheduleGc<TData>(entry: QueryEntry<TData>): void {
@@ -320,6 +371,7 @@ export class QueryCache {
       if (entry.observers === 0) {
         this.clearTimers(entry);
         this.entries.delete(entry.keyHash);
+        this.devtools.notify();
       }
     }, entry.options.gcTime);
   }
@@ -415,6 +467,7 @@ export class QueryCache {
     entry.state.fetchStatus = "fetching";
     entry.abortController?.abort();
     entry.abortController = new AbortController();
+    this.devtools.notify();
 
     entry.fetchPromise = this.runQuery(entry)
       .catch(() => {
@@ -426,6 +479,7 @@ export class QueryCache {
         if (entry.state.fetchStatus === "fetching") {
           entry.state.fetchStatus = "idle";
         }
+        this.devtools.notify();
       });
 
     return entry.fetchPromise;
@@ -461,6 +515,7 @@ export class QueryCache {
     entry.state.dataUpdatedAt = Date.now();
     entry.state.errorUpdatedAt = 0;
     entry.state.fetchStatus = "idle";
+    this.devtools.notify();
   }
 
   private applyError<TData>(entry: QueryEntry<TData>, error: Error): void {
@@ -468,6 +523,7 @@ export class QueryCache {
     entry.state.status = "error";
     entry.state.errorUpdatedAt = Date.now();
     entry.state.fetchStatus = "idle";
+    this.devtools.notify();
   }
 
   private async runMutationWithRetry<TData, TVariables>(

@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query
 
+## 0.2.0
+
+### Minor Changes
+
+- c7d717d: Make the query cache store-agnostic via pluggable `QueryStateAdapter`. Export `vanillaQueryAdapter` (default), `nanostoresQueryAdapter` (recommended), and `createAlpineNanostoresAdapter` for the Alpine plugin with `@nanostores/alpine`.
+
 ## 0.1.2
 
 ### Patch Changes

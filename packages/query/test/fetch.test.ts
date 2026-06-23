@@ -72,6 +72,22 @@ describe("typedFetch", () => {
     });
   });
 
+  it("supports throwOnHttpError=false for custom error parsing", async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ errors: [{ detail: "Not found" }] }), {
+        status: 404,
+        headers: { "content-type": "application/vnd.api+json" },
+      })
+    );
+
+    const data = await typedFetch<{ errors: { detail: string }[] }>("/api/articles/missing", {
+      fetcher,
+      throwOnHttpError: false,
+    });
+
+    expect(data.errors[0]?.detail).toBe("Not found");
+  });
+
   it("infers the response generic", () => {
     expectTypeOf(typedFetch<Todo[]>).returns.resolves.toEqualTypeOf<Todo[]>();
   });

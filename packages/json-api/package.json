@@ -1,0 +1,61 @@
+{
+  "name": "@ailuracode/alpine-json-api",
+  "version": "0.0.0",
+  "description": "Strongly typed JSON:API client for Alpine.js",
+  "type": "module",
+  "license": "MIT",
+  "author": "ailuracode",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailuracode/alpine.git",
+    "directory": "packages/json-api"
+  },
+  "bugs": {
+    "url": "https://github.com/ailuracode/alpine/issues"
+  },
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/json-api#readme",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./global": {
+      "types": "./dist/global.d.ts"
+    }
+  },
+  "types": "./dist/global.d.ts",
+  "dependencies": {
+    "@ailuracode/alpine-query": "workspace:*"
+  },
+  "peerDependencies": {
+    "@types/alpinejs": "^3.13.11",
+    "alpinejs": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/alpinejs": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist --tsconfig tsconfig.build.json && cp src/global.d.ts dist/global.d.ts",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest run --config ../../vitest.config.ts test"
+  },
+  "keywords": [
+    "alpinejs",
+    "alpine",
+    "plugin",
+    "json-api",
+    "jsonapi",
+    "rest",
+    "fetch",
+    "typescript"
+  ]
+}

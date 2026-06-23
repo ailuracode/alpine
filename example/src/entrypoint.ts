@@ -21,6 +21,8 @@ import share from "@ailuracode/alpine-share";
 import theme from "@ailuracode/alpine-theme";
 import toggle from "@ailuracode/alpine-toggle";
 import touch from "@ailuracode/alpine-touch";
+import jsonApi from "@ailuracode/alpine-json-api";
+import { jsonApiDemoOptions, registerJsonApiDemo } from "./json-api-demo.js";
 import { registerQueryDemos } from "./query-demos.js";
 
 export default (Alpine: Alpine) => {
@@ -48,7 +50,9 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(platform);
 	Alpine.plugin(NanoStores);
 	Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
+	Alpine.plugin(jsonApi(jsonApiDemoOptions));
 	const queryDemoStores = registerQueryDemos(Alpine);
+	registerJsonApiDemo(Alpine);
 	Alpine.plugin(queryDevtools({ position: "bottom", additionalStores: queryDemoStores }));
 	Alpine.plugin(notify);
 };

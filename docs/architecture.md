@@ -64,6 +64,7 @@ Use a **magic** when you need:
 | `@ailuracode/alpine-platform` | `$platform` | Client OS and platform detection |
 | `@ailuracode/alpine-clipboard` | `$clipboard` | Async copy function |
 | `@ailuracode/alpine-export` | `$export` | Programmatic file exports (downloads) |
+| `@ailuracode/alpine-json-api` | `$jsonapi` | Typed JSON:API client — `$jsonapi.findAll('articles')` |
 | `@ailuracode/alpine-calendar` | `$calendar` | Calendar date logic — `$calendar({ weekStartsOn: 1 })` |
 | `@ailuracode/alpine-toggle` | `$toggle` | Binary / ternary toggle — `$toggle({ states: { truly: 'on', falsely: 'off' } })` |
 | `@ailuracode/alpine-share` | `$share` | Web Share API — `await $share(data)`, `$share.isSupported`, `$share.canShare()` |

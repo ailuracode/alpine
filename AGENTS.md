@@ -26,6 +26,7 @@ Alpine.js plugin monorepo by **ailuracode**. Twenty-one independent npm packages
 | `@ailuracode/alpine-share` | Magic | `$share` |
 | `@ailuracode/alpine-attention` | Magic | `$wakelock`, `$idle` |
 | `@ailuracode/alpine-query` | Core | Store-agnostic query cache (`createQueryClient`, `query({ adapter })`) |
+| `@ailuracode/alpine-json-api` | Magic | `$jsonapi` — typed JSON:API client |
 | `@ailuracode/alpine-query-adapter-nanostores` | Plugin | **Recommended** — Nanostores + `@nanostores/alpine` |
 | `@ailuracode/alpine-query-adapter-alpine` | Plugin | Native `Alpine.reactive` adapter |
 | `@ailuracode/alpine-query-adapter-zustand` | Plugin | Zustand vanilla adapter |

@@ -20,6 +20,8 @@ export interface TypedFetchInit extends Omit<RequestInit, "body"> {
   fetcher?: typeof fetch;
   /** Parse the response body. Defaults to JSON. */
   parse?: ResponseParser<unknown>;
+  /** When false, non-OK responses are passed to `parse` instead of throwing `HttpError`. */
+  throwOnHttpError?: boolean;
 }
 
 function parseJsonBody(response: Response): Promise<unknown> {
@@ -40,10 +42,15 @@ function parseJsonBody(response: Response): Promise<unknown> {
  * Pass an explicit generic to describe the expected response shape.
  */
 export async function typedFetch<T>(input: RequestInfo | URL, init?: TypedFetchInit): Promise<T> {
-  const { fetcher = fetch, parse = parseJsonBody, ...requestInit } = init ?? {};
+  const {
+    fetcher = fetch,
+    parse = parseJsonBody,
+    throwOnHttpError = true,
+    ...requestInit
+  } = init ?? {};
   const response = await fetcher(input, requestInit);
 
-  if (!response.ok) {
+  if (!response.ok && throwOnHttpError) {
     throw new HttpError(`Request failed with status ${response.status}`, response);
   }
 

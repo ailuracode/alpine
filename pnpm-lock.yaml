@@ -60,6 +60,9 @@ importers:
       '@ailuracode/alpine-geo':
         specifier: workspace:*
         version: link:../packages/geo
+      '@ailuracode/alpine-json-api':
+        specifier: workspace:*
+        version: link:../packages/json-api
       '@ailuracode/alpine-network':
         specifier: workspace:*
         version: link:../packages/network
@@ -184,6 +187,18 @@ importers:
 
   packages/geo:
     dependencies:
+      '@types/alpinejs':
+        specifier: ^3.13.11
+        version: 3.13.11
+      alpinejs:
+        specifier: ^3.0.0
+        version: 3.15.12
+
+  packages/json-api:
+    dependencies:
+      '@ailuracode/alpine-query':
+        specifier: workspace:*
+        version: link:../query
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11

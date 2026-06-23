@@ -37,7 +37,11 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 
 		<div
 			class="query-table-wrap"
-			x-bind:class="{ 'is-fetching': query?.isFetching && hasCachedPage }"
+			x-bind:class="{
+				'is-fetching': query?.isFetching && hasCachedPage,
+				'is-awaiting-data': isAwaitingData,
+			}"
+			x-bind:aria-busy="isAwaitingData || query?.isFetching"
 		>
 			<table class="query-table">
 				<thead>
@@ -49,10 +53,13 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 				<tbody>
 					<template x-for="row in tableRows" :key="page + '-' + row.id">
 						<tr x-bind:class="{ 'is-loading': row.loading }">
-							<td x-text="row.id"></td>
 							<td>
-								<span x-show="!row.loading" x-text="row.name"></span>
+								<span class="query-table-skeleton query-table-skeleton--short" x-show="row.loading" aria-hidden="true"></span>
+								<span x-show="!row.loading" x-text="row.id"></span>
+							</td>
+							<td>
 								<span class="query-table-skeleton" x-show="row.loading" aria-hidden="true"></span>
+								<span x-show="!row.loading" x-text="row.name"></span>
 							</td>
 						</tr>
 					</template>

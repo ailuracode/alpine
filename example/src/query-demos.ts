@@ -67,8 +67,8 @@ function createPokeapiDemo(options: {
 				return this.rows;
 			}
 
-			// Avoid isLoading in the demo — it flickers on page changes. Use fetch + cache instead.
-			if (this.query?.isFetching && !this.hasCachedPage) {
+			// Skeleton while the query resolves — avoid isLoading (flickers on page changes).
+			if (this.query && !this.hasCachedPage) {
 				const offset = (this.page - 1) * this.pageSize;
 				return Array.from({ length: this.pageSize }, (_, index) => ({
 					id: offset + index + 1,
@@ -78,6 +78,9 @@ function createPokeapiDemo(options: {
 			}
 
 			return [];
+		},
+		get isAwaitingData(): boolean {
+			return Boolean(this.query && !this.hasCachedPage);
 		},
 		get totalCount(): number {
 			return this.query?.data?.count ?? 0;

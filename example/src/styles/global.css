@@ -497,6 +497,14 @@ kbd {
 	animation: query-table-shimmer 1.2s ease-in-out infinite;
 }
 
+.query-table-skeleton--short {
+	width: 1.75rem;
+}
+
+.query-table-wrap.is-awaiting-data .query-table tbody tr.is-loading td {
+	color: transparent;
+}
+
 @keyframes query-table-shimmer {
 	0% {
 		background-position: 100% 0;

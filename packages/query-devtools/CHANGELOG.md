@@ -1,5 +1,12 @@
 # @ailuracode/alpine-query-devtools
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @ailuracode/alpine-query@0.6.1
+
 ## 0.2.2
 
 ### Patch Changes

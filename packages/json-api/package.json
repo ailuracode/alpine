@@ -1,7 +1,7 @@
 {
-  "name": "@ailuracode/alpine-query",
-  "version": "0.6.1",
-  "description": "Store-agnostic async data fetching for Alpine.js with TanStack Query-style caching",
+  "name": "@ailuracode/alpine-json-api",
+  "version": "0.1.2",
+  "description": "Strongly typed JSON:API client for Alpine.js",
   "type": "module",
   "license": "MIT",
   "author": "ailuracode",
@@ -11,12 +11,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ailuracode/alpine.git",
-    "directory": "packages/query"
+    "directory": "packages/json-api"
   },
   "bugs": {
     "url": "https://github.com/ailuracode/alpine/issues"
   },
-  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/query#readme",
+  "homepage": "https://github.com/ailuracode/alpine/tree/master/packages/json-api#readme",
   "files": [
     "dist",
     "README.md"
@@ -26,15 +26,14 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./adapters/vanilla": {
-      "types": "./dist/adapters/vanilla.d.ts",
-      "default": "./dist/adapters/vanilla.js"
-    },
     "./global": {
       "types": "./dist/global.d.ts"
     }
   },
   "types": "./dist/global.d.ts",
+  "dependencies": {
+    "@ailuracode/alpine-query": "workspace:*"
+  },
   "peerDependencies": {
     "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.0.0"
@@ -45,7 +44,7 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts src/adapters/vanilla.ts --format esm --dts --clean --sourcemap --out-dir dist && cp src/global.d.ts dist/global.d.ts",
+    "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist --tsconfig tsconfig.build.json && cp src/global.d.ts dist/global.d.ts",
     "prepublishOnly": "pnpm run build",
     "test": "vitest run --config ../../vitest.config.ts test"
   },
@@ -53,10 +52,10 @@
     "alpinejs",
     "alpine",
     "plugin",
-    "query",
-    "cache",
+    "json-api",
+    "jsonapi",
+    "rest",
     "fetch",
-    "tanstack-query",
-    "async"
+    "typescript"
   ]
 }

@@ -12,6 +12,7 @@
 /// <reference path="../../packages/clipboard/src/global.d.ts" />
 /// <reference path="../../packages/export/src/global.d.ts" />
 /// <reference path="../../packages/geo/src/global.d.ts" />
+/// <reference path="../../packages/json-api/src/global.d.ts" />
 /// <reference path="../../packages/toggle/src/global.d.ts" />
 /// <reference path="../../packages/touch/src/global.d.ts" />
 /// <reference path="../../packages/platform/src/global.d.ts" />

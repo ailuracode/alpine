@@ -475,6 +475,42 @@ import PokeapiQueryDemo from "../components/PokeapiQueryDemo.astro";
 			</div>
 		</section>
 
+		<section class="card bg-base-100 shadow-sm border border-base-200" x-data="jsonApiDemo" x-init="init()">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					JSON:API <code class="text-base-content/60 font-normal">$jsonapi</code>
+				</h2>
+				<p class="text-sm text-base-content/70">
+					Typed JSON:API client backed by a static compound document. Articles load via
+					<code>jsonApiQueryOptions()</code> and <code>$store.query.observe()</code> with
+					<code>include: ['author']</code>. Author names come from
+					<code>relationships.author.resolved</code>.
+				</p>
+				<p class="text-sm text-base-content/60" x-show="query?.isLoading" x-cloak>Loading articles…</p>
+				<p class="text-sm text-error" x-show="query?.isError" x-cloak x-text="query?.error?.message"></p>
+				<div class="overflow-x-auto mt-3" x-show="query?.isSuccess" x-cloak>
+					<table class="table table-sm">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Title</th>
+								<th>Author</th>
+							</tr>
+						</thead>
+						<tbody>
+							<template x-for="row in rows" :key="row.id">
+								<tr>
+									<td x-text="row.id"></td>
+									<td x-text="row.title"></td>
+									<td x-text="row.author"></td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+
 		<section class="card bg-base-100 shadow-sm border border-base-200">
 			<div class="card-body">
 				<h2 class="card-title text-base">Touch <code class="text-base-content/60 font-normal">$touch</code></h2>

@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "type": "articles",
+      "id": "1",
+      "attributes": {
+        "title": "JSON:API paints my bikeshed!",
+        "body": "A complete specification for building APIs."
+      },
+      "relationships": {
+        "author": {
+          "data": { "type": "people", "id": "9" }
+        }
+      }
+    },
+    {
+      "type": "articles",
+      "id": "2",
+      "attributes": {
+        "title": "Alpine + JSON:API",
+        "body": "Typed fetch helpers for queryFn callbacks."
+      },
+      "relationships": {
+        "author": {
+          "data": { "type": "people", "id": "9" }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "people",
+      "id": "9",
+      "attributes": {
+        "name": "Dan Gebhardt"
+      }
+    }
+  ],
+  "links": {
+    "self": "/json-api/articles.json"
+  }
+}

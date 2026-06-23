@@ -21,12 +21,17 @@ export {
   parseSingleDocument,
   readJsonApiDocument,
 } from "./parse.js";
+export { jsonApiFindOneQueryOptions, jsonApiQueryOptions } from "./query.js";
 export {
   buildJsonApiQuery,
   buildJsonApiUrl,
   createJsonApiHeaders,
   createResourceDocument,
 } from "./request.js";
+export {
+  indexIncludedResources,
+  resolveResourceIncluded,
+} from "./resolve.js";
 export { defineJsonApiSchema } from "./schema.js";
 export type {
   InferAttributes,
@@ -44,6 +49,7 @@ export type {
   JsonApiQueryOptions,
   JsonApiRelationship,
   JsonApiRelationshipPayload,
+  JsonApiResolvedRelationshipValue,
   JsonApiResource,
   JsonApiResourceIdentifier,
   JsonApiResourceObject,

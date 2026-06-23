@@ -1,6 +1,7 @@
 import {
 	createJsonApiClient,
 	defineJsonApiSchema,
+	jsonApiQueryOptions,
 	type JsonApiCollectionDocument,
 } from "@ailuracode/alpine-json-api";
 import type { QueryState, QueryStore } from "@ailuracode/alpine-query";
@@ -46,31 +47,28 @@ export const jsonApiDemoOptions = {
 
 export const jsonApiClient = createJsonApiClient(jsonApiDemoOptions);
 
+const articlesQueryDefinition = jsonApiQueryOptions({
+	client: jsonApiClient,
+	resource: "articles",
+	query: { include: ["author"] },
+	queryKey: ["json-api", "articles"] as const,
+	staleTime: 5 * 60_000,
+});
+
 export function registerJsonApiDemo(Alpine: Alpine): void {
 	Alpine.data("jsonApiDemo", (): JsonApiDemoData => ({
 		query: null,
 		get rows(): JsonApiDemoRow[] {
-			const included = this.query?.data?.included ?? [];
-
-			return (this.query?.data?.data ?? []).map((article) => {
-				const authorId = article.relationships?.author?.data?.id;
-				const author = included.find(
-					(resource) => resource.type === "people" && resource.id === authorId,
-				);
-
-				return {
-					id: article.id,
-					title: article.attributes.title,
-					author: author?.attributes.name ?? "Unknown",
-				};
-			});
+			return (this.query?.data?.data ?? []).map((article) => ({
+				id: article.id,
+				title: article.attributes.title,
+				author: article.relationships?.author?.resolved?.attributes.name ?? "Unknown",
+			}));
 		},
 		init() {
 			const store = Alpine.store("query") as QueryStore;
 
-			this.query = store.observe(["json-api", "articles"], () =>
-				jsonApiClient.findAll("articles", { include: ["author"] }),
-			);
+			this.query = store.observe(articlesQueryDefinition);
 		},
 		destroy() {
 			this.query?.destroy();

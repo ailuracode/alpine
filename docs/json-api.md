@@ -57,18 +57,34 @@ Registers magic `$jsonapi` with the configured client.
 - Sparse fieldsets (`fields[type]=a,b`)
 - `include`, `sort`, `page`, and `filter` query params
 - JSON:API error documents via `JsonApiHttpError`
+- Automatic `relationships.*.resolved` hydration from compound `included` documents
 - Built on `typedFetch` from `@ailuracode/alpine-query`
 
 ## Query cache integration
 
 ```js
-$store.query.observe(["articles", page], () =>
-  $jsonapi.findAll("articles", {
-    page: { number: page, size: 10 },
-    include: ["author"],
-  })
-);
+import { jsonApiQueryOptions } from "@ailuracode/alpine-json-api";
+
+const articles = jsonApiQueryOptions({
+  client: $jsonapi,
+  resource: "articles",
+  query: { include: ["author"] },
+  queryKey: ["articles"] as const,
+  staleTime: 60_000,
+});
+
+$store.query.observe(articles);
+
+// Single resource
+const article = jsonApiFindOneQueryOptions({
+  client: $jsonapi,
+  resource: "articles",
+  id: articleId,
+  queryKey: ["articles", articleId] as const,
+});
 ```
+
+Resolved relationships are available on `data[].relationships.author.resolved` after `include` fetches compound documents.
 
 ## See also
 

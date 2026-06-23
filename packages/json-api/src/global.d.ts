@@ -18,6 +18,7 @@ export type {
   JsonApiQueryOptions,
   JsonApiRelationship,
   JsonApiRelationshipPayload,
+  JsonApiResolvedRelationshipValue,
   JsonApiResource,
   JsonApiResourceIdentifier,
   JsonApiResourceObject,

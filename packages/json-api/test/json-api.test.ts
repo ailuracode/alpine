@@ -134,6 +134,8 @@ describe("@ailuracode/alpine-json-api", () => {
     expect(result.data.attributes.title).toBe("JSON:API paints my bikeshed!");
     expect(result.included).toHaveLength(2);
     expect(result.data.relationships?.author?.data).toEqual({ type: "people", id: "9" });
+    expect(result.data.relationships?.author?.resolved?.attributes.name).toBe("Dan Gebhardt");
+    expect(result.data.relationships?.comments?.resolved?.[0]?.attributes.body).toBe("First!");
   });
 
   it("create(), update(), and delete() send JSON:API request bodies and headers", async () => {
@@ -237,7 +239,10 @@ describe("@ailuracode/alpine-json-api type inference", () => {
         type: "articles";
         attributes: { title: string; body: string };
         relationships?: {
-          author?: { data: { type: "people"; id: string } | null };
+          author?: {
+            data: { type: "people"; id: string } | null;
+            resolved: { type: "people"; attributes: { name: string } } | null;
+          };
         };
       };
     }>();

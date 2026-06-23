@@ -1,4 +1,5 @@
 import { JsonApiHttpError } from "./errors.js";
+import { resolveResourceIncluded } from "./resolve.js";
 import type {
   JsonApiCollectionDocument,
   JsonApiDocument,
@@ -98,7 +99,10 @@ export function parseSingleDocument<
   }
 
   return {
-    data: toTypedResource<TSchema, TType>(document.data, type),
+    data: resolveResourceIncluded(
+      toTypedResource<TSchema, TType>(document.data, type),
+      mapIncluded<TSchema>(document.included)
+    ),
     included: mapIncluded<TSchema>(document.included),
     ...(document.meta ? { meta: document.meta } : {}),
     ...(document.links ? { links: document.links } : {}),
@@ -113,15 +117,17 @@ export function parseCollectionDocument<
     throw new Error(`Expected a ${type} collection`);
   }
 
+  const included = mapIncluded<TSchema>(document.included);
+
   return {
     data: document.data.map((resource) => {
       if (resource.type !== type) {
         throw new Error(`Expected resource type "${type}", received "${resource.type}"`);
       }
 
-      return toTypedResource<TSchema, TType>(resource, type);
+      return resolveResourceIncluded(toTypedResource<TSchema, TType>(resource, type), included);
     }),
-    included: mapIncluded<TSchema>(document.included),
+    included,
     ...(document.meta ? { meta: document.meta } : {}),
     ...(document.links ? { links: document.links } : {}),
   };

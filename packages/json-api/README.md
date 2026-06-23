@@ -83,6 +83,10 @@ $store.query.observe(["articles"], () => $jsonapi.findAll("articles"));
 | `create(type, payload)` | `POST` a new resource |
 | `update(type, id, payload)` | `PATCH` a resource |
 | `delete(type, id)` | `DELETE` a resource |
+| `jsonApiQueryOptions({ client, resource, queryKey, ... })` | Build a typed collection `queryOptions` definition |
+| `jsonApiFindOneQueryOptions({ client, resource, id, queryKey, ... })` | Build a typed single-resource `queryOptions` definition |
+
+Relationships in responses include a `resolved` field populated automatically from compound `included` documents.
 
 Query options support `include`, sparse `fields`, `sort`, `page`, and `filter` parameters per the JSON:API spec.
 

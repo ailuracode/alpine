@@ -117,6 +117,20 @@ export type JsonApiRelationshipData<
     : never
   : never;
 
+export type JsonApiResolvedRelationshipValue<
+  TSchema extends JsonApiSchema,
+  TType extends SchemaResourceType<TSchema>,
+  TRelationship extends InferRelationshipNames<TSchema, TType>,
+> = TSchema[TType] extends { relationships: infer TRelationships }
+  ? TRelationships extends Record<string, RelationshipSchema>
+    ? TRelationship extends keyof TRelationships
+      ? TRelationships[TRelationship] extends { many: true }
+        ? Array<JsonApiResource<TSchema, TRelationships[TRelationship]["type"]>>
+        : JsonApiResource<TSchema, TRelationships[TRelationship]["type"]> | null
+      : never
+    : never
+  : never;
+
 export type JsonApiResource<
   TSchema extends JsonApiSchema,
   TType extends SchemaResourceType<TSchema>,
@@ -127,6 +141,7 @@ export type JsonApiResource<
   relationships?: {
     [TRelationship in InferRelationshipNames<TSchema, TType>]?: {
       data: JsonApiRelationshipData<TSchema, TType, TRelationship>;
+      resolved: JsonApiResolvedRelationshipValue<TSchema, TType, TRelationship>;
       links?: JsonApiLinks;
       meta?: Record<string, unknown>;
     };

@@ -154,7 +154,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 					type="button"
 					x-show="$idle.isSupported && !$idle.isWatching"
 					x-cloak
-					@click="$idle.start({ threshold: 30000 })"
+					@click="$idle.start()"
 					x-bind:disabled="$idle.isLoading"
 				>
 					Start idle detection

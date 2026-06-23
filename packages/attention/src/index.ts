@@ -57,6 +57,12 @@ export interface IdleMagic {
 }
 
 export const DEFAULT_IDLE_THRESHOLD = 60_000;
+export const MIN_IDLE_THRESHOLD = 60_000;
+
+/** Clamps idle thresholds to the browser minimum (1 minute). */
+export function normalizeIdleThreshold(threshold = DEFAULT_IDLE_THRESHOLD): number {
+  return Math.max(threshold, MIN_IDLE_THRESHOLD);
+}
 
 function getWakeLock(): WakeLockLike | null {
   if (typeof navigator === "undefined") {
@@ -277,7 +283,7 @@ function registerIdleMagic(Alpine: AlpineType.Alpine): void {
       return false;
     }
 
-    const threshold = options?.threshold ?? target.threshold;
+    const threshold = normalizeIdleThreshold(options?.threshold ?? target.threshold);
     target.threshold = threshold;
     target.isLoading = true;
     target.error = null;

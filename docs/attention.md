@@ -45,7 +45,7 @@ The plugin re-acquires the wake lock when the tab becomes visible again if you p
 | `userState` | `'active' \| 'idle' \| null` | Current user idle state |
 | `screenState` | `'locked' \| 'unlocked' \| null` | Current screen lock state |
 | `permission` | `PermissionState \| null` | Last known idle-detection permission |
-| `threshold` | `number` | Idle threshold in milliseconds (default `60000`) |
+| `threshold` | `number` | Idle threshold in milliseconds (default and minimum `60000`) |
 | `error` | `string \| null` | Last error message, if any |
 | `requestPermission()` | `() => Promise<PermissionState>` | Prompt for idle-detection permission |
 | `start(options?)` | `(options?: { threshold?: number }) => Promise<boolean>` | Start idle detection |
@@ -69,7 +69,7 @@ The plugin re-acquires the wake lock when the tab becomes visible again if you p
   <button
     type="button"
     x-show="$idle.isSupported && !$idle.isWatching"
-    @click="$idle.start({ threshold: 30000 })"
+    @click="$idle.start()"
   >
     Start idle detection
   </button>
@@ -85,6 +85,7 @@ The plugin re-acquires the wake lock when the tab becomes visible again if you p
 
 - Both APIs require a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) (HTTPS or localhost)
 - Idle Detection requires explicit permission via `requestPermission()` or `start()`
+- The idle threshold must be at least **1 minute** (`60000` ms); lower values are clamped automatically
 - Wake locks are released automatically when the tab is hidden; the plugin re-requests them on return when appropriate
 - Browser support is limited — always check `isSupported` before calling actions
 - Read-only environment state with imperative methods — no store, no persistence

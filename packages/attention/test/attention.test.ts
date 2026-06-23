@@ -8,6 +8,8 @@ import attentionPlugin, {
   type IdleMagic,
   isIdleDetectionSupported,
   isWakeLockSupported,
+  MIN_IDLE_THRESHOLD,
+  normalizeIdleThreshold,
   type WakeLockMagic,
   type WakeLockSentinelLike,
 } from "../src/index.js";
@@ -252,6 +254,7 @@ describe("@ailuracode/alpine-attention", () => {
         userState: "active",
         screenState: "unlocked",
       });
+      const startSpy = vi.spyOn(detector, "start");
 
       const restore = mockIdleDetector(createIdleDetectorClass(detector));
 
@@ -260,8 +263,9 @@ describe("@ailuracode/alpine-attention", () => {
       await expect(idle.requestPermission()).resolves.toBe("granted");
       await expect(idle.start({ threshold: 30_000 })).resolves.toBe(true);
 
+      expect(startSpy).toHaveBeenCalledWith({ threshold: MIN_IDLE_THRESHOLD });
       expect(idle.isWatching).toBe(true);
-      expect(idle.threshold).toBe(30_000);
+      expect(idle.threshold).toBe(MIN_IDLE_THRESHOLD);
       expect(idle.isActive).toBe(true);
       expect(idle.isIdle).toBe(false);
       expect(idle.screenState).toBe("unlocked");
@@ -338,5 +342,10 @@ describe("helpers", () => {
       isWatching: false,
       isSupported: false,
     });
+  });
+
+  it("clamps idle thresholds below one minute", () => {
+    expect(normalizeIdleThreshold(30_000)).toBe(MIN_IDLE_THRESHOLD);
+    expect(normalizeIdleThreshold(120_000)).toBe(120_000);
   });
 });

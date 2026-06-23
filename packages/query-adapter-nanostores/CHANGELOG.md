@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query-adapter-nanostores
 
+## 2.0.1
+
+### Patch Changes
+
+- 4abe365: Fix Nanostores and Zustand adapters to apply `undefined` patch values (e.g. mutation `reset()` clears `data`). Route multi-store devtools actions by unique store id when adapter names repeat.
+
 ## 2.0.0
 
 ### Patch Changes

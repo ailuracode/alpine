@@ -8,11 +8,13 @@ import type {
 
 export type QueryDevtoolsEntryView = QueryDevtoolsEntry & {
   adapterName: string;
+  storeId: string;
   entryId: string;
 };
 
 export type MutationDevtoolsEntryView = MutationDevtoolsEntry & {
   adapterName: string;
+  storeId: string;
   entryId: string;
 };
 
@@ -28,6 +30,12 @@ export interface MergedQueryDevtools {
   getStoreForMutation(entry: MutationDevtoolsEntryView): QueryStore;
 }
 
+interface StoreContext {
+  store: QueryStore;
+  storeId: string;
+  displayName: string;
+}
+
 function assertDevtoolsStore(store: QueryStore): void {
   if (!store.devtools) {
     throw new Error(
@@ -36,39 +44,54 @@ function assertDevtoolsStore(store: QueryStore): void {
   }
 }
 
-function buildSnapshotView(stores: QueryStore[]): QueryDevtoolsSnapshotView {
+function createStoreContexts(stores: QueryStore[]): StoreContext[] {
+  const adapterNames = stores.map((store) => store.devtools.getSnapshot().adapterName);
+  const seenByAdapter = new Map<string, number>();
+
+  return stores.map((store, index) => {
+    const baseName = adapterNames[index] ?? "";
+    const duplicateTotal = adapterNames.filter((name) => name === baseName).length;
+    const occurrence = (seenByAdapter.get(baseName) ?? 0) + 1;
+    seenByAdapter.set(baseName, occurrence);
+
+    return {
+      store,
+      storeId: String(index),
+      displayName: duplicateTotal > 1 ? `${baseName} #${occurrence}` : baseName,
+    };
+  });
+}
+
+function buildSnapshotView(contexts: StoreContext[]): QueryDevtoolsSnapshotView {
   const queries: QueryDevtoolsEntryView[] = [];
   const mutations: MutationDevtoolsEntryView[] = [];
-  const adapterNames: string[] = [];
 
-  for (const store of stores) {
-    const snapshot = store.devtools.getSnapshot();
-    adapterNames.push(snapshot.adapterName);
+  for (const context of contexts) {
+    const snapshot = context.store.devtools.getSnapshot();
 
     for (const query of snapshot.queries) {
       queries.push({
         ...query,
-        adapterName: snapshot.adapterName,
-        entryId: `${snapshot.adapterName}::${query.keyHash}`,
+        adapterName: context.displayName,
+        storeId: context.storeId,
+        entryId: `${context.storeId}::${query.keyHash}`,
       });
     }
 
     for (const mutation of snapshot.mutations) {
       mutations.push({
         ...mutation,
-        adapterName: snapshot.adapterName,
-        entryId: `${snapshot.adapterName}::${mutation.id}`,
+        adapterName: context.displayName,
+        storeId: context.storeId,
+        entryId: `${context.storeId}::${mutation.id}`,
       });
     }
   }
 
-  const uniqueAdapterNames = [...new Set(adapterNames)];
+  const displayNames = contexts.map((context) => context.displayName);
 
   return {
-    adapterName:
-      uniqueAdapterNames.length === 1
-        ? (uniqueAdapterNames[0] ?? "")
-        : uniqueAdapterNames.join(" · "),
+    adapterName: displayNames.length === 1 ? (displayNames[0] ?? "") : displayNames.join(" · "),
     queries,
     mutations,
     updatedAt: Date.now(),
@@ -88,13 +111,9 @@ export function createMergedQueryDevtools(stores: QueryStore[]): MergedQueryDevt
     assertDevtoolsStore(store);
   }
 
-  const storeByAdapter = new Map<string, QueryStore>();
-
-  for (const store of validStores) {
-    storeByAdapter.set(store.devtools.getSnapshot().adapterName, store);
-  }
-
-  const getSnapshotView = (): QueryDevtoolsSnapshotView => buildSnapshotView(validStores);
+  const contexts = createStoreContexts(validStores);
+  const storeById = new Map(contexts.map((context) => [context.storeId, context.store]));
+  const getSnapshotView = (): QueryDevtoolsSnapshotView => buildSnapshotView(contexts);
 
   const devtools: QueryDevtoolsApi = {
     subscribe(listener) {
@@ -115,19 +134,19 @@ export function createMergedQueryDevtools(stores: QueryStore[]): MergedQueryDevt
     devtools,
     getSnapshotView,
     getStoreForQuery(entry) {
-      const store = storeByAdapter.get(entry.adapterName);
+      const store = storeById.get(entry.storeId);
 
       if (!store) {
-        throw new Error(`No query store registered for adapter "${entry.adapterName}"`);
+        throw new Error(`No query store registered for store id "${entry.storeId}"`);
       }
 
       return store;
     },
     getStoreForMutation(entry) {
-      const store = storeByAdapter.get(entry.adapterName);
+      const store = storeById.get(entry.storeId);
 
       if (!store) {
-        throw new Error(`No query store registered for adapter "${entry.adapterName}"`);
+        throw new Error(`No query store registered for store id "${entry.storeId}"`);
       }
 
       return store;

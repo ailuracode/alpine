@@ -23,4 +23,21 @@ describe("@ailuracode/alpine-query-adapter-nanostores", () => {
     query.destroy();
     client.reset();
   });
+
+  it("clears mutation data when reset() patches undefined", async () => {
+    const client = createQueryClient({ adapter: nanostoresQueryAdapter });
+    const mutation = client.mutate<string, string>({
+      mutationFn: async (value) => `done:${value}`,
+    });
+
+    await mutation.mutate("test");
+    expect(mutation.data).toBe("done:test");
+    expect(mutation.status).toBe("success");
+
+    mutation.reset();
+
+    expect(mutation.data).toBeUndefined();
+    expect(mutation.status).toBe("idle");
+    client.reset();
+  });
 });

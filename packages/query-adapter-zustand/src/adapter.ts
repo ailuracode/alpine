@@ -17,7 +17,7 @@ function patchZustandStore<TRecord extends Record<string, unknown>>(
 
   for (const key of Object.keys(patch) as (keyof TRecord)[]) {
     const value = patch[key];
-    if (value !== undefined && current[key] !== value) {
+    if (current[key] !== value) {
       next[key] = value as TRecord[keyof TRecord];
       changed = true;
     }

@@ -1,5 +1,6 @@
 import { createQueryClient } from "@ailuracode/alpine-query";
 import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
+import { nanostoresQueryAdapter } from "@ailuracode/alpine-query-adapter-nanostores";
 import { createAlpineZustandAdapter } from "@ailuracode/alpine-query-adapter-zustand";
 import { describe, expect, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
@@ -61,5 +62,34 @@ describe("query devtools merge stores", () => {
     query.destroy();
     zustandClient.reset();
     alpineClient.reset();
+  });
+
+  it("routes actions to the correct store when adapter names repeat", async () => {
+    const primary = createQueryClient({ adapter: nanostoresQueryAdapter });
+    const secondary = createQueryClient({ adapter: nanostoresQueryAdapter });
+    const merged = createMergedQueryDevtools([primary, secondary]);
+
+    primary.observe(["shared", "primary"], async () => "primary");
+    secondary.observe(["shared", "secondary"], async () => "secondary");
+
+    await vi.waitFor(() => {
+      expect(primary.get(["shared", "primary"])?.isSuccess).toBe(true);
+      expect(secondary.get(["shared", "secondary"])?.isSuccess).toBe(true);
+    });
+
+    const snapshot = merged.getSnapshotView();
+    expect(snapshot.adapterName).toBe("Nanostores #1 · Nanostores #2");
+
+    const secondaryEntry = snapshot.queries.find((entry) => entry.adapterName === "Nanostores #2");
+    if (!secondaryEntry) {
+      throw new Error("Expected Nanostores #2 query entry");
+    }
+
+    merged.getStoreForQuery(secondaryEntry).remove(secondaryEntry.key);
+    expect(primary.get(["shared", "primary"])?.data).toBe("primary");
+    expect(secondary.get(["shared", "secondary"])).toBeUndefined();
+
+    primary.reset();
+    secondary.reset();
   });
 });

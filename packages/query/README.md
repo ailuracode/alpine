@@ -39,7 +39,132 @@ const vanilla = createQueryClient();
 const query = createQueryClient({ adapter: nanostoresQueryAdapter });
 ```
 
-## Custom Alpine plugin
+## Custom adapter
+
+Implement **`QueryStateAdapter`** to connect any reactive store to the query cache. The engine calls your adapter whenever a query or mutation entry is created; you own how that state is stored and how updates propagate.
+
+### Interface
+
+```ts
+import type {
+  MutationStateHandle,
+  QueryStateAdapter,
+  QueryStateHandle,
+} from "@ailuracode/alpine-query";
+
+// createQueryState → QueryStateHandle
+//   get()    — snapshot: { data, error, status, fetchStatus, dataUpdatedAt, errorUpdatedAt }
+//   patch()  — apply partial updates from the cache engine
+//   listen() — subscribe to record changes; return unsubscribe
+//   state    — reactive QueryState<TData> (getters + refetch + isLoading, isSuccess, …)
+
+// createMutationState → MutationStateHandle
+//   same shape, record fields: { data, error, status }
+//   state includes mutate / reset plus isPending, isSuccess, …
+```
+
+### Helpers exported by the core
+
+| Export | Use when |
+|--------|----------|
+| `createQueryStateView(getRecord, staleTime, refetch)` | Build `QueryState` getters + flags from a plain record |
+| `createMutationStateView(getRecord, handlers)` | Build `MutationState` getters + flags from a plain record |
+| `attachQueryFlags(state, staleTime)` | Attach boolean getters to an existing reactive query object |
+| `attachMutationFlags(state)` | Attach boolean getters to an existing reactive mutation object |
+| `createAlpineBridgedAdapter(Alpine, base)` | Sync any store-backed adapter into `Alpine.reactive` |
+| `vanillaQueryAdapter` | Reference implementation (zero dependencies) |
+
+### Store-backed adapter (sketch)
+
+```js
+import {
+  createMutationStateView,
+  createQueryStateView,
+  type QueryStateAdapter,
+} from "@ailuracode/alpine-query";
+
+export const myStoreAdapter: QueryStateAdapter = {
+  createQueryState(initial, staleTime, refetch) {
+    const record = { ...initial };
+    const state = createQueryStateView(() => record, staleTime, refetch);
+    const listeners = new Set();
+
+    return {
+      state,
+      get: () => record,
+      patch: (patch) => {
+        Object.assign(record, patch);
+        for (const listener of listeners) listener(record);
+      },
+      listen: (listener) => {
+        listeners.add(listener);
+        listener(record);
+        return () => listeners.delete(listener);
+      },
+    };
+  },
+
+  createMutationState(handlers) {
+    const record = { data: undefined, error: null, status: "idle" };
+    const state = createMutationStateView(() => record, handlers);
+    const listeners = new Set();
+
+    return {
+      state,
+      get: () => record,
+      patch: (patch) => {
+        Object.assign(record, patch);
+        for (const listener of listeners) listener(record);
+      },
+      listen: (listener) => {
+        listeners.add(listener);
+        listener(record);
+        return () => listeners.delete(listener);
+      },
+    };
+  },
+};
+```
+
+Replace the manual `Set` with your store's `subscribe` / `listen` API when available. See [`query-adapter-zustand`](../query-adapter-zustand/src/adapter.ts) and [`query-adapter-nanostores`](../query-adapter-nanostores/src/adapter.ts).
+
+### Register as an Alpine plugin
+
+```js
+import { createQueryPlugin, createAlpineBridgedAdapter } from "@ailuracode/alpine-query";
+import { myStoreAdapter } from "./my-store-adapter.js";
+
+// Store-backed: bridge into Alpine.reactive
+Alpine.plugin(
+  createQueryPlugin((Alpine) => createAlpineBridgedAdapter(Alpine, myStoreAdapter))
+);
+
+// Or pass the adapter directly if it already uses Alpine.reactive
+Alpine.plugin(createQueryPlugin(myAlpineNativeAdapter));
+```
+
+### Headless usage
+
+```js
+import { createQueryClient } from "@ailuracode/alpine-query";
+import { myStoreAdapter } from "./my-store-adapter.js";
+
+const query = createQueryClient({ adapter: myStoreAdapter });
+const todos = query.observe(["todos"], fetchTodos);
+```
+
+### Reference implementations
+
+| Adapter | File |
+|---------|------|
+| Vanilla (minimal) | [`src/adapters/vanilla.ts`](./src/adapters/vanilla.ts) |
+| Alpine.reactive | [`query-adapter-alpine`](../query-adapter-alpine/src/adapter.ts) |
+| Nanostores | [`query-adapter-nanostores`](../query-adapter-nanostores/src/adapter.ts) |
+| Zustand | [`query-adapter-zustand`](../query-adapter-zustand/src/adapter.ts) |
+
+Full guide: [docs/query.md — Custom adapter](../docs/query.md#custom-adapter).
+
+## Custom Alpine plugin (quick)
 
 ```js
 import { createQueryPlugin, vanillaQueryAdapter } from "@ailuracode/alpine-query";

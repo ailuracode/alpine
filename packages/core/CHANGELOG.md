@@ -1,4 +1,4 @@
-# @ailuracode/alpine
+# @ailuracode/alpine-core
 
 ## 0.1.0
 

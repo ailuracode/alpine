@@ -8,6 +8,7 @@
 /// <reference path="../../packages/visibility/src/global.d.ts" />
 /// <reference path="../../packages/attention/src/global.d.ts" />
 /// <reference path="../../packages/battery/src/global.d.ts" />
+/// <reference path="../../packages/calendar/src/global.d.ts" />
 /// <reference path="../../packages/clipboard/src/global.d.ts" />
 /// <reference path="../../packages/export/src/global.d.ts" />
 /// <reference path="../../packages/geo/src/global.d.ts" />

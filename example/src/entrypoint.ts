@@ -1,6 +1,7 @@
 import type { Alpine } from "alpinejs";
 import attention from "@ailuracode/alpine-attention";
 import battery from "@ailuracode/alpine-battery";
+import calendar from "@ailuracode/alpine-calendar";
 import clipboard from "@ailuracode/alpine-clipboard";
 import exportPlugin from "@ailuracode/alpine-export";
 import geo from "@ailuracode/alpine-geo";
@@ -31,6 +32,7 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(network);
 	Alpine.plugin(visibility);
 	Alpine.plugin(battery);
+	Alpine.plugin(calendar);
 	Alpine.plugin(attention);
 	Alpine.plugin(clipboard);
 	Alpine.plugin(exportPlugin);

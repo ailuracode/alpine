@@ -6,6 +6,7 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const packageNames = [
   "attention",
   "battery",
+  "calendar",
   "clipboard",
   "export",
   "geo",

@@ -1,5 +1,11 @@
 # @ailuracode/alpine-calendar
 
+## 0.1.1
+
+### Patch Changes
+
+- 9b04a1c: Add flexible `disabled` matchers (single days, inclusive/exclusive ranges, `only` ranges, weekdays, custom predicates) and `dateFns` context passthrough for date-fns plugins such as `@date-fns/tz`.
+
 ## 0.1.0
 
 ### Minor Changes

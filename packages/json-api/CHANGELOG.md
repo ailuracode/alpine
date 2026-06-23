@@ -1,5 +1,11 @@
 # @ailuracode/alpine-json-api
 
+## 0.1.1
+
+### Patch Changes
+
+- 7a3a2e4: Add automatic `relationships.*.resolved` hydration from compound `included` documents and `jsonApiQueryOptions()` / `jsonApiFindOneQueryOptions()` helpers for `$store.query.observe()`.
+
 ## 0.1.0
 
 ### Minor Changes

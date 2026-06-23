@@ -139,6 +139,48 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 		</section>
 
 		<section class="card">
+			<h2>Attention <code>$wakelock</code> · <code>$idle</code></h2>
+			<div class="btn-group">
+				<button
+					type="button"
+					x-show="$wakelock.isSupported"
+					x-cloak
+					@click="$wakelock.isActive ? $wakelock.release() : $wakelock.request()"
+					x-bind:disabled="$wakelock.isRequesting"
+				>
+					<span x-text="$wakelock.isActive ? 'Allow sleep' : 'Keep screen awake'"></span>
+				</button>
+				<button
+					type="button"
+					x-show="$idle.isSupported && !$idle.isWatching"
+					x-cloak
+					@click="$idle.start()"
+					x-bind:disabled="$idle.isLoading"
+				>
+					Start idle detection
+				</button>
+				<button type="button" x-show="$idle.isWatching" x-cloak @click="$idle.stop()">
+					Stop idle detection
+				</button>
+			</div>
+			<ul class="list">
+				<li>
+					Wake lock:
+					<strong x-text="$wakelock.isSupported ? ($wakelock.isActive ? 'active' : 'inactive') : 'unsupported'"></strong>
+				</li>
+				<li x-show="$idle.isWatching" x-cloak>
+					User: <strong x-text="$idle.userState"></strong> · Screen:
+					<strong x-text="$idle.screenState"></strong>
+				</li>
+			</ul>
+			<p class="hint" x-show="!$wakelock.isSupported && !$idle.isSupported" x-cloak>
+				Wake Lock and Idle Detection are not available in this browser.
+			</p>
+			<p class="hint hint--error" x-show="$wakelock.error" x-cloak x-text="$wakelock.error"></p>
+			<p class="hint hint--error" x-show="$idle.error" x-cloak x-text="$idle.error"></p>
+		</section>
+
+		<section class="card">
 			<h2>Clipboard <code>$clipboard</code></h2>
 			<button
 				type="button"

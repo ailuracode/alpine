@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query-devtools
 
+## 0.1.6
+
+### Patch Changes
+
+- 8bd678d: Restyle the devtools panel with a shadcn/ui-inspired light theme: zinc palette, subtle borders, tab list, outline badges, and primary/destructive/ghost button variants.
+
 ## 0.1.5
 
 ### Patch Changes

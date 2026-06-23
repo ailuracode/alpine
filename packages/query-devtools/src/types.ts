@@ -15,6 +15,14 @@ export interface QueryDevtoolsPluginOptions {
   persistToggleCorner?: boolean;
   /** `localStorage` key for the toggle corner. */
   toggleCornerStorageKey?: string;
+  /** Persist panel filters, sort, tab, and follow-latest in `localStorage`. Default: `true`. */
+  persistPreferences?: boolean;
+  /** `localStorage` key for panel preferences. */
+  preferencesStorageKey?: string;
+  /** Start with follow-latest enabled. Default: `false`. */
+  followLatest?: boolean;
+  /** Start with remember-open-state enabled. Default: `false`. */
+  rememberOpenState?: boolean;
   /** Start with the panel open. Default: `false`. */
   initialOpen?: boolean;
   /** Filter queries and mutations by search text. */

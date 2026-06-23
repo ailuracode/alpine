@@ -18,14 +18,14 @@ function syncRecordToReactive<TRecord extends Record<string, unknown>>(
 export function bridgeQueryHandleToAlpine<TData>(
   Alpine: AlpineInstance,
   handle: QueryStateHandle<TData>,
-  staleTime: number
+  getStaleTime: () => number
 ): { state: QueryState<TData>; unbind: () => void } {
   const bridged = Alpine.reactive({
     ...handle.get(),
     refetch: handle.state.refetch,
   }) as QueryState<TData>;
 
-  attachQueryFlags(bridged as QueryState<TData>, staleTime);
+  attachQueryFlags(bridged as QueryState<TData>, getStaleTime);
 
   const unbind = handle.listen((record) => {
     syncRecordToReactive(bridged as QueryStateRecord<TData>, record);
@@ -63,7 +63,8 @@ export function createAlpineBridgedAdapter(
 
     createQueryState(initial, staleTime, refetch) {
       const handle = base.createQueryState(initial, staleTime, refetch);
-      const bridge = bridgeQueryHandleToAlpine(Alpine, handle, staleTime);
+      const getStaleTime = () => handle.getStaleTime?.() ?? staleTime;
+      const bridge = bridgeQueryHandleToAlpine(Alpine, handle, getStaleTime);
 
       return {
         ...handle,

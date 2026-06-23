@@ -7,6 +7,9 @@ export interface QueryDevtoolsPluginOptions {
   toggleCorner?: ToggleCorner;
   persistToggleCorner?: boolean;
   toggleCornerStorageKey?: string;
+  persistPreferences?: boolean;
+  preferencesStorageKey?: string;
+  followLatest?: boolean;
   initialOpen?: boolean;
   filter?: string;
   storeName?: string;

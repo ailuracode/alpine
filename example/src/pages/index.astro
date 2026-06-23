@@ -4,443 +4,584 @@ import PokeapiQueryDemo from "../components/PokeapiQueryDemo.astro";
 ---
 
 <BaseLayout>
-	<main class="main">
-		<section class="card">
-			<h2>Theme <code>$store.theme</code></h2>
-			<p>
-				Mode: <strong x-text="$store.theme.mode"></strong> → resolved:
-				<strong x-text="$store.theme.resolved"></strong>
-			</p>
-			<div class="btn-group">
-				<button
-					type="button"
-					x-bind:class="{ active: $store.theme.isLight }"
-					@click="$store.theme.set('light')"
-				>
-					Light
-				</button>
-				<button
-					type="button"
-					x-bind:class="{ active: $store.theme.isDark }"
-					@click="$store.theme.set('dark')"
-				>
-					Dark
-				</button>
-				<button
-					type="button"
-					x-bind:class="{ active: $store.theme.isSystem }"
-					@click="$store.theme.set('system')"
-				>
-					System
-				</button>
-				<button type="button" @click="$store.theme.cycle()">Cycle</button>
-			</div>
-		</section>
-
-		<section class="card">
-			<h2>Screen <code>$store.device</code></h2>
-			<p>
-				Type: <strong x-text="$store.device.type"></strong> · Width:
-				<strong x-text="$store.device.width"></strong>px
-			</p>
-			<div class="badges">
-				<span class="badge" x-bind:class="{ on: $store.device.isMobile }">Mobile</span>
-				<span class="badge" x-bind:class="{ on: $store.device.isTablet }">Tablet</span>
-				<span class="badge" x-bind:class="{ on: $store.device.isDesktop }">Desktop</span>
-			</div>
-		</section>
-
-		<section class="card">
-			<h2>Scroll <code>$store.scroll</code></h2>
-			<ul class="list">
-				<li>Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
-				<li>Direction: <strong x-text="$store.scroll.direction || '—'"></strong></li>
-				<li>Progress: <strong x-text="Math.round($store.scroll.progress)"></strong>%</li>
-				<li>Locked: <strong x-text="$store.scroll.isLocked"></strong></li>
-			</ul>
-			<div class="btn-group">
-				<button type="button" @click="$store.scroll.toggleLock()">
-					<span x-text="$store.scroll.isLocked ? 'Unlock scroll' : 'Lock scroll'"></span>
-				</button>
-				<button type="button" x-show="$store.scroll.showToTop" x-cloak @click="$store.scroll.toTop()">
-					Back to top
-				</button>
-			</div>
-		</section>
-
-		<section class="card">
-			<h2>Network <code>$network</code></h2>
-			<p
-				class="status"
-				x-bind:class="$network.isOnline ? 'status--ok' : 'status--warn'"
-				x-text="$network.isOnline ? 'Online' : 'Offline'"
-			></p>
-			<div class="btn-group">
-				<button type="button" x-bind:disabled="!$network.isOnline">Save (requires connection)</button>
-			</div>
-		</section>
-
-		<section class="card">
-			<h2>Visibility <code>$visibility</code></h2>
-			<p
-				class="status"
-				x-bind:class="$visibility.isVisible ? 'status--ok' : 'status--warn'"
-				x-text="$visibility.isVisible ? 'Tab visible' : 'Tab hidden'"
-			></p>
-			<ul class="list">
-				<li>State: <strong x-text="$visibility.state"></strong></li>
-			</ul>
-			<p class="hint">Switch to another tab to see the state update.</p>
-		</section>
-
-		<section class="card">
-			<h2>Battery <code>$battery</code></h2>
-			<template x-if="$battery.isAvailable">
-				<div>
-					<div class="battery-widget" aria-hidden="true">
-						<div class="battery-shell">
-							<div
-								class="battery-fill"
-								x-bind:class="{
-									'battery-fill--low': $battery.level < 0.2 && !$battery.isCharging,
-									'battery-fill--charging': $battery.isCharging,
-								}"
-								x-bind:style="'width: ' + Math.round($battery.level * 100) + '%'"
-							></div>
-						</div>
-						<span class="battery-label" x-text="Math.round($battery.level * 100) + '%'"></span>
-					</div>
-					<p
-						class="status"
-						x-bind:class="$battery.isCharging ? 'status--ok' : 'status--warn'"
-						x-text="$battery.isCharging ? 'Charging' : 'On battery'"
-					></p>
-					<ul class="list">
-						<li x-show="$battery.chargingTime !== null">
-							Time to full:
-							<strong x-text="Math.round($battery.chargingTime / 60) + ' min'"></strong>
-						</li>
-						<li x-show="$battery.dischargingTime !== null">
-							Time to empty:
-							<strong x-text="Math.round($battery.dischargingTime / 60) + ' min'"></strong>
-						</li>
-					</ul>
-					<p
-						class="hint hint--error"
-						x-show="$battery.level < 0.2 && !$battery.isCharging"
-						x-cloak
-					>
-						Low battery — consider plugging in your device.
-					</p>
-				</div>
-			</template>
-			<p class="hint" x-show="!$battery.isAvailable" x-cloak>
-				Battery status is not available on this device or browser.
-			</p>
-		</section>
-
-		<section class="card">
-			<h2>Attention <code>$wakelock</code> · <code>$idle</code></h2>
-			<div class="btn-group">
-				<button
-					type="button"
-					x-show="$wakelock.isSupported"
-					x-cloak
-					@click="$wakelock.isActive ? $wakelock.release() : $wakelock.request()"
-					x-bind:disabled="$wakelock.isRequesting"
-				>
-					<span x-text="$wakelock.isActive ? 'Allow sleep' : 'Keep screen awake'"></span>
-				</button>
-				<button
-					type="button"
-					x-show="$idle.isSupported && !$idle.isWatching"
-					x-cloak
-					@click="$idle.start()"
-					x-bind:disabled="$idle.isLoading"
-				>
-					Start idle detection
-				</button>
-				<button type="button" x-show="$idle.isWatching" x-cloak @click="$idle.stop()">
-					Stop idle detection
-				</button>
-			</div>
-			<ul class="list">
-				<li>
-					Wake lock:
-					<strong x-text="$wakelock.isSupported ? ($wakelock.isActive ? 'active' : 'inactive') : 'unsupported'"></strong>
-				</li>
-				<li x-show="$idle.isWatching" x-cloak>
-					User: <strong x-text="$idle.userState"></strong> · Screen:
-					<strong x-text="$idle.screenState"></strong>
-				</li>
-			</ul>
-			<p class="hint" x-show="!$wakelock.isSupported && !$idle.isSupported" x-cloak>
-				Wake Lock and Idle Detection are not available in this browser.
-			</p>
-			<p class="hint hint--error" x-show="$wakelock.error" x-cloak x-text="$wakelock.error"></p>
-			<p class="hint hint--error" x-show="$idle.error" x-cloak x-text="$idle.error"></p>
-		</section>
-
-		<section class="card">
-			<h2>Clipboard <code>$clipboard</code></h2>
-			<button
-				type="button"
-				@click="await $clipboard('Hello from Alpine!'); copied = true; setTimeout(() => copied = false, 2000)"
-			>
-				Copy text
-			</button>
-			<p class="hint" x-show="copied" x-cloak x-transition>Copied to clipboard!</p>
-		</section>
-
-		<section class="card">
-			<h2>Export <code>$export</code></h2>
-			<p class="hint" x-show="!$export.isSupported()" x-cloak>
-				Programmatic file exports are not available in this environment.
-			</p>
-			<template x-if="$export.isSupported()">
-				<div>
-					<div class="btn-group">
-						<button
-							type="button"
-							@click="exportedText = await $export('Hello from Alpine!', 'hello.txt')"
-						>
-							Export text
-						</button>
-						<button
-							type="button"
-							@click="exportedJson = await $export(
-								JSON.stringify({ plugin: 'export', savedAt: Date.now() }, null, 2),
-								{ filename: 'export.json', mimeType: 'application/json' }
-							)"
-						>
-							Export JSON
-						</button>
-					</div>
-					<p class="hint" x-show="exportedText === true" x-cloak x-transition>Text export started.</p>
-					<p class="hint" x-show="exportedJson === true" x-cloak x-transition>JSON export started.</p>
-				</div>
-			</template>
-		</section>
-
-		<section class="card">
-			<h2>Share <code>$share</code></h2>
-			<p class="hint" x-show="!$share.isSupported()" x-cloak>
-				Web Share API is not available in this browser.
-			</p>
-			<template x-if="$share.isSupported()">
-				<div>
+	<main class="container max-w-3xl mx-auto px-6 py-4 grid gap-4 pb-16">
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Theme <code class="text-base-content/60 font-normal">$store.theme</code></h2>
+				<p>
+					Mode: <strong x-text="$store.theme.mode"></strong> → resolved:
+					<strong x-text="$store.theme.resolved"></strong>
+				</p>
+				<div class="flex flex-wrap gap-2 mt-3">
 					<button
 						type="button"
-						@click="shared = await $share({
-							title: document.title,
-							text: 'Check out this Alpine.js plugin demo',
-							url: window.location.href
-						})"
+						class="btn btn-sm btn-outline"
+						x-bind:class="{ 'btn-primary': $store.theme.isLight }"
+						@click="$store.theme.set('light')"
 					>
-						Share page
+						Light
 					</button>
-					<p class="hint" x-show="shared === true" x-cloak x-transition>Thanks for sharing!</p>
-					<p class="hint" x-show="shared === false" x-cloak x-transition>Share cancelled.</p>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-bind:class="{ 'btn-primary': $store.theme.isDark }"
+						@click="$store.theme.set('dark')"
+					>
+						Dark
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-bind:class="{ 'btn-primary': $store.theme.isSystem }"
+						@click="$store.theme.set('system')"
+					>
+						System
+					</button>
+					<button type="button" class="btn btn-sm btn-outline" @click="$store.theme.cycle()">
+						Cycle
+					</button>
 				</div>
-			</template>
+			</div>
 		</section>
 
-		<section class="card">
-			<h2>Calendar <code>$calendar</code></h2>
-			<div x-data="{ cal: $calendar({ weekStartsOn: 1, mode: 'single', disabled: { dayOfWeek: [0, 6] } }) }">
-				<div class="btn-group calendar-header">
-					<button type="button" @click="cal.prevMonth()">Previous</button>
-					<strong x-text="cal.formatMonth()"></strong>
-					<button type="button" @click="cal.nextMonth()">Next</button>
-					<button type="button" @click="cal.goToToday()">Today</button>
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Toggle <code class="text-base-content/60 font-normal">$toggle</code></h2>
+				<div class="grid gap-4">
+					<div x-data="&#123; power: $toggle(&#123; states: &#123; truly: 'on', falsely: 'off' &#125;, initial: 'off' &#125;) &#125;">
+						<p>
+							Binary:
+							<strong x-text="power.value"></strong>
+						</p>
+						<div class="flex flex-wrap gap-2 mt-2">
+							<button type="button" class="btn btn-sm btn-outline" @click="power.toggle()">Toggle</button>
+							<button type="button" class="btn btn-sm btn-outline" @click="power.cycle()">Cycle</button>
+							<span class="badge badge-outline" x-bind:class="&#123; 'badge-success': power.is(power.truly), 'badge-ghost': power.is(power.falsely) &#125;" x-text="power.value"></span>
+						</div>
+					</div>
+					<div x-data="&#123; answer: $toggle(&#123; states: &#123; truly: 'yes', falsely: 'no', ternary: 'unknown' &#125;, initial: 'unknown' &#125;) &#125;">
+						<p>
+							Ternary:
+							<strong x-text="answer.value"></strong>
+							<span class="badge badge-warning ml-2" x-show="answer.is(answer.ternary)">neutral</span>
+						</p>
+						<div class="flex flex-wrap gap-2 mt-2">
+							<button type="button" class="btn btn-sm btn-outline" @click="answer.toggle()">Yes / No</button>
+							<button type="button" class="btn btn-sm btn-outline" @click="answer.cycle()">Cycle all</button>
+							<button type="button" class="btn btn-sm btn-ghost" @click="answer.set(answer.ternary)">Unknown</button>
+						</div>
+					</div>
 				</div>
+			</div>
+		</section>
 
-				<div class="calendar-grid">
-					<template x-for="label in cal.weekdayLabels" :key="label">
-						<span class="calendar-weekday" x-text="label"></span>
-					</template>
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Screen <code class="text-base-content/60 font-normal">$store.device</code></h2>
+				<p>
+					Type: <strong x-text="$store.device.type"></strong> · Width:
+					<strong x-text="$store.device.width"></strong>px
+				</p>
+				<div class="flex flex-wrap gap-2 mt-2">
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isMobile }">
+						Mobile
+					</span>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isTablet }">
+						Tablet
+					</span>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isDesktop }">
+						Desktop
+					</span>
+				</div>
+			</div>
+		</section>
 
-					<template x-for="week in cal.weeks" :key="week[0].date.toISOString()">
-						<template x-for="day in week" :key="day.date.toISOString()">
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Scroll <code class="text-base-content/60 font-normal">$store.scroll</code></h2>
+				<ul class="list-disc list-inside space-y-1">
+					<li>Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
+					<li>Direction: <strong x-text="$store.scroll.direction || '—'"></strong></li>
+					<li>Progress: <strong x-text="Math.round($store.scroll.progress)"></strong>%</li>
+					<li>Locked: <strong x-text="$store.scroll.isLocked"></strong></li>
+				</ul>
+				<div class="flex flex-wrap gap-2 mt-3">
+					<button type="button" class="btn btn-sm btn-outline" @click="$store.scroll.toggleLock()">
+						<span x-text="$store.scroll.isLocked ? 'Unlock scroll' : 'Lock scroll'"></span>
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$store.scroll.showToTop"
+						x-cloak
+						@click="$store.scroll.toTop()"
+					>
+						Back to top
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Network <code class="text-base-content/60 font-normal">$network</code></h2>
+				<p
+					class="font-semibold"
+					x-bind:class="$network.isOnline ? 'text-success' : 'text-warning'"
+					x-text="$network.isOnline ? 'Online' : 'Offline'"
+				></p>
+				<div class="flex flex-wrap gap-2 mt-3">
+					<button type="button" class="btn btn-sm btn-outline" x-bind:disabled="!$network.isOnline">
+						Save (requires connection)
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					Visibility <code class="text-base-content/60 font-normal">$visibility</code>
+				</h2>
+				<p
+					class="font-semibold"
+					x-bind:class="$visibility.isVisible ? 'text-success' : 'text-warning'"
+					x-text="$visibility.isVisible ? 'Tab visible' : 'Tab hidden'"
+				></p>
+				<ul class="list-disc list-inside space-y-1">
+					<li>State: <strong x-text="$visibility.state"></strong></li>
+				</ul>
+				<p class="text-sm text-base-content/70 mt-2">Switch to another tab to see the state update.</p>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Battery <code class="text-base-content/60 font-normal">$battery</code></h2>
+				<template x-if="$battery.isAvailable">
+					<div>
+						<div class="flex items-center gap-3 mb-3" aria-hidden="true">
+							<div class="battery-shell">
+								<div
+									class="battery-fill"
+									x-bind:class="{
+										'bg-warning': $battery.level < 0.2 && !$battery.isCharging,
+										'bg-primary': $battery.isCharging,
+										'bg-success': $battery.level >= 0.2 && !$battery.isCharging,
+									}"
+									x-bind:style="'width: ' + Math.round($battery.level * 100) + '%'"
+								></div>
+							</div>
+							<span class="font-semibold tabular-nums" x-text="Math.round($battery.level * 100) + '%'"></span>
+						</div>
+						<p
+							class="font-semibold"
+							x-bind:class="$battery.isCharging ? 'text-success' : 'text-warning'"
+							x-text="$battery.isCharging ? 'Charging' : 'On battery'"
+						></p>
+						<ul class="list-disc list-inside space-y-1 mt-2">
+							<li x-show="$battery.chargingTime !== null">
+								Time to full:
+								<strong x-text="Math.round($battery.chargingTime / 60) + ' min'"></strong>
+							</li>
+							<li x-show="$battery.dischargingTime !== null">
+								Time to empty:
+								<strong x-text="Math.round($battery.dischargingTime / 60) + ' min'"></strong>
+							</li>
+						</ul>
+						<div
+							class="alert alert-warning mt-3 py-2 min-h-0"
+							x-show="$battery.level < 0.2 && !$battery.isCharging"
+							x-cloak
+						>
+							<span>Low battery — consider plugging in your device.</span>
+						</div>
+					</div>
+				</template>
+				<p class="text-sm text-base-content/70" x-show="!$battery.isAvailable" x-cloak>
+					Battery status is not available on this device or browser.
+				</p>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					Attention <code class="text-base-content/60 font-normal">$wakelock</code> ·
+					<code class="text-base-content/60 font-normal">$idle</code>
+				</h2>
+				<div class="flex flex-wrap gap-2 mt-1">
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$wakelock.isSupported"
+						x-cloak
+						@click="$wakelock.isActive ? $wakelock.release() : $wakelock.request()"
+						x-bind:disabled="$wakelock.isRequesting"
+					>
+						<span x-text="$wakelock.isActive ? 'Allow sleep' : 'Keep screen awake'"></span>
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$idle.isSupported && $idle.permission !== 'granted' && !$idle.isWatching"
+						x-cloak
+						@click="await $idle.requestPermission()"
+						x-bind:disabled="$idle.isLoading"
+					>
+						Request idle permission
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$idle.isSupported && $idle.permission === 'granted' && !$idle.isWatching"
+						x-cloak
+						@click="await $idle.start()"
+						x-bind:disabled="$idle.isLoading"
+					>
+						Start idle detection
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$idle.isWatching"
+						x-cloak
+						@click="$idle.stop()"
+					>
+						Stop idle detection
+					</button>
+				</div>
+				<ul class="list-disc list-inside space-y-1 mt-3">
+					<li>
+						Wake lock:
+						<strong
+							x-text="$wakelock.isSupported ? ($wakelock.isActive ? 'active' : 'inactive') : 'unsupported'"
+						></strong>
+					</li>
+					<li x-show="$idle.isSupported" x-cloak>
+						Idle permission:
+						<strong x-text="$idle.permission ?? 'unknown'"></strong>
+					</li>
+					<li x-show="$idle.isWatching" x-cloak>
+						User: <strong x-text="$idle.userState"></strong> · Screen:
+						<strong x-text="$idle.screenState"></strong>
+					</li>
+				</ul>
+				<p class="text-sm text-base-content/70 mt-2" x-show="$idle.isSupported" x-cloak>
+					Desktop: Chrome or Edge on localhost/HTTPS. Grant permission first, then start. Idle threshold
+					is at least 1 minute.
+				</p>
+				<p class="text-sm text-base-content/70 mt-2" x-show="!$wakelock.isSupported && !$idle.isSupported" x-cloak>
+					Wake Lock and Idle Detection are not available in this browser.
+				</p>
+				<p class="text-sm text-error mt-2" x-show="$wakelock.error" x-cloak x-text="$wakelock.error"></p>
+				<p class="text-sm text-error mt-2" x-show="$idle.error" x-cloak x-text="$idle.error"></p>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					Clipboard <code class="text-base-content/60 font-normal">$clipboard</code>
+				</h2>
+				<button
+					type="button"
+					class="btn btn-sm btn-outline"
+					@click="await $clipboard('Hello from Alpine!'); copied = true; setTimeout(() => copied = false, 2000)"
+				>
+					Copy text
+				</button>
+				<div class="alert alert-success mt-3 py-2 min-h-0" x-show="copied" x-cloak x-transition>
+					<span>Copied to clipboard!</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Export <code class="text-base-content/60 font-normal">$export</code></h2>
+				<p class="text-sm text-base-content/70" x-show="!$export.isSupported" x-cloak>
+					Programmatic file exports are not available in this environment.
+				</p>
+				<template x-if="$export.isSupported">
+					<div>
+						<div class="flex flex-wrap gap-2 mt-1">
 							<button
 								type="button"
-								class="calendar-day"
-								:disabled="day.isDisabled"
-								:class="{
-									'is-outside': !day.isCurrentMonth,
-									'is-today': day.isToday,
-									'is-selected': day.isSelected
-								}"
-								@click="cal.select(day.date)"
-								x-text="cal.format(day.date, 'd')"
-							></button>
-						</template>
-					</template>
-				</div>
-
-				<p class="hint" x-show="cal.selected" x-cloak>
-					Selected:
-					<strong x-text="cal.format(cal.selected, 'PPP')"></strong>
-				</p>
-				<p class="hint">Weekends are disabled via <code>disabled: &#123; dayOfWeek: [0, 6] &#125;</code>.</p>
-			</div>
-		</section>
-
-		<section class="card">
-			<h2>Geo <code>$store.geo</code></h2>
-			<p class="hint" x-show="!$store.geo.isSupported" x-cloak>
-				Geolocation is not available in this browser.
-			</p>
-			<template x-if="$store.geo.isSupported">
-				<div>
-					<div class="btn-group">
-						<button
-							type="button"
-							@click="$store.geo.request({ enableHighAccuracy: true })"
-							x-bind:disabled="$store.geo.isLoading"
-						>
-							<span x-text="$store.geo.isLoading ? 'Locating…' : 'Get location'"></span>
-						</button>
-						<button
-							type="button"
-							x-show="!$store.geo.isWatching"
-							x-cloak
-							@click="$store.geo.watch()"
-						>
-							Start tracking
-						</button>
-						<button
-							type="button"
-							x-show="$store.geo.isWatching"
-							x-cloak
-							@click="$store.geo.unwatch()"
-						>
-							Stop tracking
-						</button>
-						<button type="button" @click="$store.geo.reset()">Reset</button>
+								class="btn btn-sm btn-outline"
+								@click="exportedText = await $export('Hello from Alpine!', 'hello.txt')"
+							>
+								Export text
+							</button>
+							<button
+								type="button"
+								class="btn btn-sm btn-outline"
+								@click="exportedJson = await $export(JSON.stringify(&#123; plugin: 'export', savedAt: Date.now() &#125;, null, 2), &#123; filename: 'export.json', mimeType: 'application/json' &#125;)"
+							>
+								Export JSON
+							</button>
+						</div>
+						<div class="alert alert-success mt-3 py-2 min-h-0" x-show="exportedText === true" x-cloak x-transition>
+							<span>Text export started.</span>
+						</div>
+						<div class="alert alert-success mt-3 py-2 min-h-0" x-show="exportedJson === true" x-cloak x-transition>
+							<span>JSON export started.</span>
+						</div>
 					</div>
-					<p x-show="$store.geo.hasPosition" x-cloak>
-						Lat: <strong x-text="$store.geo.latitude?.toFixed(4)"></strong>,
-						Lng: <strong x-text="$store.geo.longitude?.toFixed(4)"></strong>
-						(±<strong x-text="Math.round($store.geo.accuracy ?? 0)"></strong> m)
+				</template>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Share <code class="text-base-content/60 font-normal">$share</code></h2>
+				<p class="text-sm text-base-content/70" x-show="!$share.isSupported" x-cloak>
+					Web Share API is not available in this browser.
+				</p>
+				<template x-if="$share.isSupported">
+					<div>
+						<button
+							type="button"
+							class="btn btn-sm btn-outline"
+							@click="shared = await $share(&#123; title: document.title, text: 'Check out this Alpine.js plugin demo', url: window.location.href &#125;)"
+						>
+							Share page
+						</button>
+						<div class="alert alert-success mt-3 py-2 min-h-0" x-show="shared === true" x-cloak x-transition>
+							<span>Thanks for sharing!</span>
+						</div>
+						<div class="alert alert-info mt-3 py-2 min-h-0" x-show="shared === false" x-cloak x-transition>
+							<span>Share cancelled.</span>
+						</div>
+					</div>
+				</template>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					Calendar <code class="text-base-content/60 font-normal">$calendar</code>
+				</h2>
+				<div x-data="{ cal: $calendar({ weekStartsOn: 1, mode: 'single', disabled: { dayOfWeek: [0, 6] } }) }">
+					<div class="flex flex-wrap items-center gap-2">
+						<button type="button" class="btn btn-sm btn-outline" @click="cal.prevMonth()">Previous</button>
+						<strong x-text="cal.formatMonth()"></strong>
+						<button type="button" class="btn btn-sm btn-outline" @click="cal.nextMonth()">Next</button>
+						<button type="button" class="btn btn-sm btn-outline" @click="cal.goToToday()">Today</button>
+					</div>
+
+					<div class="grid grid-cols-7 gap-1 mt-3">
+						<template x-for="label in cal.weekdayLabels" :key="label">
+							<span class="text-center text-xs font-semibold text-base-content/60 py-1" x-text="label"></span>
+						</template>
+					</div>
+
+					<template x-for="week in cal.weeks" :key="week[0].date.toISOString()">
+						<div class="grid grid-cols-7 gap-1">
+							<template x-for="day in week" :key="day.date.toISOString()">
+								<button
+									type="button"
+									class="btn btn-sm btn-ghost btn-square tabular-nums"
+									x-bind:disabled="day.isDisabled"
+									x-bind:class="{ 'opacity-45': !day.isCurrentMonth, 'btn-outline btn-primary': day.isToday && !day.isSelected, 'btn-primary': day.isSelected }"
+									@click="cal.select(day.date)"
+									x-text="cal.format(day.date, 'd')"
+								></button>
+							</template>
+						</div>
+					</template>
+
+					<p class="text-sm text-success mt-3" x-show="cal.selected" x-cloak>
+						Selected:
+						<strong x-text="cal.format(cal.selected, 'PPP')"></strong>
 					</p>
-					<p class="hint hint--error" x-show="$store.geo.hasError" x-cloak x-text="$store.geo.error"></p>
+					<p class="text-sm text-base-content/70 mt-2">
+						Weekends are disabled via <code>disabled: &#123; dayOfWeek: [0, 6] &#125;</code>.
+					</p>
 				</div>
-			</template>
-		</section>
-
-		<section class="card">
-			<h2>Query <code>$store.query</code></h2>
-			<p class="hint">
-				Three state adapters — pick one for <code>query(&#123; adapter &#125;)</code>, then register
-				<code>$store.query</code>. Each column runs the same paginated
-				<a href="https://pokeapi.co/" target="_blank" rel="noreferrer">PokeAPI</a> demo.
-				Nanostores uses <code>$store.query</code> globally; Alpine.reactive and Zustand use
-				<code>createQueryClient</code>. Open the <strong>Query</strong> devtools button
-				(bottom-right) to inspect caches from all three adapters.
-			</p>
-
-			<div class="query-adapters">
-				<PokeapiQueryDemo dataName="queryNanostoresAdapterDemo" title="Nanostores" badgeClass="on">
-					<Fragment slot="description">
-						<code>query(&#123; adapter: createAlpineNanostoresAdapter &#125;)</code> +
-						<code>NanoStores</code> — paginated fetch from
-						<a href="https://pokeapi.co/" target="_blank" rel="noreferrer">PokeAPI</a>.
-					</Fragment>
-				</PokeapiQueryDemo>
-				<PokeapiQueryDemo dataName="queryAlpineAdapterDemo" title="Alpine.reactive">
-					<Fragment slot="description">
-						<code>createQueryClient(&#123; adapter: createAlpineStoreAdapter(Alpine) &#125;)</code>
-						— native <code>Alpine.reactive</code>, zero extra store deps. Same PokeAPI pagination demo.
-					</Fragment>
-				</PokeapiQueryDemo>
-				<PokeapiQueryDemo dataName="queryZustandAdapterDemo" title="Zustand">
-					<Fragment slot="description">
-						<code>createQueryClient(&#123; adapter: createAlpineZustandAdapter(Alpine) &#125;)</code>
-						— Zustand vanilla bridged into Alpine.reactive. Same PokeAPI pagination demo.
-					</Fragment>
-				</PokeapiQueryDemo>
 			</div>
 		</section>
 
-		<section class="card">
-			<h2>Touch <code>$touch</code></h2>
-			<ul class="list">
-				<li>Touch: <strong x-text="$touch.isTouch"></strong></li>
-				<li>Coarse pointer: <strong x-text="$touch.isCoarse"></strong></li>
-				<li>Hover: <strong x-text="$touch.canHover"></strong></li>
-				<li>Max touch points: <strong x-text="$touch.maxTouchPoints"></strong></li>
-			</ul>
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Geo <code class="text-base-content/60 font-normal">$store.geo</code></h2>
+				<p class="text-sm text-base-content/70" x-show="!$store.geo.isSupported" x-cloak>
+					Geolocation is not available in this browser.
+				</p>
+				<template x-if="$store.geo.isSupported">
+					<div>
+						<div class="flex flex-wrap gap-2 mt-1">
+							<button
+								type="button"
+								class="btn btn-sm btn-outline"
+								@click="$store.geo.request(&#123; enableHighAccuracy: true &#125;)"
+								x-bind:disabled="$store.geo.isLoading"
+							>
+								<span x-text="$store.geo.isLoading ? 'Locating…' : 'Get location'"></span>
+							</button>
+							<button
+								type="button"
+								class="btn btn-sm btn-outline"
+								x-show="!$store.geo.isWatching"
+								x-cloak
+								@click="$store.geo.watch()"
+							>
+								Start tracking
+							</button>
+							<button
+								type="button"
+								class="btn btn-sm btn-outline"
+								x-show="$store.geo.isWatching"
+								x-cloak
+								@click="$store.geo.unwatch()"
+							>
+								Stop tracking
+							</button>
+							<button type="button" class="btn btn-sm btn-outline" @click="$store.geo.reset()">Reset</button>
+						</div>
+						<p class="mt-3" x-show="$store.geo.hasPosition" x-cloak>
+							Lat: <strong x-text="$store.geo.latitude?.toFixed(4)"></strong>,
+							Lng: <strong x-text="$store.geo.longitude?.toFixed(4)"></strong>
+							(±<strong x-text="Math.round($store.geo.accuracy ?? 0)"></strong> m)
+						</p>
+						<p class="text-sm text-error mt-2" x-show="$store.geo.hasError" x-cloak x-text="$store.geo.error"></p>
+					</div>
+				</template>
+			</div>
 		</section>
 
-		<section class="card">
-			<h2>Platform <code>$platform</code></h2>
-			<p>
-				Detected OS: <strong x-text="$platform.name"></strong>
-			</p>
-			<div class="badges">
-				<span class="badge" x-bind:class="{ on: $platform.isMac }">macOS</span>
-				<span class="badge" x-bind:class="{ on: $platform.isWindows }">Windows</span>
-				<span class="badge" x-bind:class="{ on: $platform.isLinux }">Linux</span>
-				<span class="badge" x-bind:class="{ on: $platform.isIos }">iOS</span>
-				<span class="badge" x-bind:class="{ on: $platform.isAndroid }">Android</span>
-				<span class="badge" x-bind:class="{ on: $platform.isChromeos }">ChromeOS</span>
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Query <code class="text-base-content/60 font-normal">$store.query</code></h2>
+				<p class="text-sm text-base-content/70">
+					Three state adapters — pick one for <code>query(&#123; adapter &#125;)</code>, then register
+					<code>$store.query</code>. Each column runs the same paginated
+					<a href="https://pokeapi.co/" target="_blank" rel="noreferrer" class="link link-primary">PokeAPI</a>
+					demo. Nanostores uses <code>$store.query</code> globally; Alpine.reactive and Zustand use
+					<code>createQueryClient</code>. Open the <strong>Query</strong> devtools button (bottom-right) to
+					inspect caches from all three adapters.
+				</p>
+
+				<div class="grid gap-4 mt-4">
+					<PokeapiQueryDemo
+						dataName="queryNanostoresAdapterDemo"
+						title="Nanostores"
+						badgeClass="badge-primary"
+					/>
+					<PokeapiQueryDemo dataName="queryAlpineAdapterDemo" title="Alpine.reactive" />
+					<PokeapiQueryDemo dataName="queryZustandAdapterDemo" title="Zustand" />
+				</div>
 			</div>
-			<p class="hint" x-show="$platform.isMac" x-cloak>Use <kbd>⌘</kbd> + <kbd>C</kbd> to copy.</p>
-			<p class="hint" x-show="$platform.isWindows || $platform.isLinux" x-cloak>
-				Use <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy.
-			</p>
-			<p class="hint" x-show="$platform.isIos || $platform.isAndroid" x-cloak>
-				Touch-optimized shortcuts may differ from desktop.
-			</p>
 		</section>
 
-		<section class="card">
-			<h2>Notify <code>$notify</code></h2>
-			<ul class="list">
-				<li>Supported: <strong x-text="$notify.isSupported()"></strong></li>
-				<li>Permission: <strong x-text="$notify.permission()"></strong></li>
-			</ul>
-			<p class="hint hint--error" x-show="$notify.requiresHomeScreenInstall()" x-cloak>
-				On iPhone and iPad, add this site to your Home Screen and open it from there to enable notifications.
-			</p>
-			<div class="btn-group">
-				<button
-					type="button"
-					x-show="$notify.isSupported() && $notify.permission() === 'default'"
-					x-cloak
-					@click="await $notify.requestPermission()"
-				>
-					Request permission
-				</button>
-				<button
-					type="button"
-					x-show="$notify.isSupported() && $notify.permission() === 'granted'"
-					x-cloak
-					@click="await $notify.sendAsync('Task complete', { body: 'Plugins are working correctly.' })"
-				>
-					Send notification
-				</button>
-				<button
-					type="button"
-					x-show="$notify.isSupported()"
-					x-cloak
-					@click="await $notify.sendIfPermittedAsync('Silent notification')"
-				>
-					sendIfPermitted
-				</button>
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Touch <code class="text-base-content/60 font-normal">$touch</code></h2>
+				<ul class="list-disc list-inside space-y-1">
+					<li>Touch: <strong x-text="$touch.isTouch"></strong></li>
+					<li>Coarse pointer: <strong x-text="$touch.isCoarse"></strong></li>
+					<li>Hover: <strong x-text="$touch.canHover"></strong></li>
+					<li>Max touch points: <strong x-text="$touch.maxTouchPoints"></strong></li>
+				</ul>
 			</div>
-			<p class="hint hint--error" x-show="$notify.isSupported() && $notify.permission() === 'denied'" x-cloak>
-				Permission denied — enable notifications in your browser settings.
-			</p>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">
+					Platform <code class="text-base-content/60 font-normal">$platform</code>
+				</h2>
+				<p>
+					Detected OS: <strong x-text="$platform.name"></strong>
+				</p>
+				<div class="flex flex-wrap gap-2 mt-2">
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isMac }">macOS</span>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isWindows }"
+						>Windows</span
+					>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isLinux }">Linux</span>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isIos }">iOS</span>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isAndroid }"
+						>Android</span
+					>
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $platform.isChromeos }"
+						>ChromeOS</span
+					>
+				</div>
+				<p class="text-sm text-base-content/70 mt-2" x-show="$platform.isMac" x-cloak>
+					Use <kbd class="kbd kbd-sm">⌘</kbd> + <kbd class="kbd kbd-sm">C</kbd> to copy.
+				</p>
+				<p class="text-sm text-base-content/70 mt-2" x-show="$platform.isWindows || $platform.isLinux" x-cloak>
+					Use <kbd class="kbd kbd-sm">Ctrl</kbd> + <kbd class="kbd kbd-sm">C</kbd> to copy.
+				</p>
+				<p class="text-sm text-base-content/70 mt-2" x-show="$platform.isIos || $platform.isAndroid" x-cloak>
+					Touch-optimized shortcuts may differ from desktop.
+				</p>
+			</div>
+		</section>
+
+		<section class="card bg-base-100 shadow-sm border border-base-200">
+			<div class="card-body">
+				<h2 class="card-title text-base">Notify <code class="text-base-content/60 font-normal">$notify</code></h2>
+				<ul class="list-disc list-inside space-y-1">
+					<li>Supported: <strong x-text="$notify.isSupported"></strong></li>
+					<li>Permission: <strong x-text="$notify.permission"></strong></li>
+				</ul>
+				<div class="alert alert-warning mt-3 py-2 min-h-0" x-show="$notify.requiresHomeScreenInstall" x-cloak>
+					<span
+						>On iPhone and iPad, add this site to your Home Screen and open it from there to enable
+						notifications.</span
+					>
+				</div>
+				<div class="flex flex-wrap gap-2 mt-3">
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$notify.isSupported && $notify.permission === 'default'"
+						x-cloak
+						@click="await $notify.requestPermission()"
+					>
+						Request permission
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$notify.isSupported && $notify.permission === 'granted'"
+						x-cloak
+						@click="await $notify.sendAsync('Task complete', &#123; body: 'Plugins are working correctly.' &#125;)"
+					>
+						Send notification
+					</button>
+					<button
+						type="button"
+						class="btn btn-sm btn-outline"
+						x-show="$notify.isSupported"
+						x-cloak
+						@click="await $notify.sendIfPermittedAsync('Silent notification')"
+					>
+						sendIfPermitted
+					</button>
+				</div>
+				<div
+					class="alert alert-error mt-3 py-2 min-h-0"
+					x-show="$notify.isSupported && $notify.permission === 'denied'"
+					x-cloak
+				>
+					<span>Permission denied — enable notifications in your browser settings.</span>
+				</div>
+			</div>
 		</section>
 	</main>
 
-	<footer class="footer">
-		<p>
-			<a href="https://github.com/ailuracode/alpine" target="_blank" rel="noreferrer">Source</a>
-			·
-			<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer">npm</a>
-		</p>
+	<footer class="footer footer-center p-6 text-base-content/60 text-sm">
+		<nav>
+			<a href="https://github.com/ailuracode/alpine" target="_blank" rel="noreferrer" class="link link-hover">
+				Source
+			</a>
+			<a href="https://www.npmjs.com/~siddharthagf" target="_blank" rel="noreferrer" class="link link-hover">
+				npm
+			</a>
+		</nav>
 	</footer>
 </BaseLayout>

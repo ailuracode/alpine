@@ -19,6 +19,7 @@ import screen from "@ailuracode/alpine-screen";
 import scroll from "@ailuracode/alpine-scroll";
 import share from "@ailuracode/alpine-share";
 import theme from "@ailuracode/alpine-theme";
+import toggle from "@ailuracode/alpine-toggle";
 import touch from "@ailuracode/alpine-touch";
 import { registerQueryDemos } from "./query-demos.js";
 
@@ -32,7 +33,7 @@ export default (Alpine: Alpine) => {
 		}),
 	);
 	Alpine.plugin(screen);
-	Alpine.plugin(scroll);
+	Alpine.plugin(scroll());
 	Alpine.plugin(share);
 	Alpine.plugin(network);
 	Alpine.plugin(visibility);
@@ -42,6 +43,7 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(clipboard);
 	Alpine.plugin(exportPlugin);
 	Alpine.plugin(geo);
+	Alpine.plugin(toggle);
 	Alpine.plugin(touch);
 	Alpine.plugin(platform);
 	Alpine.plugin(NanoStores);

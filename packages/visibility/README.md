@@ -25,12 +25,24 @@ Alpine.start();
 <span x-text="$visibility.state"></span>
 ```
 
+## Exported helpers
+
+```js
+import {
+  VISIBILITY_STATES,
+  createVisibilityState,
+  readVisibilityState,
+} from "@ailuracode/alpine-visibility";
+```
+
 ## API summary
 
 | | |
 |-|-|
 | **Magic** | `$visibility` |
-| **Properties** | `isVisible` (boolean), `state` (`"visible"` \| `"hidden"` \| `"prerender"`) |
+| **Getters** | `isVisible`, `isHidden` (boolean), `state` (`VisibilityState`) |
+| **Methods** | `is(state)` |
+| **Helpers** | `readVisibilityState()`, `createVisibilityState()`, `VISIBILITY_STATES` |
 
 ## License
 

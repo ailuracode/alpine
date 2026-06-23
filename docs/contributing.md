@@ -80,7 +80,7 @@ See [Architecture](./architecture.md). Prefer stores for shared mutable state; m
 
 ### CSS
 
-Plugins must stay CSS-framework agnostic. DOM styling belongs in the consumer app (via callbacks like `theme.onChange` or app-level CSS for `.scroll-locked`).
+Plugins must stay CSS-framework agnostic. DOM styling belongs in the consumer app (via callbacks like `theme({ onChange })` or `scroll({ onLockChange })`).
 
 ## Adding a new package
 

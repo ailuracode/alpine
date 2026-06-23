@@ -38,17 +38,19 @@ Alpine.plugin(
 
 ## Magic API
 
-| Method | Type | Description |
+| Member | Type | Description |
 |--------|------|-------------|
-| `isSupported()` | `boolean` | `true` when notifications can be shown in this environment |
-| `requiresHomeScreenInstall()` | `boolean` | `true` on iOS/iPadOS Safari tabs that need a Home Screen install |
-| `permission()` | `NotificationPermission` | `granted`, `denied`, or `default` |
+| `isSupported` | `boolean` (getter) | `true` when notifications can be shown in this environment |
+| `requiresHomeScreenInstall` | `boolean` (getter) | `true` on iOS/iPadOS Safari tabs that need a Home Screen install |
+| `permission` | `NotificationPermission` (getter) | `granted`, `denied`, or `default` |
 | `requestPermission()` | `Promise<NotificationPermission>` | Prompts the user when permission is `default` |
 | `send(title, options?)` | `Notification \| null` | Creates a desktop notification synchronously |
 | `sendAsync(title, options?)` | `Promise<Notification \| null>` | Preferred on mobile; uses a service worker when needed |
 | `sendIfPermitted(title, options?)` | `Notification \| null` | Same as `send` — explicit intent in templates |
 | `sendIfPermittedAsync(title, options?)` | `Promise<Notification \| null>` | Same as `sendAsync` |
 | `close(notification)` | `void` | Closes a notification safely |
+
+Use getters without parentheses in templates: `$notify.isSupported`, `$notify.permission`.
 
 All methods except `requestPermission()` are synchronous. Nothing throws when notifications are unavailable.
 
@@ -73,7 +75,7 @@ $notify.send("Order completed", {
 
 ```html
 <button
-  x-show="$notify.isSupported() && $notify.permission() === 'default'"
+  x-show="$notify.isSupported && $notify.permission === 'default'"
   @click="await $notify.requestPermission()"
 >
   Enable notifications
@@ -107,23 +109,23 @@ $notify.sendIfPermitted("Background job finished");
 ### Feature detection in templates
 
 ```html
-<div x-show="!$notify.isSupported() && !$notify.requiresHomeScreenInstall()">
+<div x-show="!$notify.isSupported && !$notify.requiresHomeScreenInstall">
   Notifications are not supported in this browser.
 </div>
 
-<div x-show="$notify.requiresHomeScreenInstall()">
+<div x-show="$notify.requiresHomeScreenInstall">
   Add this site to your Home Screen on iPhone or iPad to enable notifications.
 </div>
 
-<div x-show="$notify.isSupported() && $notify.permission() === 'denied'">
+<div x-show="$notify.isSupported && $notify.permission === 'denied'">
   Notifications are blocked. Enable them in browser settings.
 </div>
 ```
 
 ## Behavior
 
-- **Unsupported browsers** — `isSupported()` is `false`, `permission()` returns `denied`, `send` / `sendIfPermitted` return `null`.
-- **iOS/iPadOS Safari tabs** — `requiresHomeScreenInstall()` is `true`; notifications only work after the user adds the site to the Home Screen and opens it from there.
+- **Unsupported browsers** — `isSupported` is `false`, `permission` returns `denied`, `send` / `sendIfPermitted` return `null`.
+- **iOS/iPadOS Safari tabs** — `requiresHomeScreenInstall` is `true`; notifications only work after the user adds the site to the Home Screen and opens it from there.
 - **Android and mobile Chrome** — `new Notification()` is not available; the plugin uses `ServiceWorkerRegistration.showNotification()` via the bundled `notify-sw.js`.
 - **Denied permission** — `Notification` is never constructed; methods return `null` or `denied` without throwing.
 - **Default permission** — `send` returns `null` until the user grants access via `requestPermission()`.
@@ -143,7 +145,7 @@ The plugin does not render UI, manage toast stacks, or persist preferences. Use 
 | HTTP (non-localhost) | Blocked — requires HTTPS |
 | Web Workers / Service Workers | This plugin targets `window` / Alpine templates in the main document |
 
-Always check `isSupported()`, `requiresHomeScreenInstall()`, and `permission()` before showing permission prompts or assuming notifications will appear.
+Always check `isSupported`, `requiresHomeScreenInstall`, and `permission` before showing permission prompts or assuming notifications will appear.
 
 ## TypeScript
 

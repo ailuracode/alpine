@@ -1,11 +1,25 @@
 import type AlpineType from "alpinejs";
 
-export type DeviceType = "mobile" | "tablet" | "desktop";
+export const DEVICE_TYPES = ["mobile", "tablet", "desktop"] as const;
 
-export interface DeviceBreakpoints {
+export type DeviceType = (typeof DEVICE_TYPES)[number];
+
+export const DEFAULT_DEVICE_BREAKPOINTS = {
+  mobileMax: 767,
+  tabletMax: 1023,
+} as const;
+
+export type DeviceBreakpoints = {
   mobileMax?: number;
   tabletMax?: number;
-}
+};
+
+export type DeviceSnapshot = {
+  readonly width: number;
+  readonly mobileMax: number;
+  readonly tabletMax: number;
+  readonly type: DeviceType;
+};
 
 export interface DeviceStore {
   mobileMax: number;
@@ -22,9 +36,55 @@ export interface DeviceStore {
   setBreakpoints(breakpoints?: DeviceBreakpoints): void;
 }
 
-const DEFAULT_MOBILE_MAX = 767;
-const DEFAULT_TABLET_MAX = 1023;
 const WIDTH_DEBOUNCE_MS = 100;
+
+function resolveBreakpoints(breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS): {
+  mobileMax: number;
+  tabletMax: number;
+} {
+  return {
+    mobileMax: breakpoints.mobileMax ?? DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
+    tabletMax: breakpoints.tabletMax ?? DEFAULT_DEVICE_BREAKPOINTS.tabletMax,
+  };
+}
+
+/** Builds a typed breakpoints object for `setBreakpoints()`. */
+export function deviceBreakpoints<const T extends DeviceBreakpoints>(breakpoints: T): T {
+  return breakpoints;
+}
+
+/** Resolves device type from viewport width and breakpoint bounds. */
+export function resolveDeviceTypeFromWidth(
+  width: number,
+  breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS
+): DeviceType {
+  const { mobileMax, tabletMax } = resolveBreakpoints(breakpoints);
+
+  if (width <= mobileMax) {
+    return "mobile";
+  }
+
+  if (width <= tabletMax) {
+    return "tablet";
+  }
+
+  return "desktop";
+}
+
+/** Reads a width-based device snapshot (store type uses `matchMedia` at runtime). */
+export function readDeviceSnapshot(
+  breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS
+): DeviceSnapshot {
+  const resolved = resolveBreakpoints(breakpoints);
+  const width = typeof window !== "undefined" ? window.innerWidth : 0;
+
+  return {
+    width,
+    mobileMax: resolved.mobileMax,
+    tabletMax: resolved.tabletMax,
+    type: resolveDeviceTypeFromWidth(width, resolved),
+  };
+}
 
 function createQueries(mobileMax: number, tabletMax: number) {
   return {
@@ -67,13 +127,16 @@ function applyWidth(target: Pick<DeviceStore, "width">): boolean {
 
 /** Alpine.js screen plugin. Registers `$store.device`. */
 export default function screenPlugin(Alpine: AlpineType.Alpine): void {
-  let queries = createQueries(DEFAULT_MOBILE_MAX, DEFAULT_TABLET_MAX);
+  let queries = createQueries(
+    DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
+    DEFAULT_DEVICE_BREAKPOINTS.tabletMax
+  );
   let typeHandler: (() => void) | null = null;
   let widthTimer: ReturnType<typeof setTimeout> | null = null;
 
   const deviceStore: DeviceStore = {
-    mobileMax: DEFAULT_MOBILE_MAX,
-    tabletMax: DEFAULT_TABLET_MAX,
+    mobileMax: DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
+    tabletMax: DEFAULT_DEVICE_BREAKPOINTS.tabletMax,
     width: window.innerWidth,
     type: "desktop",
 

@@ -1,7 +1,56 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
-import screenPlugin, { type DeviceStore } from "../src/index.js";
+import screenPlugin, {
+  DEFAULT_DEVICE_BREAKPOINTS,
+  DEVICE_TYPES,
+  type DeviceSnapshot,
+  type DeviceStore,
+  type DeviceType,
+  deviceBreakpoints,
+  readDeviceSnapshot,
+  resolveDeviceTypeFromWidth,
+} from "../src/index.js";
+
+describe("@ailuracode/alpine-screen type inference", () => {
+  it("exports literal device types", () => {
+    expectTypeOf(DEVICE_TYPES).toEqualTypeOf<readonly ["mobile", "tablet", "desktop"]>();
+    expectTypeOf(DEFAULT_DEVICE_BREAKPOINTS.mobileMax).toEqualTypeOf<767>();
+  });
+
+  it("types resolveDeviceTypeFromWidth()", () => {
+    expectTypeOf(resolveDeviceTypeFromWidth(500)).toEqualTypeOf<DeviceType>();
+    expectTypeOf(
+      resolveDeviceTypeFromWidth(800, { mobileMax: 767, tabletMax: 1023 })
+    ).toEqualTypeOf<DeviceType>();
+  });
+
+  it("types readDeviceSnapshot()", () => {
+    const snapshot = readDeviceSnapshot();
+
+    expectTypeOf(snapshot).toEqualTypeOf<DeviceSnapshot>();
+    expectTypeOf(snapshot.type).toEqualTypeOf<DeviceType>();
+  });
+
+  it("types deviceBreakpoints()", () => {
+    const breakpoints = deviceBreakpoints({ mobileMax: 640, tabletMax: 1024 });
+
+    expectTypeOf(breakpoints.mobileMax).toEqualTypeOf<640>();
+    expectTypeOf(breakpoints.tabletMax).toEqualTypeOf<1024>();
+  });
+
+  it("types $store.device", () => {
+    setMatchMedia("(max-width: 767px)", true);
+    setMatchMedia("(min-width: 768px) and (max-width: 1023px)", false);
+
+    const Alpine = startAlpine(screenPlugin);
+    const device = Alpine.store("device") as DeviceStore;
+
+    expectTypeOf(device.type).toEqualTypeOf<DeviceType>();
+    expectTypeOf(device.is).parameters.toEqualTypeOf<[name: DeviceType]>();
+    expectTypeOf(device.isMobile).toEqualTypeOf<boolean>();
+  });
+});
 
 describe("@ailuracode/alpine-screen", () => {
   let store: DeviceStore;
@@ -12,6 +61,26 @@ describe("@ailuracode/alpine-screen", () => {
 
     const Alpine = startAlpine(screenPlugin);
     store = Alpine.store("device") as DeviceStore;
+  });
+
+  it("resolves type from width via helper", () => {
+    expect(resolveDeviceTypeFromWidth(500)).toBe("mobile");
+    expect(resolveDeviceTypeFromWidth(900)).toBe("tablet");
+    expect(resolveDeviceTypeFromWidth(1200)).toBe("desktop");
+  });
+
+  it("reads device snapshot from width", () => {
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 900,
+    });
+
+    expect(readDeviceSnapshot()).toEqual({
+      width: 900,
+      mobileMax: DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
+      tabletMax: DEFAULT_DEVICE_BREAKPOINTS.tabletMax,
+      type: "tablet",
+    });
   });
 
   it("registers the device store", () => {
@@ -54,18 +123,22 @@ describe("@ailuracode/alpine-screen", () => {
     expect(store.is("tablet")).toBe(true);
   });
 
-  it("debounces resize updates", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("updates width on resize after debounce", async () => {
     vi.useFakeTimers();
+
     Object.defineProperty(window, "innerWidth", {
       configurable: true,
       value: 800,
     });
 
     window.dispatchEvent(new Event("resize"));
-    vi.advanceTimersByTime(100);
+    await vi.advanceTimersByTimeAsync(100);
 
     expect(store.width).toBe(800);
-    vi.useRealTimers();
   });
 });
 
@@ -76,6 +149,7 @@ describe("@ailuracode/alpine-screen desktop", () => {
 
     const Alpine = startAlpine(screenPlugin);
     const device = Alpine.store("device") as DeviceStore;
+    device.setBreakpoints({ mobileMax: 767, tabletMax: 1023 });
 
     expect(device.type).toBe("desktop");
     expect(device.isDesktop).toBe(true);

@@ -30,6 +30,7 @@ export default function queryDevtoolsPlugin(
 }
 
 export { getQueryStore, mountQueryDevtools } from "./panel.js";
+export { DEFAULT_PREFERENCES_STORAGE_KEY } from "./panel-preferences.js";
 export {
   DEFAULT_TOGGLE_CORNER,
   DEFAULT_TOGGLE_CORNER_STORAGE_KEY,

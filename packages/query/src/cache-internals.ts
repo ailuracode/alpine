@@ -1,10 +1,10 @@
 import type { QueryStateHandle } from "./adapters/types.js";
-import type { QueryKey, QueryState, ResolvedQueryOptions } from "./types.js";
+import type { QueryFunction, QueryKey, QueryState, ResolvedQueryOptions } from "./types.js";
 
 export type QueryEntry<TData = unknown> = {
   key: QueryKey;
   keyHash: string;
-  queryFn: () => Promise<TData>;
+  queryFn: QueryFunction<TData>;
   options: ResolvedQueryOptions<TData>;
   handle: QueryStateHandle<TData>;
   state: QueryState<TData>;
@@ -13,7 +13,11 @@ export type QueryEntry<TData = unknown> = {
   intervalId: ReturnType<typeof setInterval> | null;
   fetchPromise: Promise<void> | null;
   abortController: AbortController | null;
+  fetchGeneration: number;
   isInvalidated: boolean;
+  fetchStartedAt: number | null;
+  lastFetchDurationMs: number | null;
+  devtoolsUnsubscribe?: () => void;
 };
 
 export type QueryCacheInternals = {

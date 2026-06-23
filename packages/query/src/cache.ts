@@ -4,6 +4,7 @@ import { DevtoolsRegistry } from "./devtools-registry.js";
 import type {
   MutationOptions,
   MutationState,
+  QueryFunction,
   QueryKey,
   QueryOptions,
   QueryState,
@@ -37,6 +38,9 @@ export class QueryCache {
     return {
       subscribe: (listener: () => void) => this.devtools.subscribe(listener),
       getSnapshot: () => this.devtools.buildSnapshot(this.entries.values(), this.adapter.name),
+      clearMutations: () => {
+        this.devtools.clearMutations();
+      },
     };
   }
 
@@ -84,7 +88,7 @@ export class QueryCache {
 
   observe<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
   ): QueryState<TData> & { destroy(): void } {
     const entry = this.ensureEntry(key, queryFn, options);
@@ -100,7 +104,7 @@ export class QueryCache {
 
   fetch<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
   ): QueryState<TData> {
     const entry = this.ensureEntry(key, queryFn, options);
@@ -114,7 +118,7 @@ export class QueryCache {
 
   async prefetch<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
   ): Promise<void> {
     const entry = this.ensureEntry(key, queryFn, options);
@@ -165,7 +169,9 @@ export class QueryCache {
       return;
     }
 
+    entry.fetchGeneration += 1;
     entry.abortController?.abort();
+    entry.fetchPromise = null;
     entry.handle.patch({ fetchStatus: "idle" });
     this.devtools.notify();
   }
@@ -178,6 +184,29 @@ export class QueryCache {
 
     this.entries.clear();
     this.devtools.clearMutations();
+    this.devtools.notify();
+  }
+
+  resetQueries(key?: QueryKey | QueryKey[]): void {
+    const targets = key ? this.resolveTargets(key) : [...this.entries.values()];
+
+    for (const entry of targets) {
+      entry.isInvalidated = false;
+      entry.fetchGeneration += 1;
+      entry.abortController?.abort();
+      entry.fetchPromise = null;
+
+      const hasInitialData = entry.options.initialData !== undefined;
+      entry.handle.patch({
+        data: entry.options.initialData ?? entry.options.placeholderData,
+        error: null,
+        status: (hasInitialData ? "success" : "pending") as QueryStatus,
+        fetchStatus: "idle",
+        dataUpdatedAt: hasInitialData ? Date.now() : 0,
+        errorUpdatedAt: 0,
+      });
+    }
+
     this.devtools.notify();
   }
 
@@ -222,7 +251,7 @@ export class QueryCache {
 
   private ensureEntry<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
   ): QueryEntry<TData> {
     const keyHash = hashKey(key);
@@ -235,6 +264,7 @@ export class QueryCache {
     if (existing) {
       existing.queryFn = queryFn;
       existing.options = resolvedOptions;
+      existing.handle.setStaleTime?.(resolvedOptions.staleTime);
       return existing;
     }
 
@@ -268,7 +298,13 @@ export class QueryCache {
       intervalId: null,
       fetchPromise: null,
       abortController: null,
+      fetchGeneration: 0,
       isInvalidated: false,
+      fetchStartedAt: null,
+      lastFetchDurationMs: null,
+      devtoolsUnsubscribe: handle.listen(() => {
+        this.devtools.notify();
+      }),
     };
 
     this.entries.set(keyHash, entryRef as QueryEntry);
@@ -345,6 +381,7 @@ export class QueryCache {
     entry.abortController?.abort();
     entry.abortController = null;
     entry.fetchPromise = null;
+    entry.fetchGeneration += 1;
   }
 
   private ensureFocusListener(): void {
@@ -387,6 +424,7 @@ export class QueryCache {
   private fetchEntry<TData>(entry: QueryEntry<TData>, force = false): Promise<void> | undefined {
     if (!entry.options.enabled) {
       entry.handle.patch({ fetchStatus: "paused" });
+      this.devtools.notify();
       return;
     }
 
@@ -396,19 +434,32 @@ export class QueryCache {
     }
 
     if (entry.fetchPromise) {
-      return entry.fetchPromise;
+      if (!force) {
+        return entry.fetchPromise;
+      }
+
+      entry.fetchGeneration += 1;
+      entry.abortController?.abort();
+      entry.fetchPromise = null;
     }
 
+    const generation = entry.fetchGeneration;
+    const abortController = new AbortController();
+    entry.abortController = abortController;
+    entry.fetchStartedAt = Date.now();
+    entry.lastFetchDurationMs = null;
     entry.handle.patch({ fetchStatus: "fetching" });
-    entry.abortController?.abort();
-    entry.abortController = new AbortController();
     this.devtools.notify();
 
-    entry.fetchPromise = this.runQuery(entry)
+    entry.fetchPromise = this.runQuery(entry, abortController.signal, generation)
       .catch(() => {
         // Errors are stored on query state.
       })
       .finally(() => {
+        if (entry.fetchGeneration !== generation) {
+          return;
+        }
+
         entry.fetchPromise = null;
         entry.isInvalidated = false;
         if (entry.handle.get().fetchStatus === "fetching") {
@@ -420,14 +471,54 @@ export class QueryCache {
     return entry.fetchPromise;
   }
 
-  private async runQuery<TData>(entry: QueryEntry<TData>): Promise<void> {
+  private isAborted(signal: AbortSignal): boolean {
+    return signal.aborted;
+  }
+
+  private async executeQueryAttempt<TData>(
+    entry: QueryEntry<TData>,
+    signal: AbortSignal
+  ): Promise<TData | "aborted"> {
+    if (this.isAborted(signal)) {
+      return "aborted";
+    }
+
+    try {
+      const data = await entry.queryFn({ signal });
+      return this.isAborted(signal) ? "aborted" : data;
+    } catch (error) {
+      if (this.isAborted(signal)) {
+        return "aborted";
+      }
+
+      throw error;
+    }
+  }
+
+  private async runQuery<TData>(
+    entry: QueryEntry<TData>,
+    signal: AbortSignal,
+    generation: number
+  ): Promise<void> {
+    if (entry.fetchGeneration !== generation) {
+      return;
+    }
+
     const { retry, retryDelay } = entry.options;
     let attempt = 0;
 
     while (true) {
+      if (entry.fetchGeneration !== generation) {
+        return;
+      }
+
       try {
-        const data = await entry.queryFn();
-        this.applySuccess(entry, data);
+        const result = await this.executeQueryAttempt(entry, signal);
+        if (result === "aborted" || entry.fetchGeneration !== generation) {
+          return;
+        }
+
+        this.applySuccess(entry, result);
         return;
       } catch (error) {
         const queryError = error instanceof Error ? error : new Error(String(error));
@@ -443,7 +534,17 @@ export class QueryCache {
     }
   }
 
+  private recordFetchDuration(entry: QueryEntry): void {
+    if (entry.fetchStartedAt === null) {
+      return;
+    }
+
+    entry.lastFetchDurationMs = Date.now() - entry.fetchStartedAt;
+    entry.fetchStartedAt = null;
+  }
+
   private applySuccess<TData>(entry: QueryEntry<TData>, data: TData): void {
+    this.recordFetchDuration(entry);
     entry.handle.patch({
       data,
       error: null,
@@ -456,6 +557,7 @@ export class QueryCache {
   }
 
   private applyError<TData>(entry: QueryEntry<TData>, error: Error): void {
+    this.recordFetchDuration(entry);
     entry.handle.patch({
       error,
       status: "error",
@@ -513,6 +615,7 @@ export class QueryCache {
   }
 
   private disposeEntryHandle<TData>(entry: QueryEntry<TData>): void {
+    entry.devtoolsUnsubscribe?.();
     entry.handle.dispose?.();
   }
 }

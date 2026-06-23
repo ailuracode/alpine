@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "alpine-js": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "alpine-js/SKILL.md",
+      "computedHash": "529e2ee02bf6e2adece466e7148b9288182637fefc3b5d4f3eeb18e12906445c"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vitest/SKILL.md",
+      "computedHash": "943d436114c677802426741980146c07560bf375297666b03062444f4b98a785"
+    }
+  }
+}

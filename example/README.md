@@ -1,6 +1,6 @@
 # Alpine.js plugins example
 
-Interactive [Astro](https://astro.build) demo for all `@ailuracode/alpine-*` packages. Part of the pnpm workspace (`example/`). **Private** — not published to npm.
+Interactive [Astro](https://astro.build) demo for all `@ailuracode/alpine-*` packages. Styled with [Tailwind CSS](https://tailwindcss.com) and [daisyUI](https://daisyui.com). Part of the pnpm workspace (`example/`). **Private** — not published to npm.
 
 ## Run locally
 

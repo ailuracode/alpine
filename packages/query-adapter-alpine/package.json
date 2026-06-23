@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-query-adapter-alpine",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Native Alpine.reactive adapter plugin for @ailuracode/alpine-query",
   "type": "module",
   "license": "MIT",
@@ -39,7 +39,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist --tsconfig tsconfig.build.json",
     "prepublishOnly": "pnpm run build",
-    "test": "vitest run --config ../../vitest.config.js test"
+    "test": "vitest run --config ../../vitest.config.ts test"
   },
   "keywords": [
     "alpinejs",

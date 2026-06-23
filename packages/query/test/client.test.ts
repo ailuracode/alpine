@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { createQueryClient } from "../src/client.js";
-import type { QueryStore } from "../src/types.js";
+import type { QueryFunction, QueryState, QueryStore } from "../src/types.js";
 
 type Todo = { id: number; title: string };
 
@@ -18,8 +18,14 @@ describe("createQueryClient()", () => {
   });
 
   it("works without Alpine.js", async () => {
-    const queryFn = vi.fn().mockResolvedValue([{ id: 1, title: "Learn Alpine Query" }]);
-    const query = client.observe<Todo[]>(["todos"], queryFn);
+    const queryFn = vi
+      .fn<QueryFunction<Todo[]>>()
+      .mockResolvedValue([{ id: 1, title: "Learn Alpine Query" }]);
+    const query = client.observe(["todos"], queryFn);
+
+    expectTypeOf(query.data).toEqualTypeOf<Todo[] | undefined>();
+    expectTypeOf(query.data).not.toBeAny();
+    expectTypeOf(query).toEqualTypeOf<QueryState<Todo[]> & { destroy(): void }>();
 
     expect(query.isLoading).toBe(true);
 
@@ -37,10 +43,10 @@ describe("createQueryClient()", () => {
 
   it("supports mutations without Alpine.js", async () => {
     const mutation = client.mutate({
-      mutationFn: async (title: string) => `created:${title}`,
+      mutationFn: async ({ title }: { title: string }) => `created:${title}`,
     });
 
-    const result = await mutation.mutate("Task");
+    const result = await mutation.mutate({ title: "Task" });
 
     expect(result).toBe("created:Task");
     expect(mutation.isSuccess).toBe(true);

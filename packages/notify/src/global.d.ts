@@ -1,9 +1,9 @@
 /// <reference types="@types/alpinejs" />
 
 export interface NotifyMagic {
-  isSupported(): boolean;
-  requiresHomeScreenInstall(): boolean;
-  permission(): NotificationPermission;
+  readonly isSupported: boolean;
+  readonly requiresHomeScreenInstall: boolean;
+  readonly permission: NotificationPermission;
   requestPermission(): Promise<NotificationPermission>;
   send(title: string, options?: NotificationOptions): Notification | null;
   sendAsync(title: string, options?: NotificationOptions): Promise<Notification | null>;

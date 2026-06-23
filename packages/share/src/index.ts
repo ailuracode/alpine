@@ -1,7 +1,7 @@
 import type AlpineType from "alpinejs";
 
 export type ShareMagic = ((data: ShareData) => Promise<boolean>) & {
-  isSupported(): boolean;
+  readonly isSupported: boolean;
   canShare(data?: ShareData): boolean;
 };
 
@@ -59,8 +59,8 @@ export async function shareData(data: ShareData): Promise<boolean> {
 
 /** Builds callable `$share` magic with `isSupported` and `canShare` helpers. */
 export function createShareMagic(): ShareMagic {
-  const share = (data: ShareData) => shareData(data);
-  share.isSupported = isShareSupported;
+  const share = ((data: ShareData) => shareData(data)) as ShareMagic;
+  Object.defineProperty(share, "isSupported", { get: isShareSupported });
   share.canShare = canShareData;
   return share;
 }

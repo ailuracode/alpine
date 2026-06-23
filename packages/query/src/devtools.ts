@@ -20,6 +20,8 @@ export interface QueryDevtoolsEntry {
   isInvalidated: boolean;
   dataUpdatedAt: number;
   errorUpdatedAt: number;
+  fetchStartedAt: number | null;
+  fetchDurationMs: number | null;
   data: unknown;
   error: { message: string; name: string } | null;
   options: ResolvedQueryOptions;
@@ -44,6 +46,7 @@ export interface QueryDevtoolsSnapshot {
 export interface QueryDevtoolsApi {
   subscribe(listener: () => void): () => void;
   getSnapshot(): QueryDevtoolsSnapshot;
+  clearMutations(): void;
 }
 
 export type DevtoolsListener = () => void;

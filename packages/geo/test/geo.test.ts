@@ -106,6 +106,33 @@ describe("@ailuracode/alpine-geo", () => {
     expect(store.isLoading).toBe(false);
   });
 
+  it("request() ignores stale responses from concurrent calls", async () => {
+    vi.useFakeTimers();
+
+    let calls = 0;
+    getCurrentPosition.mockImplementation((success) => {
+      calls += 1;
+      if (calls === 1) {
+        setTimeout(() => success(createPosition(1, 1)), 50);
+        return;
+      }
+
+      success(createPosition(2, 2));
+    });
+
+    const first = store.request();
+    const second = store.request();
+
+    await vi.advanceTimersByTimeAsync(50);
+    await Promise.all([first, second]);
+
+    expect(store.latitude).toBe(2);
+    expect(store.longitude).toBe(2);
+    expect(store.isLoading).toBe(false);
+
+    vi.useRealTimers();
+  });
+
   it("watch() tracks position updates", () => {
     const position = createPosition(51.5074, -0.1278, 5);
     watchPosition.mockImplementation((success) => {
@@ -138,8 +165,9 @@ describe("@ailuracode/alpine-geo", () => {
     expect(store.unwatch()).toBe(false);
   });
 
-  it("watch() captures geolocation errors", () => {
-    watchPosition.mockImplementation((_success, error) => {
+  it("watch() captures geolocation errors and clears coordinates", () => {
+    watchPosition.mockImplementation((success, error) => {
+      success(createPosition());
       error(createError(3, "Position request timed out"));
       return 7;
     });
@@ -150,6 +178,7 @@ describe("@ailuracode/alpine-geo", () => {
     expect(store.hasError).toBe(true);
     expect(store.error).toBe("Position request timed out");
     expect(store.errorCode).toBe(3);
+    expect(store.hasPosition).toBe(false);
     expect(store.isWatching).toBe(true);
   });
 

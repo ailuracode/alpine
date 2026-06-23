@@ -92,4 +92,15 @@ describe("query devtools merge stores", () => {
     primary.reset();
     secondary.reset();
   });
+
+  it("exposes adapter options for each merged store", () => {
+    const primary = createQueryClient({ adapter: nanostoresQueryAdapter });
+    const secondary = createQueryClient({ adapter: createAlpineStoreAdapter(startAlpine()) });
+    const merged = createMergedQueryDevtools([primary, secondary]);
+
+    expect(merged.getAdapterOptions()).toEqual([
+      { id: "0", label: "Nanostores" },
+      { id: "1", label: "Alpine.reactive" },
+    ]);
+  });
 });

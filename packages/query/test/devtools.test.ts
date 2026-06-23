@@ -16,6 +16,58 @@ describe("@ailuracode/alpine-query devtools", () => {
     store.reset();
   });
 
+  it("reports pending and fetching states before a query resolves", async () => {
+    vi.useFakeTimers();
+
+    let resolve!: (value: string) => void;
+    const pending = new Promise<string>((done) => {
+      resolve = done;
+    });
+
+    const queryObserver = store.observe(["slow"], async () => pending);
+
+    expect(store.devtools.getSnapshot().queries[0]?.status).toBe("pending");
+    expect(store.devtools.getSnapshot().queries[0]?.fetchStatus).toBe("fetching");
+    expect(store.devtools.getSnapshot().queries[0]?.fetchDurationMs).toBe(0);
+
+    vi.advanceTimersByTime(250);
+    expect(store.devtools.getSnapshot().queries[0]?.fetchDurationMs).toBe(250);
+
+    resolve("ok");
+    await vi.waitFor(() => {
+      expect(queryObserver.isSuccess).toBe(true);
+    });
+
+    expect(store.devtools.getSnapshot().queries[0]?.status).toBe("success");
+    expect(store.devtools.getSnapshot().queries[0]?.fetchDurationMs).toBeGreaterThanOrEqual(250);
+    expect(store.devtools.getSnapshot().queries[0]?.fetchStartedAt).toBeNull();
+    queryObserver.destroy();
+    vi.useRealTimers();
+  });
+
+  it("notifies devtools subscribers on intermediate query states", async () => {
+    const listener = vi.fn();
+    store.devtools.subscribe(listener);
+
+    let resolve!: (value: string) => void;
+    const pending = new Promise<string>((done) => {
+      resolve = done;
+    });
+
+    const queryObserver = store.observe(["notify-me"], async () => pending);
+    expect(listener).toHaveBeenCalled();
+    expect(store.devtools.getSnapshot().queries[0]?.fetchStatus).toBe("fetching");
+
+    resolve("ok");
+    await vi.waitFor(() => {
+      expect(queryObserver.isSuccess).toBe(true);
+    });
+
+    expect(store.devtools.getSnapshot().queries[0]?.status).toBe("success");
+    expect(listener.mock.calls.length).toBeGreaterThan(1);
+    queryObserver.destroy();
+  });
+
   it("exposes devtools snapshot and subscription", async () => {
     const listener = vi.fn();
     const unsubscribe = store.devtools.subscribe(listener);
@@ -61,5 +113,37 @@ describe("@ailuracode/alpine-query devtools", () => {
     expect(store.devtools.getSnapshot().mutations[0]?.status).toBe("error");
     store.reset();
     expect(store.devtools.getSnapshot().mutations).toHaveLength(0);
+  });
+
+  it("clears mutations without removing cached queries", async () => {
+    const query = store.observe(["keep"], async () => "cached");
+    await vi.waitFor(() => {
+      expect(query.isSuccess).toBe(true);
+    });
+
+    const mutation = store.mutate<string, string>({
+      mutationFn: async (value) => value,
+    });
+    await mutation.mutate("x");
+
+    expect(store.devtools.getSnapshot().mutations).toHaveLength(1);
+    store.clearMutations();
+    expect(store.devtools.getSnapshot().mutations).toHaveLength(0);
+    expect(store.get(["keep"])?.data).toBe("cached");
+
+    query.destroy();
+  });
+
+  it("resetQueries() restores a query to its initial state", () => {
+    const query = store.observe(["reset-me"], async () => "loaded", {
+      initialData: "seed",
+      staleTime: 60_000,
+    });
+
+    store.resetQueries(["reset-me"]);
+    expect(query.data).toBe("seed");
+    expect(query.status).toBe("success");
+
+    query.destroy();
   });
 });

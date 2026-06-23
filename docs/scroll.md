@@ -16,30 +16,37 @@ npm install @ailuracode/alpine-scroll alpinejs
 import Alpine from "alpinejs";
 import scroll from "@ailuracode/alpine-scroll";
 
-Alpine.plugin(scroll);
+Alpine.plugin(scroll());
 Alpine.start();
 ```
 
-## Required CSS
+Scroll lock applies inline styles on `html` and `body` (overflow hidden, fixed body). No CSS classes or framework styles are required.
 
-The plugin adds `.scroll-locked` to `html` and `body`. Define styles in your project:
+### Optional lock callback
 
-```css
-html.scroll-locked {
-  overflow: hidden;
-}
+Add your own classes or attributes when lock state changes:
 
-body.scroll-locked {
-  position: fixed;
-  left: 0;
-  right: 0;
-  width: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-}
+```js
+Alpine.plugin(
+  scroll({
+    onLockChange(locked) {
+      document.documentElement.toggleAttribute("data-scroll-locked", locked);
+    },
+  }),
+);
 ```
 
-Optional: `scrollbar-gutter: stable` on `html` reduces layout shift when locking.
+## Exported helpers
+
+```js
+import {
+  SCROLL_DIRECTIONS,
+  computeScrollDirection,
+  computeScrollMetrics,
+  readScrollSnapshot,
+  scrollOptions,
+} from "@ailuracode/alpine-scroll";
+```
 
 ## Store API
 
@@ -51,7 +58,7 @@ Store name: `$store.scroll`
 |----------|------|-------------|
 | `x` | `number` | Horizontal scroll offset |
 | `y` | `number` | Vertical scroll offset |
-| `direction` | `string` | `up`, `down`, or `none` |
+| `direction` | `ScrollDirection` | `up`, `down`, or `none` |
 | `progress` | `number` | Scroll progress `0–100` |
 | `atTop` | `boolean` | At top of page |
 | `atBottom` | `boolean` | At bottom of page |
@@ -75,6 +82,7 @@ Store name: `$store.scroll`
 | `lock()` | Lock body scroll (reference counted) |
 | `unlock()` | Release one lock |
 | `toggleLock()` | Toggle lock state |
+| `isDirection(direction)` | Check current direction (`ScrollDirection`) |
 | `toTop(behavior?)` | Scroll to top (`behavior` default: `'smooth'`) |
 | `toBottom(behavior?)` | Scroll to bottom |
 | `refresh()` | Manually refresh metrics |

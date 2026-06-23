@@ -69,6 +69,7 @@ function clearPosition(store: GeoStore): void {
 export default function geoPlugin(Alpine: AlpineType.Alpine): void {
   const supported = typeof navigator.geolocation?.getCurrentPosition === "function";
   let watchId: number | null = null;
+  let requestGeneration = 0;
 
   const geoStore: GeoStore = {
     latitude: null,
@@ -115,14 +116,26 @@ export default function geoPlugin(Alpine: AlpineType.Alpine): void {
       this.error = null;
       this.errorCode = null;
 
+      const generation = ++requestGeneration;
+
       return new Promise((resolve) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
+            if (generation !== requestGeneration) {
+              resolve(false);
+              return;
+            }
+
             applyPosition(this, position);
             this.loading = false;
             resolve(true);
           },
           (error) => {
+            if (generation !== requestGeneration) {
+              resolve(false);
+              return;
+            }
+
             clearCoords(this);
             applyError(this, error);
             this.loading = false;
@@ -146,6 +159,7 @@ export default function geoPlugin(Alpine: AlpineType.Alpine): void {
           applyPosition(this, position);
         },
         (error) => {
+          clearCoords(this);
           applyError(this, error);
         },
         options

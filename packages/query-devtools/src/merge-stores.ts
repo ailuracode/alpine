@@ -23,9 +23,16 @@ export type QueryDevtoolsSnapshotView = Omit<QueryDevtoolsSnapshot, "queries" | 
   mutations: MutationDevtoolsEntryView[];
 };
 
+export type QueryDevtoolsAdapterOption = {
+  id: string;
+  label: string;
+};
+
 export interface MergedQueryDevtools {
   devtools: QueryDevtoolsApi;
   getSnapshotView(): QueryDevtoolsSnapshotView;
+  getAdapterOptions(): QueryDevtoolsAdapterOption[];
+  getStoresForScope(scope: string): QueryStore[];
   getStoreForQuery(entry: QueryDevtoolsEntryView): QueryStore;
   getStoreForMutation(entry: MutationDevtoolsEntryView): QueryStore;
 }
@@ -128,11 +135,30 @@ export function createMergedQueryDevtools(stores: QueryStore[]): MergedQueryDevt
     getSnapshot() {
       return getSnapshotView();
     },
+    clearMutations() {
+      for (const context of contexts) {
+        context.store.clearMutations();
+      }
+    },
   };
 
   return {
     devtools,
     getSnapshotView,
+    getAdapterOptions() {
+      return contexts.map((context) => ({
+        id: context.storeId,
+        label: context.displayName,
+      }));
+    },
+    getStoresForScope(scope) {
+      if (scope === "all") {
+        return contexts.map((context) => context.store);
+      }
+
+      const store = storeById.get(scope);
+      return store ? [store] : [];
+    },
     getStoreForQuery(entry) {
       const store = storeById.get(entry.storeId);
 

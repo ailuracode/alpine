@@ -37,6 +37,26 @@ type PokemonRow = {
 	loading?: boolean;
 };
 
+type PokeapiDemoData = {
+	page: number;
+	pageSize: number;
+	queries: Record<number, QueryObserver>;
+	adapterName: string;
+	badge: string;
+	query: QueryObserver | null;
+	rows: PokemonRow[];
+	tableRows: PokemonRow[];
+	isAwaitingData: boolean;
+	totalCount: number;
+	hasCachedPage: boolean;
+	ensurePage(page?: number): void;
+	loadPage(): void;
+	prevPage(): void;
+	nextPage(): void;
+	init(): void;
+	destroy(): void;
+};
+
 function createSkeletonRows(page: number, pageSize: number): PokemonRow[] {
 	const offset = (page - 1) * pageSize;
 
@@ -50,6 +70,10 @@ function createSkeletonRows(page: number, pageSize: number): PokemonRow[] {
 async function fetchPokemonPage(page: number): Promise<PokemonListResponse> {
 	const response = await fetch(
 		`${POKEAPI}?limit=${PAGE_SIZE}&offset=${(page - 1) * PAGE_SIZE}`,
+		{
+			// Avoid the browser HTTP cache so DevTools throttling and refetches hit the network.
+			cache: "no-store",
+		},
 	);
 
 	if (!response.ok) {
@@ -64,7 +88,7 @@ function createPokeapiDemo(options: {
 	badge: string;
 	observePage: (page: number) => QueryObserver;
 }) {
-	return () => ({
+	return (): PokeapiDemoData => ({
 		page: 1,
 		pageSize: PAGE_SIZE,
 		queries: {} as Record<number, QueryObserver>,
@@ -107,7 +131,7 @@ function createPokeapiDemo(options: {
 		get hasCachedPage(): boolean {
 			return Boolean(this.query?.data?.results?.length);
 		},
-		ensurePage(page = this.page) {
+		ensurePage(this: PokeapiDemoData, page = this.page) {
 			if (this.queries[page]) {
 				return;
 			}

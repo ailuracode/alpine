@@ -53,7 +53,7 @@ describe("@ailuracode/alpine-export", () => {
     it("exportData() accepts a filename shorthand string", async () => {
       const { anchors } = installExportDom();
 
-      await expect(exportData("https://example.com/data.json", "export.json")).resolves.toBe(true);
+      await expect(exportData("/data.json", "export.json")).resolves.toBe(true);
 
       expect(anchors[0]?.download).toBe("export.json");
     });
@@ -117,22 +117,22 @@ describe("@ailuracode/alpine-export", () => {
 
       expect(store).not.toHaveBeenCalled();
       expect(typeof magicApi).toBe("function");
-      expect(magicApi?.isSupported()).toBe(true);
+      expect(magicApi?.isSupported).toBe(true);
     });
 
     it("registers callable $export magic", async () => {
       const { click } = installExportDom();
       const { export: exportFile } = createMagicHarness(exportPlugin) as { export: ExportMagic };
 
-      expect(exportFile.isSupported()).toBe(true);
-      await expect(exportFile("https://example.com/file.txt", "file.txt")).resolves.toBe(true);
-      expect(click).toHaveBeenCalledTimes(1);
+      expect(exportFile.isSupported).toBe(true);
+      await expect(exportFile("https://example.com/file.txt", "file.txt")).resolves.toBe(false);
+      expect(click).not.toHaveBeenCalled();
     });
 
     it("createExportMagic() exposes the public API", () => {
       const magic = createExportMagic();
 
-      expect(magic.isSupported).toBe(isExportSupported);
+      expect(magic.isSupported).toBe(isExportSupported());
     });
   });
 });

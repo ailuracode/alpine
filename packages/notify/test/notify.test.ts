@@ -319,9 +319,9 @@ describe("@ailuracode/alpine-notify", () => {
     it("exposes the full API surface", () => {
       const notify = createNotifyMagic();
 
-      expect(notify.isSupported()).toBe(true);
-      expect(typeof notify.requiresHomeScreenInstall).toBe("function");
-      expect(notify.permission()).toBe("granted");
+      expect(notify.isSupported).toBe(true);
+      expect(notify.requiresHomeScreenInstall).toBe(false);
+      expect(notify.permission).toBe("granted");
       expect(typeof notify.requestPermission).toBe("function");
       expect(typeof notify.send).toBe("function");
       expect(typeof notify.sendAsync).toBe("function");
@@ -350,7 +350,7 @@ describe("@ailuracode/alpine-notify", () => {
     it("registers $notify magic when called directly", () => {
       const { notify } = createMagicHarness(notifyPlugin) as { notify: NotifyMagic };
 
-      expect(notify.isSupported()).toBe(true);
+      expect(notify.isSupported).toBe(true);
       expect(notify.send("Hello")?.title).toBe("Hello");
     });
 
@@ -364,7 +364,7 @@ describe("@ailuracode/alpine-notify", () => {
         notify: NotifyMagic;
       };
 
-      expect(notify.isSupported()).toBe(true);
+      expect(notify.isSupported).toBe(true);
     });
   });
 });

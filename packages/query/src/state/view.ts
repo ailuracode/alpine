@@ -21,7 +21,10 @@ export type MutationStateRecord<TData = unknown> = {
   status: MutationStatus;
 };
 
-export function attachQueryFlags<TData>(state: QueryState<TData>, staleTime: number): void {
+export function attachQueryFlags<TData>(
+  state: QueryState<TData>,
+  getStaleTime: () => number
+): void {
   Object.defineProperties(state, {
     isPending: {
       get() {
@@ -54,7 +57,7 @@ export function attachQueryFlags<TData>(state: QueryState<TData>, staleTime: num
           return true;
         }
 
-        return Date.now() - state.dataUpdatedAt > staleTime;
+        return Date.now() - state.dataUpdatedAt > getStaleTime();
       },
     },
   });
@@ -89,7 +92,7 @@ export function attachMutationFlags<TData, TVariables>(
 
 export function createQueryStateView<TData>(
   getRecord: () => QueryStateRecord<TData>,
-  staleTime: number,
+  getStaleTime: () => number,
   refetch: () => Promise<void>
 ): QueryState<TData> {
   const state = {
@@ -114,7 +117,7 @@ export function createQueryStateView<TData>(
     refetch,
   } as QueryState<TData>;
 
-  attachQueryFlags(state, staleTime);
+  attachQueryFlags(state, getStaleTime);
 
   return state;
 }

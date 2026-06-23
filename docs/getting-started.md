@@ -83,7 +83,7 @@ function applyTheme({ resolved }) {
 }
 
 Alpine.plugin(theme({ onChange: applyTheme }));
-Alpine.plugin(scroll);
+Alpine.plugin(scroll());
 
 Alpine.start();
 ```

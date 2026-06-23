@@ -1,3 +1,5 @@
+import { paintClasses } from "./ui-styles.js";
+
 export type DevtoolsTheme = "light" | "dark" | "system";
 
 const noop = (): void => undefined;
@@ -25,14 +27,19 @@ export function resolveDevtoolsTheme(theme: DevtoolsTheme): "light" | "dark" {
 }
 
 export function applyDevtoolsThemeClass(element: HTMLElement, theme: DevtoolsTheme): void {
-  element.classList.remove("aq-devtools-root--light", "aq-devtools-root--dark");
-  element.classList.add(`aq-devtools-root--${resolveDevtoolsTheme(theme)}`);
+  const resolved = resolveDevtoolsTheme(theme);
+  paintClasses(element, "aq-devtools-root", `aq-devtools-root--${resolved}`);
 }
 
 /** Apply theme classes and watch host changes when `theme` is `"system"`. */
-export function bindDevtoolsTheme(element: HTMLElement, theme: DevtoolsTheme): () => void {
+export function bindDevtoolsTheme(
+  element: HTMLElement,
+  theme: DevtoolsTheme,
+  onChange?: () => void
+): () => void {
   const apply = (): void => {
     applyDevtoolsThemeClass(element, theme);
+    onChange?.();
   };
 
   apply();

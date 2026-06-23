@@ -75,24 +75,27 @@ export class DevtoolsRegistry {
   }
 
   private serializeQuery(entry: QueryEntry): QueryDevtoolsEntry {
-    const { state } = entry;
+    const record = entry.handle.get();
+    const { staleTime } = entry.options;
 
     return {
       key: [...entry.key],
       keyHash: entry.keyHash,
-      status: state.status,
-      fetchStatus: state.fetchStatus,
+      status: record.status,
+      fetchStatus: record.fetchStatus,
       observers: entry.observers,
-      isStale: state.isStale,
-      isLoading: state.isLoading,
-      isFetching: state.isFetching,
-      isError: state.isError,
-      isSuccess: state.isSuccess,
+      isStale: record.dataUpdatedAt === 0 || Date.now() - record.dataUpdatedAt > staleTime,
+      isLoading: record.status === "pending" && record.fetchStatus === "fetching",
+      isFetching: record.fetchStatus === "fetching",
+      isError: record.status === "error",
+      isSuccess: record.status === "success",
       isInvalidated: entry.isInvalidated,
-      dataUpdatedAt: state.dataUpdatedAt,
-      errorUpdatedAt: state.errorUpdatedAt,
-      data: serializeDevtoolsValue(state.data),
-      error: serializeDevtoolsError(state.error),
+      dataUpdatedAt: record.dataUpdatedAt,
+      errorUpdatedAt: record.errorUpdatedAt,
+      fetchStartedAt: entry.fetchStartedAt,
+      fetchDurationMs: resolveFetchDurationMs(entry),
+      data: serializeDevtoolsValue(record.data),
+      error: serializeDevtoolsError(record.error),
       options: { ...entry.options },
     };
   }
@@ -112,4 +115,14 @@ export class DevtoolsRegistry {
       this.mutations.length = MAX_MUTATION_HISTORY;
     }
   }
+}
+
+function resolveFetchDurationMs(entry: QueryEntry): number | null {
+  const record = entry.handle.get();
+
+  if (record.fetchStatus === "fetching" && entry.fetchStartedAt !== null) {
+    return Date.now() - entry.fetchStartedAt;
+  }
+
+  return entry.lastFetchDurationMs;
 }

@@ -35,7 +35,7 @@ Alpine.start();
 | | |
 |-|-|
 | **Magic** | `$export(source, options?)` |
-| **Helpers** | `$export.isSupported()` |
+| **Helpers** | `$export.isSupported` (getter) |
 
 Callable like `$clipboard` and `$share`.
 

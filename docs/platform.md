@@ -24,13 +24,14 @@ Alpine.start();
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `name` | `"macos" \| "windows" \| "linux" \| "ios" \| "android" \| "chromeos" \| "unknown"` | Resolved platform |
-| `isMac` | `boolean` | Desktop macOS |
-| `isWindows` | `boolean` | Windows |
-| `isLinux` | `boolean` | Desktop Linux |
-| `isIos` | `boolean` | iOS / iPadOS |
-| `isAndroid` | `boolean` | Android |
-| `isChromeos` | `boolean` | ChromeOS |
+| `name` | `PlatformName` (getter) | Resolved platform |
+| `isMac` | `boolean` (getter) | Desktop macOS |
+| `isWindows` | `boolean` (getter) | Windows |
+| `isLinux` | `boolean` (getter) | Desktop Linux |
+| `isIos` | `boolean` (getter) | iOS / iPadOS |
+| `isAndroid` | `boolean` (getter) | Android |
+| `isChromeos` | `boolean` (getter) | ChromeOS |
+| `is(platform)` | `boolean` | `true` when `name` matches the given platform |
 
 ## HTML examples
 
@@ -48,12 +49,15 @@ Pure detection functions are exported for reuse in other packages:
 
 ```js
 import {
+  PLATFORM_NAMES,
+  createPlatformState,
   detectPlatformName,
   isAndroidDevice,
   isIosDevice,
   isLinuxDevice,
   isMacDevice,
   isWindowsDevice,
+  platformFlags,
   readPlatformState,
 } from "@ailuracode/alpine-platform";
 ```

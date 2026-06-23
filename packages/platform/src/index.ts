@@ -1,22 +1,32 @@
 import type AlpineType from "alpinejs";
 
-export type PlatformName =
-  | "macos"
-  | "windows"
-  | "linux"
-  | "ios"
-  | "android"
-  | "chromeos"
-  | "unknown";
+export const PLATFORM_NAMES = [
+  "macos",
+  "windows",
+  "linux",
+  "ios",
+  "android",
+  "chromeos",
+  "unknown",
+] as const;
 
-export interface PlatformMagic {
-  name: PlatformName;
-  isMac: boolean;
-  isWindows: boolean;
-  isLinux: boolean;
-  isIos: boolean;
-  isAndroid: boolean;
-  isChromeos: boolean;
+export type PlatformName = (typeof PLATFORM_NAMES)[number];
+
+export type PlatformFlags = {
+  readonly isMac: boolean;
+  readonly isWindows: boolean;
+  readonly isLinux: boolean;
+  readonly isIos: boolean;
+  readonly isAndroid: boolean;
+  readonly isChromeos: boolean;
+};
+
+export type PlatformSnapshot = PlatformFlags & {
+  readonly name: PlatformName;
+};
+
+export interface PlatformMagic extends PlatformSnapshot {
+  is(platform: PlatformName): boolean;
 }
 
 type NavigatorWithUserAgentData = Navigator & {
@@ -146,12 +156,8 @@ export function detectPlatformName(): PlatformName {
   return "unknown";
 }
 
-/** Reads the current platform state from the environment. */
-export function readPlatformState(): PlatformMagic {
-  const name = detectPlatformName();
-
+export function platformFlags(name: PlatformName): PlatformFlags {
   return {
-    name,
     isMac: name === "macos",
     isWindows: name === "windows",
     isLinux: name === "linux",
@@ -161,11 +167,51 @@ export function readPlatformState(): PlatformMagic {
   };
 }
 
+/** Reads a snapshot of the current platform state from the environment. */
+export function readPlatformState(): PlatformSnapshot {
+  const name = detectPlatformName();
+
+  return {
+    name,
+    ...platformFlags(name),
+  };
+}
+
+/** Builds live platform magic state with getter-based flags. */
+export function createPlatformState(): PlatformMagic {
+  return {
+    get name() {
+      return detectPlatformName();
+    },
+    get isMac() {
+      return platformFlags(detectPlatformName()).isMac;
+    },
+    get isWindows() {
+      return platformFlags(detectPlatformName()).isWindows;
+    },
+    get isLinux() {
+      return platformFlags(detectPlatformName()).isLinux;
+    },
+    get isIos() {
+      return platformFlags(detectPlatformName()).isIos;
+    },
+    get isAndroid() {
+      return platformFlags(detectPlatformName()).isAndroid;
+    },
+    get isChromeos() {
+      return platformFlags(detectPlatformName()).isChromeos;
+    },
+    is(platform: PlatformName) {
+      return detectPlatformName() === platform;
+    },
+  };
+}
+
 /** Alpine.js platform plugin. Registers reactive magic `$platform`. */
 export default function platformPlugin(Alpine: AlpineType.Alpine): void {
-  const state = Alpine.reactive(readPlatformState());
+  const state = Alpine.reactive(createPlatformState());
 
-  Alpine.magic("platform", () => state);
+  Alpine.magic("platform", () => state as PlatformMagic);
 }
 
 declare global {

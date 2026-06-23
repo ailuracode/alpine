@@ -59,6 +59,85 @@ export interface IdleMagic {
 export const DEFAULT_IDLE_THRESHOLD = 60_000;
 export const MIN_IDLE_THRESHOLD = 60_000;
 
+const IDLE_DETECTION_PERMISSION = "idle-detection" as PermissionName;
+
+function idlePermissionError(permission: Exclude<PermissionState, "granted">): string {
+  return permission === "denied"
+    ? "Idle Detection permission is blocked. Reset it in your browser site settings and try again."
+    : "Idle Detection permission was not granted";
+}
+
+/** Reads idle-detection permission from the Permissions API when available. */
+export async function readIdlePermissionStatus(): Promise<PermissionState | null> {
+  if (typeof navigator === "undefined" || !navigator.permissions?.query) {
+    return null;
+  }
+
+  try {
+    const status = await navigator.permissions.query({ name: IDLE_DETECTION_PERMISSION });
+    return status.state;
+  } catch {
+    return null;
+  }
+}
+
+async function syncIdlePermission(target: Pick<IdleMagic, "permission">): Promise<void> {
+  if (target.permission === "granted") {
+    return;
+  }
+
+  const queried = await readIdlePermissionStatus();
+  if (queried != null) {
+    target.permission = queried;
+  }
+}
+
+async function promptIdlePermission(
+  target: Pick<IdleMagic, "permission" | "error">,
+  IdleDetectorCtor: IdleDetectorConstructor
+): Promise<PermissionState> {
+  try {
+    const permission = await IdleDetectorCtor.requestPermission();
+    target.permission = permission;
+
+    if (permission === "granted") {
+      target.error = null;
+      return permission;
+    }
+
+    target.error = idlePermissionError(permission);
+    return permission;
+  } catch (error) {
+    target.error = error instanceof Error ? error.message : "Failed to request idle permission";
+    target.permission = "denied";
+    return "denied";
+  }
+}
+
+async function ensureIdlePermission(
+  target: IdleMagic,
+  IdleDetectorCtor: IdleDetectorConstructor | null
+): Promise<boolean> {
+  await syncIdlePermission(target);
+
+  if (target.permission === "granted") {
+    target.error = null;
+    return true;
+  }
+
+  if (target.permission === "denied") {
+    target.error = idlePermissionError("denied");
+    return false;
+  }
+
+  if (!IdleDetectorCtor) {
+    return false;
+  }
+
+  const permission = await promptIdlePermission(target, IdleDetectorCtor);
+  return permission === "granted";
+}
+
 /** Clamps idle thresholds to the browser minimum (1 minute). */
 export function normalizeIdleThreshold(threshold = DEFAULT_IDLE_THRESHOLD): number {
   return Math.max(threshold, MIN_IDLE_THRESHOLD);
@@ -252,18 +331,25 @@ function registerIdleMagic(Alpine: AlpineType.Alpine): void {
     return true;
   };
 
-  const ensureIdlePermission = async (target: IdleMagic): Promise<boolean> => {
-    if (target.permission === "granted") {
-      return true;
+  const ensureIdlePermissionForTarget = (target: IdleMagic) =>
+    ensureIdlePermission(target, IdleDetectorCtor);
+
+  const restartIdleIfThresholdChanged = (
+    target: IdleMagic,
+    options?: { threshold?: number }
+  ): boolean => {
+    if (!(target.isWatching && detector)) {
+      return false;
     }
 
-    const permission = await target.requestPermission();
-    if (permission === "granted") {
-      return true;
+    const nextThreshold = normalizeIdleThreshold(options?.threshold ?? target.threshold);
+    if (options?.threshold === undefined || nextThreshold === target.threshold) {
+      return false;
     }
 
-    target.error = "Idle Detection permission was not granted";
-    return false;
+    clearIdleDetector();
+    clearIdleState(target);
+    return true;
   };
 
   const startIdleWatching = async (
@@ -275,11 +361,11 @@ function registerIdleMagic(Alpine: AlpineType.Alpine): void {
       return false;
     }
 
-    if (target.isWatching && detector) {
+    if (target.isWatching && detector && !restartIdleIfThresholdChanged(target, options)) {
       return true;
     }
 
-    if (!(await ensureIdlePermission(target))) {
+    if (!(await ensureIdlePermissionForTarget(target))) {
       return false;
     }
 
@@ -318,17 +404,19 @@ function registerIdleMagic(Alpine: AlpineType.Alpine): void {
         return "denied";
       }
 
-      this.error = null;
+      await syncIdlePermission(this);
 
-      try {
-        const permission = await IdleDetectorCtor.requestPermission();
-        this.permission = permission;
-        return permission;
-      } catch (error) {
-        this.error = error instanceof Error ? error.message : "Failed to request idle permission";
-        this.permission = "denied";
+      if (this.permission === "granted") {
+        this.error = null;
+        return "granted";
+      }
+
+      if (this.permission === "denied") {
+        this.error = idlePermissionError("denied");
         return "denied";
       }
+
+      return promptIdlePermission(this, IdleDetectorCtor);
     },
 
     start(options?: { threshold?: number }) {
@@ -348,6 +436,23 @@ function registerIdleMagic(Alpine: AlpineType.Alpine): void {
   });
 
   Alpine.magic("idle", () => state);
+
+  if (typeof navigator !== "undefined" && navigator.permissions?.query) {
+    void navigator.permissions
+      .query({ name: IDLE_DETECTION_PERMISSION })
+      .then((status) => {
+        state.permission = status.state;
+        status.addEventListener("change", () => {
+          state.permission = status.state;
+          if (status.state !== "granted" && state.isWatching) {
+            state.stop();
+          }
+        });
+      })
+      .catch(() => {
+        // Permissions API name unsupported — fall back to requestPermission().
+      });
+  }
 }
 
 /** Alpine.js attention plugin. Registers `$wakelock` and `$idle` magics. */

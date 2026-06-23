@@ -10,6 +10,7 @@ import attentionPlugin, {
   isWakeLockSupported,
   MIN_IDLE_THRESHOLD,
   normalizeIdleThreshold,
+  readIdlePermissionStatus,
   type WakeLockMagic,
   type WakeLockSentinelLike,
 } from "../src/index.js";
@@ -273,6 +274,29 @@ describe("@ailuracode/alpine-attention", () => {
       restore();
     });
 
+    it("restarts idle detection when threshold changes", async () => {
+      const detector = createIdleDetector();
+      const startSpy = vi.spyOn(detector, "start");
+
+      const restore = mockIdleDetector(createIdleDetectorClass(detector));
+
+      const { idle } = createMagicHarness(attentionPlugin) as { idle: IdleMagic };
+
+      await idle.start({ threshold: MIN_IDLE_THRESHOLD });
+      expect(startSpy).toHaveBeenCalledTimes(1);
+
+      startSpy.mockClear();
+      await idle.start({ threshold: MIN_IDLE_THRESHOLD });
+      expect(startSpy).not.toHaveBeenCalled();
+
+      await idle.start({ threshold: MIN_IDLE_THRESHOLD * 2 });
+      expect(startSpy).toHaveBeenCalledTimes(1);
+      expect(startSpy).toHaveBeenCalledWith({ threshold: MIN_IDLE_THRESHOLD * 2 });
+      expect(idle.threshold).toBe(MIN_IDLE_THRESHOLD * 2);
+
+      restore();
+    });
+
     it("updates state on idle change events", async () => {
       const detector = createIdleDetector();
 
@@ -305,6 +329,31 @@ describe("@ailuracode/alpine-attention", () => {
       expect(idle.userState).toBeNull();
 
       restore();
+    });
+
+    it("does not start when idle permission is denied", async () => {
+      const restoreDetector = mockIdleDetector(createIdleDetectorClass(createIdleDetector()));
+      const query = vi.spyOn(navigator.permissions, "query").mockResolvedValue({
+        state: "denied",
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      } as unknown as PermissionStatus);
+
+      const { idle } = createMagicHarness(attentionPlugin) as { idle: IdleMagic };
+
+      await vi.waitFor(() => {
+        expect(idle.permission).toBe("denied");
+      });
+
+      const IdleDetector = Reflect.get(globalThis, "IdleDetector") as IdleDetectorConstructor;
+      const requestPermission = vi.spyOn(IdleDetector, "requestPermission");
+
+      await expect(idle.start()).resolves.toBe(false);
+      expect(requestPermission).not.toHaveBeenCalled();
+      expect(idle.error).toContain("blocked");
+
+      query.mockRestore();
+      restoreDetector();
     });
   });
 });
@@ -347,5 +396,15 @@ describe("helpers", () => {
   it("clamps idle thresholds below one minute", () => {
     expect(normalizeIdleThreshold(30_000)).toBe(MIN_IDLE_THRESHOLD);
     expect(normalizeIdleThreshold(120_000)).toBe(120_000);
+  });
+
+  it("returns null when idle permission cannot be queried", async () => {
+    const query = vi
+      .spyOn(navigator.permissions, "query")
+      .mockRejectedValue(new Error("unsupported"));
+
+    await expect(readIdlePermissionStatus()).resolves.toBeNull();
+
+    query.mockRestore();
   });
 });

@@ -37,7 +37,12 @@ export const nanostoresQueryAdapter: QueryStateAdapter = {
     refetch: () => Promise<void>
   ) {
     const store = map(initial);
-    const state = createQueryStateView(() => store.get(), staleTime, refetch);
+    const staleTimeRef = { current: staleTime };
+    const state = createQueryStateView(
+      () => store.get(),
+      () => staleTimeRef.current,
+      refetch
+    );
 
     return {
       state,
@@ -45,6 +50,12 @@ export const nanostoresQueryAdapter: QueryStateAdapter = {
       patch: (patch: Partial<QueryStateRecord<TData>>) => patchMapStore(store, patch),
       listen: (listener: (record: QueryStateRecord<TData>) => void) =>
         store.listen((record) => listener({ ...record })),
+      setStaleTime(next: number) {
+        staleTimeRef.current = next;
+      },
+      getStaleTime() {
+        return staleTimeRef.current;
+      },
     };
   },
 

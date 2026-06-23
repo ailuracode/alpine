@@ -30,9 +30,10 @@ Alpine.start();
 | | |
 |-|-|
 | **Store** | `$store.device` |
-| **State** | `type`, `width`, `mobileMax`, `tabletMax` |
+| **State** | `type` (`DeviceType`), `width`, `mobileMax`, `tabletMax` |
 | **Getters** | `isMobile`, `isTablet`, `isDesktop` |
-| **Methods** | `setBreakpoints({ mobileMax, tabletMax })`, `refresh()` |
+| **Methods** | `is(DeviceType)`, `setBreakpoints()`, `refresh()` |
+| **Helpers** | `DEVICE_TYPES`, `deviceBreakpoints()`, `readDeviceSnapshot()`, `resolveDeviceTypeFromWidth()` |
 | **Defaults** | mobile ≤767px · tablet 768–1023px · desktop ≥1024px |
 
 ## License

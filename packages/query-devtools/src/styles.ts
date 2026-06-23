@@ -1,5 +1,4 @@
-export const DEVTOOLS_STYLES = `
-.aq-devtools-root {
+const AQ_DEVTOOLS_LIGHT_THEME = `
   --aq-background: hsl(0 0% 100%);
   --aq-foreground: hsl(240 10% 3.9%);
   --aq-card: hsl(0 0% 100%);
@@ -21,16 +20,71 @@ export const DEVTOOLS_STYLES = `
   --aq-success-foreground: hsl(0 0% 98%);
   --aq-warning: hsl(38 92% 50%);
   --aq-warning-foreground: hsl(240 5.9% 10%);
+  --aq-warning-text: hsl(32 95% 38%);
   --aq-pending: hsl(262 83% 58%);
   --aq-pending-foreground: hsl(0 0% 98%);
-  --aq-radius: 0.5rem;
   --aq-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --aq-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --aq-tab-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  color-scheme: light;
+`;
+
+const AQ_DEVTOOLS_DARK_THEME = `
+  --aq-background: hsl(240 10% 3.9%);
+  --aq-foreground: hsl(0 0% 98%);
+  --aq-card: hsl(240 10% 3.9%);
+  --aq-card-foreground: hsl(0 0% 98%);
+  --aq-muted: hsl(240 3.7% 15.9%);
+  --aq-muted-foreground: hsl(240 5% 64.9%);
+  --aq-border: hsl(240 3.7% 15.9%);
+  --aq-input: hsl(240 3.7% 15.9%);
+  --aq-ring: hsl(240 4.9% 83.9%);
+  --aq-primary: hsl(0 0% 98%);
+  --aq-primary-foreground: hsl(240 5.9% 10%);
+  --aq-secondary: hsl(240 3.7% 15.9%);
+  --aq-secondary-foreground: hsl(0 0% 98%);
+  --aq-accent: hsl(240 3.7% 15.9%);
+  --aq-accent-foreground: hsl(0 0% 98%);
+  --aq-destructive: hsl(0 62.8% 30.6%);
+  --aq-destructive-foreground: hsl(0 0% 98%);
+  --aq-success: hsl(142 71% 45%);
+  --aq-success-foreground: hsl(0 0% 98%);
+  --aq-warning: hsl(38 92% 50%);
+  --aq-warning-foreground: hsl(240 5.9% 10%);
+  --aq-warning-text: hsl(38 92% 62%);
+  --aq-pending: hsl(263 70% 72%);
+  --aq-pending-foreground: hsl(240 5.9% 10%);
+  --aq-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.45), 0 4px 6px -4px rgb(0 0 0 / 0.35);
+  --aq-shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.55), 0 8px 10px -6px rgb(0 0 0 / 0.45);
+  --aq-tab-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+`;
+
+export const DEVTOOLS_STYLES = `
+.aq-devtools-root {
+  ${AQ_DEVTOOLS_LIGHT_THEME}
+  --aq-radius: 0.5rem;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
   color: var(--aq-foreground);
   z-index: 2147483646;
   -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme="dark"] .aq-devtools-root,
+:root.dark .aq-devtools-root,
+.aq-devtools-root.aq-devtools-root--dark {
+  ${AQ_DEVTOOLS_DARK_THEME}
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .aq-devtools-root:not(.aq-devtools-root--light) {
+    ${AQ_DEVTOOLS_DARK_THEME}
+  }
+}
+
+.aq-devtools-root.aq-devtools-root--light {
+  ${AQ_DEVTOOLS_LIGHT_THEME}
 }
 
 .aq-devtools-toggle {
@@ -213,7 +267,7 @@ export const DEVTOOLS_STYLES = `
 .aq-devtools-tab.is-active {
   background: var(--aq-background);
   color: var(--aq-foreground);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  box-shadow: var(--aq-tab-shadow);
 }
 
 .aq-devtools-btn {
@@ -240,7 +294,7 @@ export const DEVTOOLS_STYLES = `
 }
 
 .aq-devtools-btn--primary:hover {
-  background: color-mix(in srgb, var(--aq-primary) 90%, white);
+  opacity: 0.92;
   color: var(--aq-primary-foreground);
 }
 
@@ -251,7 +305,7 @@ export const DEVTOOLS_STYLES = `
 }
 
 .aq-devtools-btn--destructive:hover {
-  background: color-mix(in srgb, var(--aq-destructive) 90%, black);
+  opacity: 0.92;
   color: var(--aq-destructive-foreground);
 }
 
@@ -360,16 +414,11 @@ export const DEVTOOLS_STYLES = `
   color: var(--aq-pending);
 }
 
-.aq-devtools-badge--fetching {
-  border-color: color-mix(in srgb, var(--aq-warning) 35%, var(--aq-border));
-  background: color-mix(in srgb, var(--aq-warning) 12%, var(--aq-background));
-  color: color-mix(in srgb, var(--aq-warning) 85%, black);
-}
-
+.aq-devtools-badge--fetching,
 .aq-devtools-badge--stale {
   border-color: color-mix(in srgb, var(--aq-warning) 35%, var(--aq-border));
   background: color-mix(in srgb, var(--aq-warning) 12%, var(--aq-background));
-  color: color-mix(in srgb, var(--aq-warning) 85%, black);
+  color: var(--aq-warning-text);
 }
 
 .aq-devtools-badge--muted {

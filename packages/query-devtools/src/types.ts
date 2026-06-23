@@ -19,6 +19,8 @@ export interface QueryDevtoolsPluginOptions {
   initialOpen?: boolean;
   /** Filter queries and mutations by search text. */
   filter?: string;
+  /** Color theme. Default: follows host (`data-theme`, `.dark`, or system preference). */
+  theme?: "light" | "dark" | "system";
   /** Custom store name. Default: `query`. */
   storeName?: string;
 }

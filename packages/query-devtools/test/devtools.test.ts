@@ -160,6 +160,33 @@ describe("@ailuracode/alpine-query-devtools", () => {
     vi.useRealTimers();
   });
 
+  it("applies dark theme from the host document in system mode", () => {
+    document.documentElement.dataset.theme = "dark";
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const controller = mountQueryDevtools({ store, theme: "system" });
+
+    const root = document.querySelector(".aq-devtools-root") as HTMLElement;
+    expect(root.classList.contains("aq-devtools-root--dark")).toBe(true);
+
+    controller.destroy();
+  });
+
+  it("respects a forced light theme option", () => {
+    document.documentElement.dataset.theme = "dark";
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const controller = mountQueryDevtools({ store, theme: "light" });
+
+    const root = document.querySelector(".aq-devtools-root") as HTMLElement;
+    expect(root.classList.contains("aq-devtools-root--light")).toBe(true);
+    expect(root.classList.contains("aq-devtools-root--dark")).toBe(false);
+
+    controller.destroy();
+  });
+
   it("devtools actions refetch, invalidate, and remove queries", async () => {
     vi.useFakeTimers();
 

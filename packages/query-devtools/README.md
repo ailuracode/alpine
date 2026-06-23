@@ -37,6 +37,7 @@ A floating **Query** button appears in the bottom-right corner. Click it to open
 - Search filter by query key
 - Actions: **Refetch**, **Invalidate**, **Remove**
 - Tabs for **Queries** and **Mutations**
+- Light and dark themes (follows your app theme by default)
 
 ## Options
 
@@ -48,6 +49,7 @@ A floating **Query** button appears in the bottom-right corner. Click it to open
 | `toggleCornerStorageKey` | `"alpine-query-devtools:toggle-corner"` | Storage key for the corner |
 | `initialOpen` | `false` | Open the panel on mount |
 | `filter` | `""` | Initial search text |
+| `theme` | `"system"` | `"light"`, `"dark"`, or follow the host (`data-theme`, `.dark`, or system preference) |
 | `storeName` | `"query"` | Alpine store name |
 
 ### Toggle corners

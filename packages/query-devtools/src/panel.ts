@@ -6,6 +6,7 @@ import type {
   QueryStore,
 } from "@ailuracode/alpine-query";
 import { DEVTOOLS_STYLES } from "./styles.js";
+import { bindDevtoolsTheme } from "./theme.js";
 import {
   applyToggleCorner,
   cornerLabel,
@@ -127,6 +128,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     store,
     position = "bottom",
     initialOpen = false,
+    theme = "system",
     toggleCorner = DEFAULT_TOGGLE_CORNER,
     persistToggleCorner = true,
     toggleCornerStorageKey = DEFAULT_TOGGLE_CORNER_STORAGE_KEY,
@@ -156,6 +158,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
   const root = document.createElement("div");
   root.className = "aq-devtools-root";
+  const unbindTheme = bindDevtoolsTheme(root, theme);
 
   const toggle = document.createElement("button");
   toggle.type = "button";
@@ -477,6 +480,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     },
     destroy() {
       unsubscribe();
+      unbindTheme();
       root.remove();
     },
   };

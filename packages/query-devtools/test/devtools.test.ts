@@ -27,6 +27,9 @@ describe("@ailuracode/alpine-query-devtools", () => {
     const toggle = document.querySelector(".aq-devtools-toggle") as HTMLButtonElement;
 
     expect(toggle.textContent).toBe("Query (0)");
+    expect(document.querySelector(".aq-devtools-title")?.textContent).toBe(
+      "Alpine Query · Nanostores"
+    );
 
     const query = store.observe(["pokemon", 1], async () => ({ name: "bulbasaur" }));
     await vi.runAllTimersAsync();

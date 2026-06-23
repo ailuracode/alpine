@@ -29,6 +29,8 @@ function patchMapStore<TRecord extends Record<string, unknown>>(
 
 /** Nanostores `map()` adapter for `@ailuracode/alpine-query`. */
 export const nanostoresQueryAdapter: QueryStateAdapter = {
+  name: "Nanostores",
+
   createQueryState<TData>(
     initial: QueryStateRecord<TData>,
     staleTime: number,

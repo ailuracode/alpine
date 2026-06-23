@@ -30,6 +30,8 @@ function patchZustandStore<TRecord extends Record<string, unknown>>(
 
 /** Zustand vanilla store adapter for `@ailuracode/alpine-query`. No official zustand-alpine integration exists. */
 export const zustandQueryAdapter: QueryStateAdapter = {
+  name: "Zustand",
+
   createQueryState<TData>(
     initial: QueryStateRecord<TData>,
     staleTime: number,

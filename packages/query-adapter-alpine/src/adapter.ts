@@ -33,6 +33,8 @@ function toMutationRecord<TData, TVariables>(
 /** Native Alpine.reactive adapter — no external store library. */
 export function createAlpineStoreAdapter(Alpine: AlpineInstance): QueryStateAdapter {
   return {
+    name: "Alpine.reactive",
+
     createQueryState<TData>(
       initial: QueryStateRecord<TData>,
       staleTime: number,

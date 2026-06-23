@@ -58,6 +58,8 @@ function createHandle<TRecord extends Record<string, unknown>, TView>(
 
 /** Zero-dependency adapter for tests and non-reactive environments. */
 export const vanillaQueryAdapter: QueryStateAdapter = {
+  name: "Vanilla",
+
   createQueryState<TData>(
     initial: QueryStateRecord<TData>,
     staleTime: number,

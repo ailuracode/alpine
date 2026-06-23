@@ -28,8 +28,9 @@ export class DevtoolsRegistry {
     }
   }
 
-  buildSnapshot(entries: Iterable<QueryEntry>): QueryDevtoolsSnapshot {
+  buildSnapshot(entries: Iterable<QueryEntry>, adapterName: string): QueryDevtoolsSnapshot {
     return {
+      adapterName,
       queries: [...entries].map((entry) => this.serializeQuery(entry)),
       mutations: [...this.mutations],
       updatedAt: Date.now(),

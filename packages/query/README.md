@@ -43,6 +43,8 @@ const query = createQueryClient({ adapter: nanostoresQueryAdapter });
 
 Implement **`QueryStateAdapter`** to connect any reactive store to the query cache. The engine calls your adapter whenever a query or mutation entry is created; you own how that state is stored and how updates propagate.
 
+Set **`name`** to a short human-readable label — query devtools show it in the panel title (`Alpine Query · Nanostores`).
+
 ### Interface
 
 ```ts
@@ -53,6 +55,7 @@ import type {
 } from "@ailuracode/alpine-query";
 
 // createQueryState → QueryStateHandle
+//   name     — display label for devtools (required)
 //   get()    — snapshot: { data, error, status, fetchStatus, dataUpdatedAt, errorUpdatedAt }
 //   patch()  — apply partial updates from the cache engine
 //   listen() — subscribe to record changes; return unsubscribe
@@ -84,6 +87,8 @@ import {
 } from "@ailuracode/alpine-query";
 
 export const myStoreAdapter: QueryStateAdapter = {
+  name: "My Store",
+
   createQueryState(initial, staleTime, refetch) {
     const record = { ...initial };
     const state = createQueryStateView(() => record, staleTime, refetch);

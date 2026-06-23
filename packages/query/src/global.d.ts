@@ -90,6 +90,7 @@ export interface MutationDevtoolsEntry {
 }
 
 export interface QueryDevtoolsSnapshot {
+  adapterName: string;
   queries: QueryDevtoolsEntry[];
   mutations: MutationDevtoolsEntry[];
   updatedAt: number;

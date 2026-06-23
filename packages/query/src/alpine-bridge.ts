@@ -59,6 +59,8 @@ export function createAlpineBridgedAdapter(
   base: QueryStateAdapter
 ): QueryStateAdapter {
   return {
+    name: base.name,
+
     createQueryState(initial, staleTime, refetch) {
       const handle = base.createQueryState(initial, staleTime, refetch);
       const bridge = bridgeQueryHandleToAlpine(Alpine, handle, staleTime);

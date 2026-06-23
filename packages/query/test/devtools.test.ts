@@ -25,6 +25,7 @@ describe("@ailuracode/alpine-query devtools", () => {
     });
 
     const snapshot = store.devtools.getSnapshot();
+    expect(snapshot.adapterName).toBe("Alpine.reactive");
     expect(snapshot.queries).toHaveLength(1);
     expect(snapshot.queries[0]?.key).toEqual(["devtools"]);
     expect(snapshot.queries[0]?.data).toBe("ok");

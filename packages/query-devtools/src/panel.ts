@@ -401,6 +401,9 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     const snapshot = store.devtools.getSnapshot();
 
     toggle.textContent = `Query (${snapshot.queries.length})`;
+    title.textContent = snapshot.adapterName
+      ? `Alpine Query · ${snapshot.adapterName}`
+      : "Alpine Query";
     panel.classList.toggle("is-open", isOpen);
     queriesTab.classList.toggle("is-active", activeTab === "queries");
     mutationsTab.classList.toggle("is-active", activeTab === "mutations");

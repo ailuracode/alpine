@@ -19,6 +19,9 @@ export type MutationStateHandle<TData = unknown, TVariables = void> = {
 
 /** Pluggable reactive state layer for query and mutation entries. */
 export type QueryStateAdapter = {
+  /** Human-readable label shown in query devtools (e.g. `"Nanostores"`, `"Zustand"`). */
+  readonly name: string;
+
   createQueryState<TData>(
     initial: QueryStateRecord<TData>,
     staleTime: number,

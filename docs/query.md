@@ -102,6 +102,8 @@ See the [package README](../packages/query/README.md) for the full API.
 
 The cache engine talks to your store library through a **`QueryStateAdapter`**. Implement this interface to plug in any reactive runtime — Redux, Pinia, Solid signals, a custom event bus, etc.
 
+Every adapter must expose a **`name`** string (e.g. `"Nanostores"`, `"Zustand"`). Query devtools display it in the panel header (`Alpine Query · YourName`).
+
 ### Contract
 
 Each cached query and mutation gets a **handle** with four responsibilities:
@@ -148,6 +150,8 @@ import {
 } from "@ailuracode/alpine-query";
 
 export const myStoreAdapter: QueryStateAdapter = {
+  name: "My Store",
+
   createQueryState(initial, staleTime, refetch) {
     const record = { ...initial }; // or your store's map/set API
     const state = createQueryStateView(() => record, staleTime, refetch);

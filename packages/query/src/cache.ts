@@ -36,7 +36,7 @@ export class QueryCache {
   getDevtools() {
     return {
       subscribe: (listener: () => void) => this.devtools.subscribe(listener),
-      getSnapshot: () => this.devtools.buildSnapshot(this.entries.values()),
+      getSnapshot: () => this.devtools.buildSnapshot(this.entries.values(), this.adapter.name),
     };
   }
 

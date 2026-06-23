@@ -2,6 +2,24 @@ import { describe, expect, it } from "vitest";
 import { resolveResourceIncluded } from "../src/resolve.js";
 import type { JsonApiResource } from "../src/types.js";
 
+const schema = {
+  articles: {
+    attributes: {} as { title: string; body: string },
+    relationships: {
+      author: { type: "people" as const },
+      comments: { type: "comments" as const, many: true as const },
+    },
+  },
+  people: {
+    attributes: {} as { name: string },
+  },
+  comments: {
+    attributes: {} as { body: string },
+  },
+} as const;
+
+type Schema = typeof schema;
+
 describe("resolveResourceIncluded", () => {
   it("resolves to-one and to-many relationships from included resources", () => {
     const article = {
@@ -19,20 +37,7 @@ describe("resolveResourceIncluded", () => {
           ],
         },
       },
-    } as JsonApiResource<
-      {
-        articles: {
-          attributes: { title: string; body: string };
-          relationships: {
-            author: { type: "people" };
-            comments: { type: "comments"; many: true };
-          };
-        };
-        people: { attributes: { name: string } };
-        comments: { attributes: { body: string } };
-      },
-      "articles"
-    >;
+    } as JsonApiResource<Schema, "articles">;
 
     const included = [
       {
@@ -45,18 +50,9 @@ describe("resolveResourceIncluded", () => {
         id: "5",
         attributes: { body: "First!" },
       },
-    ] as Array<
-      JsonApiResource<
-        {
-          articles: { attributes: { title: string; body: string } };
-          people: { attributes: { name: string } };
-          comments: { attributes: { body: string } };
-        },
-        "people" | "comments"
-      >
-    >;
+    ] as Array<JsonApiResource<Schema, "people" | "comments">>;
 
-    const resolved = resolveResourceIncluded(article, included);
+    const resolved = resolveResourceIncluded<Schema, "articles">(article, included);
 
     expect(resolved.relationships?.author?.resolved?.attributes.name).toBe("Dan Gebhardt");
     expect(resolved.relationships?.comments?.resolved).toHaveLength(1);
@@ -73,20 +69,9 @@ describe("resolveResourceIncluded", () => {
           data: null,
         },
       },
-    } as JsonApiResource<
-      {
-        articles: {
-          attributes: { title: string; body: string };
-          relationships: {
-            author: { type: "people" };
-          };
-        };
-        people: { attributes: { name: string } };
-      },
-      "articles"
-    >;
+    } as JsonApiResource<Schema, "articles">;
 
-    const resolved = resolveResourceIncluded(article, []);
+    const resolved = resolveResourceIncluded<Schema, "articles">(article, []);
 
     expect(resolved.relationships?.author?.resolved).toBeNull();
   });

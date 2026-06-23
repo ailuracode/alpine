@@ -70,16 +70,18 @@ describe("jsonApiQueryOptions", () => {
     });
 
     expectTypeOf(definition.queryKey).toEqualTypeOf<readonly ["articles"]>();
-    expectTypeOf(definition.queryFn).returns.resolves.toMatchObjectType<{
-      data: Array<{
-        attributes: { title: string };
-        relationships?: {
-          author?: {
-            resolved: { attributes: { name: string } } | null;
-          };
-        };
-      }>;
-    }>();
+
+    type ArticlesDocument = Awaited<ReturnType<typeof definition.queryFn>>;
+
+    type AuthorRelationship = NonNullable<
+      NonNullable<ArticlesDocument["data"][number]["relationships"]>["author"]
+    >;
+
+    expectTypeOf<ArticlesDocument["data"][number]["attributes"]["title"]>().toBeString();
+    expectTypeOf<AuthorRelationship["resolved"]>().toMatchTypeOf<{
+      attributes: { name: string };
+    } | null>();
+    expectTypeOf<NonNullable<AuthorRelationship["resolved"]>["attributes"]["name"]>().toBeString();
 
     const query = client.observe(definition);
     await vi.runAllTimersAsync();

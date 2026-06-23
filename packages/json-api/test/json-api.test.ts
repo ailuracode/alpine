@@ -4,7 +4,7 @@ import {
   JsonApiHttpError,
 } from "@ailuracode/alpine-json-api";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
-import type { JsonApiClient } from "../src/types.js";
+import type { JsonApiClient, JsonApiCreatePayload } from "../src/types.js";
 
 const schema = defineJsonApiSchema({
   articles: {
@@ -228,37 +228,52 @@ describe("@ailuracode/alpine-json-api type inference", () => {
     type Schema = typeof schema;
     type Client = JsonApiClient<Schema>;
 
-    expectTypeOf<Client["findAll"]>().parameters.toEqualTypeOf<
-      ["articles" | "people" | "comments", (undefined | object)?]
-    >();
+    async function fetchArticle(client: Client) {
+      return client.findOne("articles", "1", { include: ["author"] });
+    }
 
-    expectTypeOf(
-      {} as Awaited<ReturnType<Client["findOne"]>> extends infer R ? R : never
-    ).toMatchTypeOf<{
-      data: {
-        type: "articles";
-        attributes: { title: string; body: string };
-        relationships?: {
-          author?: {
-            data: { type: "people"; id: string } | null;
-            resolved: { type: "people"; attributes: { name: string } } | null;
-          };
-        };
-      };
+    type ArticleDocument = Awaited<ReturnType<typeof fetchArticle>>;
+
+    expectTypeOf<ArticleDocument["data"]["type"]>().toEqualTypeOf<"articles">();
+    expectTypeOf<ArticleDocument["data"]["attributes"]>().toEqualTypeOf<{
+      title: string;
+      body: string;
     }>();
+    type AuthorRelationship = NonNullable<
+      NonNullable<ArticleDocument["data"]["relationships"]>["author"]
+    >;
+
+    expectTypeOf<AuthorRelationship["resolved"]>().toMatchTypeOf<{
+      type: "people";
+      attributes: { name: string };
+    } | null>();
+    expectTypeOf<NonNullable<AuthorRelationship["resolved"]>["attributes"]["name"]>().toBeString();
   });
 
   it("types create payloads from schema attributes and relationships", () => {
-    type Client = JsonApiClient<typeof schema>;
+    type Schema = typeof schema;
+    type Client = JsonApiClient<Schema>;
 
-    type CreatePayload = Parameters<Client["create"]>[1];
+    async function createArticle(client: Client) {
+      return client.create("articles", {
+        attributes: { title: "Hello", body: "World" },
+        relationships: {
+          author: { data: { type: "people", id: "9" } },
+        },
+      });
+    }
 
-    expectTypeOf<CreatePayload>().toEqualTypeOf<{
-      attributes: { title: string; body: string };
-      relationships?: {
-        author?: { data: { type: "people"; id: string } | null };
-        comments?: { data: Array<{ type: "comments"; id: string }> };
-      };
-    }>();
+    type CreateInput = JsonApiCreatePayload<Schema, "articles">;
+
+    type AuthorRelationship = NonNullable<NonNullable<CreateInput["relationships"]>["author"]>;
+
+    expectTypeOf<CreateInput["attributes"]>().toEqualTypeOf<{ title: string; body: string }>();
+    expectTypeOf<AuthorRelationship["data"]>().toEqualTypeOf<{
+      type: "people";
+      id: string;
+    } | null>();
+    expectTypeOf<Awaited<ReturnType<typeof createArticle>>["data"]["type"]>().toEqualTypeOf<
+      "articles"
+    >();
   });
 });

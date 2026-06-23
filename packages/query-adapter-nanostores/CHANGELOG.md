@@ -1,5 +1,13 @@
 # @ailuracode/alpine-query-adapter-nanostores
 
+## 2.0.0
+
+### Patch Changes
+
+- e164010: Add `query({ adapter })` as the primary Alpine plugin API. Pass a state adapter, then the plugin registers `$store.query`. Adapter packages export factories for use with `query()`.
+- Updated dependencies [e164010]
+  - @ailuracode/alpine-query@0.4.0
+
 ## 1.0.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query
 
+## 0.4.0
+
+### Minor Changes
+
+- e164010: Add `query({ adapter })` as the primary Alpine plugin API. Pass a state adapter, then the plugin registers `$store.query`. Adapter packages export factories for use with `query()`.
+
 ## 0.3.1
 
 ### Patch Changes

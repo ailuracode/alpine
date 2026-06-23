@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query
 
+## 0.3.1
+
+### Patch Changes
+
+- 26bf083: Add required `name` on `QueryStateAdapter` and show it in query devtools (`Alpine Query · Nanostores`).
+
 ## 0.3.0
 
 ### Minor Changes

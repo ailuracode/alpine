@@ -19,6 +19,7 @@
   "dependencies": {
     "@ailuracode/alpine-attention": "workspace:*",
     "@ailuracode/alpine-battery": "workspace:*",
+    "@ailuracode/alpine-calendar": "workspace:*",
     "@ailuracode/alpine-clipboard": "workspace:*",
     "@ailuracode/alpine-export": "workspace:*",
     "@ailuracode/alpine-geo": "workspace:*",

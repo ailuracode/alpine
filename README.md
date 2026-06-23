@@ -13,6 +13,7 @@ Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common
 | [`@ailuracode/alpine-battery`](./packages/battery/README.md) | Magic | Device battery level and charging state |
 | [`@ailuracode/alpine-clipboard`](./packages/clipboard/README.md) | Magic | Copy text to clipboard |
 | [`@ailuracode/alpine-export`](./packages/export/README.md) | Magic | Programmatic file exports (downloads) |
+| [`@ailuracode/alpine-calendar`](./packages/calendar/README.md) | Magic | Calendar date logic powered by date-fns |
 | [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
 | [`@ailuracode/alpine-touch`](./packages/touch/README.md) | Magic | Touch and pointer capabilities |
 | [`@ailuracode/alpine-platform`](./packages/platform/README.md) | Magic | Client OS and platform detection |
@@ -74,6 +75,7 @@ See [AGENTS.md](./AGENTS.md) for the full checklist.
 - [Battery](./docs/battery.md)
 - [Clipboard](./docs/clipboard.md)
 - [Export](./docs/export.md)
+- [Calendar](./docs/calendar.md)
 - [Scroll](./docs/scroll.md)
 - [Touch](./docs/touch.md)
 - [Platform](./docs/platform.md)

@@ -339,3 +339,43 @@ kbd {
 .footer a:hover {
 	text-decoration: underline;
 }
+
+.calendar-header {
+	align-items: center;
+}
+
+.calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 0.35rem;
+	margin-top: 0.75rem;
+}
+
+.calendar-weekday {
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--muted);
+	padding: 0.25rem 0;
+}
+
+.calendar-day {
+	min-width: 0;
+	padding: 0.45rem 0;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.calendar-day.is-outside {
+	opacity: 0.45;
+}
+
+.calendar-day.is-today {
+	border-color: var(--accent);
+}
+
+.calendar-day.is-selected {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+}

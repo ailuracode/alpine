@@ -245,6 +245,46 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 		</section>
 
 		<section class="card">
+			<h2>Calendar <code>$calendar</code></h2>
+			<div x-data="{ cal: $calendar({ weekStartsOn: 1, mode: 'single' }) }">
+				<div class="btn-group calendar-header">
+					<button type="button" @click="cal.prevMonth()">Previous</button>
+					<strong x-text="cal.formatMonth()"></strong>
+					<button type="button" @click="cal.nextMonth()">Next</button>
+					<button type="button" @click="cal.goToToday()">Today</button>
+				</div>
+
+				<div class="calendar-grid">
+					<template x-for="label in cal.weekdayLabels" :key="label">
+						<span class="calendar-weekday" x-text="label"></span>
+					</template>
+
+					<template x-for="week in cal.weeks" :key="week[0].date.toISOString()">
+						<template x-for="day in week" :key="day.date.toISOString()">
+							<button
+								type="button"
+								class="calendar-day"
+								:disabled="day.isDisabled"
+								:class="{
+									'is-outside': !day.isCurrentMonth,
+									'is-today': day.isToday,
+									'is-selected': day.isSelected
+								}"
+								@click="cal.select(day.date)"
+								x-text="cal.format(day.date, 'd')"
+							></button>
+						</template>
+					</template>
+				</div>
+
+				<p class="hint" x-show="cal.selected" x-cloak>
+					Selected:
+					<strong x-text="cal.format(cal.selected, 'PPP')"></strong>
+				</p>
+			</div>
+		</section>
+
+		<section class="card">
 			<h2>Geo <code>$store.geo</code></h2>
 			<p class="hint" x-show="!$store.geo.isSupported" x-cloak>
 				Geolocation is not available in this browser.

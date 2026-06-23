@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lazy plugin registry and initializer for Alpine.js",
   "type": "module",
   "license": "MIT",

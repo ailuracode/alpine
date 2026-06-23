@@ -222,7 +222,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
   const closeButton = document.createElement("button");
   closeButton.type = "button";
-  closeButton.className = "aq-devtools-btn";
+  closeButton.className = "aq-devtools-btn aq-devtools-btn--ghost";
   closeButton.textContent = "Close";
 
   const body = document.createElement("div");
@@ -253,7 +253,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
     const refetchButton = document.createElement("button");
     refetchButton.type = "button";
-    refetchButton.className = "aq-devtools-btn";
+    refetchButton.className = "aq-devtools-btn aq-devtools-btn--primary";
     refetchButton.textContent = "Refetch";
     refetchButton.addEventListener("click", () => {
       void store.get(entry.key)?.refetch();
@@ -269,7 +269,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
-    removeButton.className = "aq-devtools-btn";
+    removeButton.className = "aq-devtools-btn aq-devtools-btn--destructive";
     removeButton.textContent = "Remove";
     removeButton.addEventListener("click", () => {
       store.remove(entry.key);

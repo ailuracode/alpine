@@ -172,4 +172,76 @@ describe("@ailuracode/alpine-query", () => {
     expect(queryFn).toHaveBeenCalledTimes(1);
     expect(store.get(["prefetch"])?.data).toBe("prefetched");
   });
+
+  it("fetch() returns query state without subscribing", async () => {
+    const queryFn = vi.fn().mockResolvedValue("fetched");
+    const query = store.fetch(["fetch-only"], queryFn);
+    await vi.runAllTimersAsync();
+
+    expect(query.isSuccess).toBe(true);
+    expect(query.data).toBe("fetched");
+  });
+
+  it("cancel() stops an in-flight query", () => {
+    const queryFn = vi.fn().mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve("late"), 5_000);
+        })
+    );
+
+    const query = store.observe(["cancel-me"], queryFn);
+    expect(query.isFetching).toBe(true);
+    store.cancel(["cancel-me"]);
+    expect(query.fetchStatus).toBe("idle");
+    query.destroy();
+  });
+
+  it("invalidate() without a key refetches all active queries", async () => {
+    const first = vi.fn().mockResolvedValueOnce("a1").mockResolvedValueOnce("a2");
+    const second = vi.fn().mockResolvedValueOnce("b1").mockResolvedValueOnce("b2");
+
+    const q1 = store.observe(["a"], first, { staleTime: 60_000 });
+    const q2 = store.observe(["b"], second, { staleTime: 60_000 });
+    await vi.runAllTimersAsync();
+
+    store.invalidate();
+    await vi.runAllTimersAsync();
+
+    expect(first).toHaveBeenCalledTimes(2);
+    expect(second).toHaveBeenCalledTimes(2);
+    q1.destroy();
+    q2.destroy();
+  });
+
+  it("supports initialData and partial invalidation", async () => {
+    const queryFn = vi.fn().mockResolvedValue("live");
+
+    const query = store.observe(["items", 1], queryFn, { initialData: "seed", staleTime: 60_000 });
+    expect(query.data).toBe("seed");
+
+    const sibling = store.observe(["items", 2], queryFn, { staleTime: 60_000 });
+    await vi.runAllTimersAsync();
+
+    store.invalidate(["items"]);
+    await vi.runAllTimersAsync();
+
+    expect(queryFn.mock.calls.length).toBeGreaterThanOrEqual(2);
+    query.destroy();
+    sibling.destroy();
+  });
+
+  it("mutation onError receives context from onMutate", async () => {
+    const onError = vi.fn();
+    const mutation = store.mutate<string, string, { saved: boolean }>({
+      mutationFn: () => {
+        throw new Error("fail");
+      },
+      onMutate: async () => ({ saved: true }),
+      onError,
+    });
+
+    await expect(mutation.mutate("x")).rejects.toThrow("fail");
+    expect(onError).toHaveBeenCalledWith(expect.any(Error), "x", { saved: true });
+  });
 });

@@ -1,7 +1,8 @@
 import queryPlugin, { type QueryStore } from "@ailuracode/alpine-query";
+import queryDevtoolsPlugin from "@ailuracode/alpine-query-devtools";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
-import { mountQueryDevtools } from "../src/panel.js";
+import { getQueryStore, mountQueryDevtools } from "../src/panel.js";
 import { DEFAULT_TOGGLE_CORNER_STORAGE_KEY } from "../src/toggle-corner.js";
 
 describe("@ailuracode/alpine-query-devtools", () => {
@@ -62,5 +63,67 @@ describe("@ailuracode/alpine-query-devtools", () => {
     const restored = document.querySelector(".aq-devtools-toggle") as HTMLButtonElement;
     expect(restored.classList.contains("aq-devtools-toggle--bottom-left")).toBe(true);
     restoredController.destroy();
+  });
+
+  it("supports panel interactions and filtering", async () => {
+    const Alpine = startAlpine(queryPlugin());
+    const store = Alpine.store("query") as QueryStore;
+    const controller = mountQueryDevtools({ store, initialOpen: true });
+
+    await store
+      .mutate({
+        mutationFn: async () => "created",
+      })
+      .mutate("todo");
+
+    const query = store.observe(["visible"], async () => "shown");
+    const hidden = store.observe(["hidden"], async () => "secret");
+    await vi.waitFor(() => {
+      expect(query.isSuccess).toBe(true);
+      expect(hidden.isSuccess).toBe(true);
+    });
+
+    const search = document.querySelector(".aq-devtools-search") as HTMLInputElement;
+    search.value = "visible";
+    search.dispatchEvent(new Event("input"));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const list = document.querySelector(".aq-devtools-list");
+    expect(list?.textContent).toContain("visible");
+    expect(list?.textContent).not.toContain("hidden");
+
+    search.value = "";
+    search.dispatchEvent(new Event("input"));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    const mutationsTab = [...document.querySelectorAll(".aq-devtools-tab")].find(
+      (button) => button.textContent === "Mutations"
+    ) as HTMLButtonElement;
+    mutationsTab.click();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(document.body.textContent).toContain("mutation-");
+
+    controller.close();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(document.querySelector(".aq-devtools-panel")?.classList.contains("is-open")).toBe(false);
+
+    controller.destroy();
+    query.destroy();
+    hidden.destroy();
+  });
+
+  it("registers through the alpine plugin on alpine:initialized", () => {
+    const Alpine = startAlpine(queryPlugin(), queryDevtoolsPlugin());
+    document.dispatchEvent(new Event("alpine:initialized"));
+
+    expect(document.querySelector(".aq-devtools-toggle")).toBeTruthy();
+    document.querySelector(".aq-devtools-root")?.remove();
+    (Alpine.store("query") as QueryStore).reset();
+  });
+
+  it("getQueryStore() throws when query store is missing", () => {
+    expect(() => getQueryStore({ store: () => undefined })).toThrow(
+      "@ailuracode/alpine-query-devtools could not find"
+    );
   });
 });

@@ -45,4 +45,18 @@ describe("@ailuracode/alpine-query devtools", () => {
     expect(snapshot.mutations[0]?.variables).toBe("test");
     expect(snapshot.mutations[0]?.data).toBe("done:test");
   });
+
+  it("tracks failed mutations and clears history on reset", async () => {
+    const mutation = store.mutate({
+      mutationFn: () => {
+        throw new Error("mutation failed");
+      },
+    });
+
+    await expect(mutation.mutate("x")).rejects.toThrow("mutation failed");
+
+    expect(store.devtools.getSnapshot().mutations[0]?.status).toBe("error");
+    store.reset();
+    expect(store.devtools.getSnapshot().mutations).toHaveLength(0);
+  });
 });

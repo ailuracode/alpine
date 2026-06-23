@@ -1,16 +1,10 @@
 import type AlpineType from "alpinejs";
 import { QueryCache } from "./cache.js";
-import type {
-  MutationOptions,
-  MutationState,
-  QueryKey,
-  QueryOptions,
-  QueryPluginOptions,
-  QueryState,
-  QueryStore,
-} from "./types.js";
+import { createQueryStore } from "./client.js";
+import type { QueryPluginOptions } from "./types.js";
 import { resolveQueryOptions, resolveRetryCount, resolveRetryDelay } from "./utils.js";
 
+export { createQueryClient } from "./client.js";
 export type {
   MutationDevtoolsEntry,
   QueryDevtoolsApi,
@@ -35,76 +29,14 @@ export default function queryPlugin(options: QueryPluginOptions = {}): AlpineTyp
   const defaultMutationOptions = options.defaultOptions?.mutations ?? {};
 
   return function registerQuery(Alpine) {
-    const cache = new QueryCache(Alpine.reactive, {
+    const cache = new QueryCache({
       defaultQueryOptions: resolveQueryOptions(defaultQueryOptions, {}),
       defaultMutationRetry: resolveRetryCount(defaultMutationOptions.retry, 0),
       defaultMutationRetryDelay: resolveRetryDelay(defaultMutationOptions.retryDelay, 1000),
+      reactive: Alpine.reactive,
     });
 
-    const queryStore: QueryStore = {
-      devtools: cache.getDevtools(),
-      observe<TData>(
-        key: QueryKey,
-        queryFn: () => Promise<TData>,
-        queryOptions?: QueryOptions<TData>
-      ) {
-        return cache.observe(
-          key,
-          queryFn,
-          resolveQueryOptions(queryOptions, defaultQueryOptions)
-        ) as QueryState<TData> & { destroy(): void };
-      },
-
-      fetch<TData>(
-        key: QueryKey,
-        queryFn: () => Promise<TData>,
-        queryOptions?: QueryOptions<TData>
-      ) {
-        return cache.fetch(
-          key,
-          queryFn,
-          resolveQueryOptions(queryOptions, defaultQueryOptions)
-        ) as QueryState<TData>;
-      },
-
-      get<TData>(key: QueryKey) {
-        return cache.get(key) as QueryState<TData> | undefined;
-      },
-
-      prefetch<TData>(
-        key: QueryKey,
-        queryFn: () => Promise<TData>,
-        queryOptions?: QueryOptions<TData>
-      ) {
-        return cache.prefetch(key, queryFn, resolveQueryOptions(queryOptions, defaultQueryOptions));
-      },
-
-      invalidate(key) {
-        cache.invalidate(key);
-      },
-
-      remove(key) {
-        cache.remove(key);
-      },
-
-      setData(key, data) {
-        cache.setData(key, data);
-      },
-
-      cancel(key) {
-        cache.cancel(key);
-      },
-
-      reset() {
-        cache.reset();
-      },
-
-      mutate<TData, TVariables = void, TContext = unknown>(
-        mutationOptions: MutationOptions<TData, TVariables, TContext>
-      ): MutationState<TData, TVariables> {
-        return cache.mutate(mutationOptions);
-      },
-    };
+    const queryStore = createQueryStore(cache);
 
     Alpine.store("query", queryStore);
   };

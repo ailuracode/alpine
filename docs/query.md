@@ -18,6 +18,17 @@ Alpine.plugin(query());
 Alpine.start();
 ```
 
+### Without Alpine
+
+`createQueryClient()` exposes the same API without registering `$store.query`. Internal state uses Nanostores; the Alpine plugin bridges that cache into reactive templates.
+
+```js
+import { createQueryClient } from "@ailuracode/alpine-query";
+
+const query = createQueryClient();
+const todos = query.observe(["todos"], fetchTodos);
+```
+
 ```html
 <div
   x-data="{

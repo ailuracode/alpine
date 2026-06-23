@@ -32,8 +32,8 @@
   },
   "types": "./dist/global.d.ts",
   "peerDependencies": {
-    "alpinejs": "^3.0.0",
-    "@types/alpinejs": "^3.13.11"
+    "@types/alpinejs": "^3.13.11",
+    "alpinejs": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "@types/alpinejs": {
@@ -54,5 +54,8 @@
     "fetch",
     "tanstack-query",
     "async"
-  ]
+  ],
+  "dependencies": {
+    "nanostores": "^1.3.0"
+  }
 }

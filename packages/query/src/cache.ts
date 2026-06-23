@@ -1,11 +1,16 @@
 import type AlpineType from "alpinejs";
+import { bridgeMutationStateToAlpine, bridgeQueryStateToAlpine } from "./alpine-bridge.js";
 import type { QueryEntry } from "./cache-internals.js";
 import { DevtoolsRegistry } from "./devtools-registry.js";
+import {
+  createMutationStateStore,
+  createQueryStateStore,
+  patchMutationState,
+  patchQueryState,
+} from "./nano-state.js";
 import type {
-  FetchStatus,
   MutationOptions,
   MutationState,
-  MutationStatus,
   QueryKey,
   QueryOptions,
   QueryState,
@@ -19,80 +24,20 @@ type QueryCacheConfig = {
   defaultMutationRetryDelay: number | ((attempt: number) => number);
 };
 
-function attachQueryFlags<TData>(state: QueryState<TData>, staleTime: number): void {
-  Object.defineProperties(state, {
-    isPending: {
-      get() {
-        return state.status === "pending";
-      },
-    },
-    isLoading: {
-      get() {
-        return state.status === "pending" && state.fetchStatus === "fetching";
-      },
-    },
-    isFetching: {
-      get() {
-        return state.fetchStatus === "fetching";
-      },
-    },
-    isError: {
-      get() {
-        return state.status === "error";
-      },
-    },
-    isSuccess: {
-      get() {
-        return state.status === "success";
-      },
-    },
-    isStale: {
-      get() {
-        if (state.dataUpdatedAt === 0) {
-          return true;
-        }
-
-        return Date.now() - state.dataUpdatedAt > staleTime;
-      },
-    },
-  });
-}
-
-function attachMutationFlags<TData, TVariables>(mutation: MutationState<TData, TVariables>): void {
-  Object.defineProperties(mutation, {
-    isIdle: {
-      get() {
-        return mutation.status === "idle";
-      },
-    },
-    isPending: {
-      get() {
-        return mutation.status === "pending";
-      },
-    },
-    isError: {
-      get() {
-        return mutation.status === "error";
-      },
-    },
-    isSuccess: {
-      get() {
-        return mutation.status === "success";
-      },
-    },
-  });
-}
+type QueryCacheOptions = QueryCacheConfig & {
+  reactive?: AlpineType.Alpine["reactive"];
+};
 
 export class QueryCache {
   private readonly entries = new Map<string, QueryEntry>();
   private readonly config: QueryCacheConfig;
-  private readonly reactive: AlpineType.Alpine["reactive"];
+  private readonly reactive?: AlpineType.Alpine["reactive"];
   private readonly devtools = new DevtoolsRegistry();
   private focusListenerAttached = false;
 
-  constructor(reactive: AlpineType.Alpine["reactive"], config: QueryCacheConfig) {
-    this.reactive = reactive;
-    this.config = config;
+  constructor(options: QueryCacheOptions) {
+    this.config = options;
+    this.reactive = options.reactive;
   }
 
   getDevtools() {
@@ -215,7 +160,7 @@ export class QueryCache {
 
     const nextData =
       typeof data === "function"
-        ? (data as (current: TData | undefined) => TData)(entry.state.data)
+        ? (data as (current: TData | undefined) => TData)(entry.$state.get().data)
         : data;
     this.applySuccess(entry, nextData);
   }
@@ -227,7 +172,7 @@ export class QueryCache {
     }
 
     entry.abortController?.abort();
-    entry.state.fetchStatus = "idle";
+    patchQueryState(entry.$state, { fetchStatus: "idle" });
     this.devtools.notify();
   }
 
@@ -244,13 +189,9 @@ export class QueryCache {
   mutate<TData, TVariables, TContext>(
     options: MutationOptions<TData, TVariables, TContext>
   ): MutationState<TData, TVariables> {
-    const mutation = this.reactive({
-      data: undefined as TData | undefined,
-      error: null as Error | null,
-      status: "idle" as MutationStatus,
+    const { $state, state } = createMutationStateStore<TData, TVariables>({
       mutate: async (variables: TVariables) => {
-        mutation.status = "pending";
-        mutation.error = null;
+        patchMutationState($state, { status: "pending", error: null });
         const mutationId = this.devtools.trackMutationStart(variables);
 
         let context: TContext | undefined;
@@ -258,16 +199,14 @@ export class QueryCache {
         try {
           context = await options.onMutate?.(variables);
           const data = await this.runMutationWithRetry(options.mutationFn, variables);
-          mutation.data = data;
-          mutation.status = "success";
+          patchMutationState($state, { data, status: "success" });
           this.devtools.trackMutationSuccess(mutationId, data);
           options.onSuccess?.(data, variables, context);
           options.onSettled?.(data, null, variables, context);
           return data;
         } catch (error) {
           const mutationError = error instanceof Error ? error : new Error(String(error));
-          mutation.error = mutationError;
-          mutation.status = "error";
+          patchMutationState($state, { error: mutationError, status: "error" });
           this.devtools.trackMutationError(mutationId, mutationError);
           options.onError?.(mutationError, variables, context);
           options.onSettled?.(undefined, mutationError, variables, context);
@@ -275,15 +214,19 @@ export class QueryCache {
         }
       },
       reset: () => {
-        mutation.data = undefined;
-        mutation.error = null;
-        mutation.status = "idle";
+        patchMutationState($state, {
+          data: undefined,
+          error: null,
+          status: "idle",
+        });
       },
-    }) as MutationState<TData, TVariables>;
+    });
 
-    attachMutationFlags(mutation);
+    if (this.reactive) {
+      return bridgeMutationStateToAlpine(state, $state, this.reactive);
+    }
 
-    return mutation;
+    return state;
   }
 
   private ensureEntry<TData>(
@@ -305,38 +248,43 @@ export class QueryCache {
     }
 
     const hasInitialData = resolvedOptions.initialData !== undefined;
-    const baseState = {
-      data: resolvedOptions.initialData ?? resolvedOptions.placeholderData,
-      error: null as Error | null,
-      status: (hasInitialData ? "success" : "pending") as QueryStatus,
-      fetchStatus: "idle" as FetchStatus,
-      dataUpdatedAt: hasInitialData ? Date.now() : 0,
-      errorUpdatedAt: 0,
-      refetch: async () => {
-        await this.fetchEntry(entry, true);
-      },
-    };
+    let entryRef: QueryEntry<TData>;
 
-    const entry = {
+    const { $state, state } = createQueryStateStore<TData>(
+      {
+        data: resolvedOptions.initialData ?? resolvedOptions.placeholderData,
+        error: null,
+        status: (hasInitialData ? "success" : "pending") as QueryStatus,
+        fetchStatus: "idle",
+        dataUpdatedAt: hasInitialData ? Date.now() : 0,
+        errorUpdatedAt: 0,
+      },
+      resolvedOptions.staleTime,
+      async () => {
+        await this.fetchEntry(entryRef, true);
+      }
+    );
+
+    entryRef = {
       key,
       keyHash,
       queryFn,
       options: resolvedOptions,
-      state: baseState as QueryState<TData>,
+      $state,
+      state: this.reactive
+        ? bridgeQueryStateToAlpine(state, $state, this.reactive, resolvedOptions.staleTime)
+        : state,
       observers: 0,
       gcTimeout: null,
       intervalId: null,
       fetchPromise: null,
       abortController: null,
       isInvalidated: false,
-    } as QueryEntry<TData>;
+    };
 
-    entry.state = this.reactive(baseState) as QueryState<TData>;
-    attachQueryFlags(entry.state, resolvedOptions.staleTime);
-
-    this.entries.set(keyHash, entry as QueryEntry);
+    this.entries.set(keyHash, entryRef as QueryEntry);
     this.devtools.notify();
-    return entry;
+    return entryRef;
   }
 
   private subscribe<TData>(entry: QueryEntry<TData>): void {
@@ -438,25 +386,22 @@ export class QueryCache {
   }
 
   private isStale<TData>(entry: QueryEntry<TData>): boolean {
-    if (entry.state.dataUpdatedAt === 0) {
+    const { dataUpdatedAt } = entry.$state.get();
+    if (dataUpdatedAt === 0) {
       return true;
     }
 
-    return Date.now() - entry.state.dataUpdatedAt > entry.options.staleTime;
+    return Date.now() - dataUpdatedAt > entry.options.staleTime;
   }
 
   private fetchEntry<TData>(entry: QueryEntry<TData>, force = false): Promise<void> | undefined {
     if (!entry.options.enabled) {
-      entry.state.fetchStatus = "paused";
+      patchQueryState(entry.$state, { fetchStatus: "paused" });
       return;
     }
 
-    if (
-      !force &&
-      entry.state.status === "success" &&
-      !entry.isInvalidated &&
-      !this.isStale(entry)
-    ) {
+    const current = entry.$state.get();
+    if (!force && current.status === "success" && !entry.isInvalidated && !this.isStale(entry)) {
       return;
     }
 
@@ -464,7 +409,7 @@ export class QueryCache {
       return entry.fetchPromise;
     }
 
-    entry.state.fetchStatus = "fetching";
+    patchQueryState(entry.$state, { fetchStatus: "fetching" });
     entry.abortController?.abort();
     entry.abortController = new AbortController();
     this.devtools.notify();
@@ -476,8 +421,8 @@ export class QueryCache {
       .finally(() => {
         entry.fetchPromise = null;
         entry.isInvalidated = false;
-        if (entry.state.fetchStatus === "fetching") {
-          entry.state.fetchStatus = "idle";
+        if (entry.$state.get().fetchStatus === "fetching") {
+          patchQueryState(entry.$state, { fetchStatus: "idle" });
         }
         this.devtools.notify();
       });
@@ -509,20 +454,24 @@ export class QueryCache {
   }
 
   private applySuccess<TData>(entry: QueryEntry<TData>, data: TData): void {
-    entry.state.data = data;
-    entry.state.error = null;
-    entry.state.status = "success";
-    entry.state.dataUpdatedAt = Date.now();
-    entry.state.errorUpdatedAt = 0;
-    entry.state.fetchStatus = "idle";
+    patchQueryState(entry.$state, {
+      data,
+      error: null,
+      status: "success",
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      fetchStatus: "idle",
+    });
     this.devtools.notify();
   }
 
   private applyError<TData>(entry: QueryEntry<TData>, error: Error): void {
-    entry.state.error = error;
-    entry.state.status = "error";
-    entry.state.errorUpdatedAt = Date.now();
-    entry.state.fetchStatus = "idle";
+    patchQueryState(entry.$state, {
+      error,
+      status: "error",
+      errorUpdatedAt: Date.now(),
+      fetchStatus: "idle",
+    });
     this.devtools.notify();
   }
 

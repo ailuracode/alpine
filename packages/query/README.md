@@ -28,6 +28,24 @@ Alpine.plugin(
 Alpine.start();
 ```
 
+## Framework-agnostic client
+
+Use `createQueryClient()` when you need the query cache outside Alpine.js (tests, SSR setup, or other frameworks). State is backed by [Nanostores](https://github.com/nanostores/nanostores); the Alpine plugin bridges it to `$store.query` for templates.
+
+```js
+import { createQueryClient } from "@ailuracode/alpine-query";
+
+const query = createQueryClient({
+  defaultOptions: {
+    queries: { staleTime: 30_000 },
+  },
+});
+
+const todos = query.observe(["todos"], () => fetch("/api/todos").then((r) => r.json()));
+await todos.refetch();
+todos.destroy();
+```
+
 ## Queries
 
 Use `observe()` inside `x-data` for component-scoped subscriptions (similar to `useQuery`):

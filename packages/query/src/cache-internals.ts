@@ -1,16 +1,13 @@
-import type {
-  FetchStatus,
-  QueryKey,
-  QueryState,
-  QueryStatus,
-  ResolvedQueryOptions,
-} from "./types.js";
+import type { MapStore } from "nanostores";
+import type { QueryStateRecord } from "./nano-state.js";
+import type { QueryKey, QueryState, ResolvedQueryOptions } from "./types.js";
 
 export type QueryEntry<TData = unknown> = {
   key: QueryKey;
   keyHash: string;
   queryFn: () => Promise<TData>;
   options: ResolvedQueryOptions<TData>;
+  $state: MapStore<QueryStateRecord<TData>>;
   state: QueryState<TData>;
   observers: number;
   gcTimeout: ReturnType<typeof setTimeout> | null;
@@ -27,6 +24,3 @@ export type QueryCacheInternals = {
   invalidateEntry(keyHash: string): void;
   removeEntry(keyHash: string): void;
 };
-
-export type FetchStatusValue = FetchStatus;
-export type QueryStatusValue = QueryStatus;

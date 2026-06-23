@@ -2,7 +2,7 @@
 
 Package: `@ailuracode/alpine-screen`
 
-Responsive device detection and live viewport width. Uses `matchMedia` for device type and debounced `resize` for width.
+Responsive device detection and live viewport width. Uses `matchMedia` for device type and `requestAnimationFrame`-coalesced `resize` updates for width.
 
 ## Install
 
@@ -36,7 +36,7 @@ Store name: `$store.device`
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `type` | `string` | `mobile`, `tablet`, or `desktop` |
+| `type` | `DeviceType` | `mobile`, `tablet`, or `desktop` (via `matchMedia`) |
 | `width` | `number` | Current `window.innerWidth` |
 | `mobileMax` | `number` | Mobile upper bound (default `767`) |
 | `tabletMax` | `number` | Tablet upper bound (default `1023`) |
@@ -53,7 +53,7 @@ Store name: `$store.device`
 
 | Method | Description |
 |--------|-------------|
-| `is(name)` | Generic type check: `is('mobile')` |
+| `is(name)` | Generic type check: `is('mobile')` — `name` is `DeviceType` |
 | `refresh()` | Update type and width |
 | `refreshType()` | Update type only |
 | `refreshWidth()` | Update width only |
@@ -69,14 +69,27 @@ Store name: `$store.device`
 <p>Device: <span x-text="$store.device.type"></span></p>
 ```
 
+## Exported helpers
+
+```js
+import {
+  DEVICE_TYPES,
+  DEFAULT_DEVICE_BREAKPOINTS,
+  deviceBreakpoints,
+  readDeviceSnapshot,
+  resolveDeviceTypeFromWidth,
+} from "@ailuracode/alpine-screen";
+```
+
+`readDeviceSnapshot()` and `resolveDeviceTypeFromWidth()` derive type from width. `$store.device.type` uses `matchMedia` at runtime and may differ in edge cases.
+
 ## Custom breakpoints
 
 ```js
 // After Alpine.start(), from a component or script:
-Alpine.store("device").setBreakpoints({
-  mobileMax: 640,
-  tabletMax: 1024,
-});
+Alpine.store("device").setBreakpoints(
+  deviceBreakpoints({ mobileMax: 640, tabletMax: 1024 }),
+);
 ```
 
 Or call during plugin init via a wrapper if you need custom defaults at startup.
@@ -84,4 +97,4 @@ Or call during plugin init via a wrapper if you need custom defaults at startup.
 ## Performance
 
 - Device **type** updates via `matchMedia` `change` events (no resize polling)
-- **Width** updates on `resize` with 100ms debounce
+- **Width** updates on `resize`, coalesced to one refresh per animation frame

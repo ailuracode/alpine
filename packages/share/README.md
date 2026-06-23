@@ -22,7 +22,7 @@ Alpine.start();
 
 ```html
 <button
-  x-show="$share.isSupported()"
+  x-show="$share.isSupported"
   @click="await $share({ title: 'Hello', url: window.location.href })"
 >
   Share page
@@ -34,7 +34,7 @@ Alpine.start();
 | | |
 |-|-|
 | **Magic** | `$share(data)` |
-| **Helpers** | `$share.isSupported()`, `$share.canShare(data?)` |
+| **Helpers** | `$share.isSupported` (getter), `$share.canShare(data?)` |
 
 Callable like `$clipboard`.
 

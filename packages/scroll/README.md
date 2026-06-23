@@ -16,7 +16,7 @@ npm install @ailuracode/alpine-scroll alpinejs
 import Alpine from "alpinejs";
 import scroll from "@ailuracode/alpine-scroll";
 
-Alpine.plugin(scroll);
+Alpine.plugin(scroll());
 Alpine.start();
 ```
 
@@ -24,16 +24,30 @@ Alpine.start();
 <button x-show="$store.scroll.showToTop" @click="$store.scroll.toTop()">Top</button>
 ```
 
-Add `.scroll-locked` CSS — see [docs](../../docs/scroll.md#required-css).
+Scroll lock uses inline styles — no CSS classes required.
+
+## Exported helpers
+
+```js
+import {
+  SCROLL_DIRECTIONS,
+  SCROLL_BEHAVIORS,
+  computeScrollDirection,
+  computeScrollMetrics,
+  readScrollSnapshot,
+  scrollOptions,
+} from "@ailuracode/alpine-scroll";
+```
 
 ## API summary
 
 | | |
 |-|-|
 | **Store** | `$store.scroll` |
-| **State** | `x`, `y`, `direction`, `progress`, `atTop`, `atBottom`, `locked` |
+| **State** | `x`, `y`, `direction` (`ScrollDirection`), `progress`, `atTop`, `atBottom`, `locked` |
 | **Getters** | `isLocked`, `showToTop`, `isScrollingDown`, `isScrollingUp` |
-| **Methods** | `lock()`, `unlock()`, `toggleLock()`, `toTop()`, `toBottom()` |
+| **Methods** | `isDirection()`, `lock()`, `unlock()`, `toggleLock()`, `toTop()`, `toBottom()` |
+| **Options** | `scrollOptions({ onLockChange })` |
 
 ## License
 

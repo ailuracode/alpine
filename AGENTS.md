@@ -19,6 +19,7 @@ Alpine.js plugin monorepo by **ailuracode**. Twenty-one independent npm packages
 | `@ailuracode/alpine-export` | Magic | `$export` |
 | `@ailuracode/alpine-calendar` | Magic | `$calendar` |
 | `@ailuracode/alpine-touch` | Magic | `$touch` |
+| `@ailuracode/alpine-toggle` | Magic | `$toggle` |
 | `@ailuracode/alpine-platform` | Magic | `$platform` |
 | `@ailuracode/alpine-notify` | Magic | `$notify` |
 | `@ailuracode/alpine-geo` | Store | `$store.geo` |
@@ -81,7 +82,7 @@ Do **not** bump `version` in `package.json` manually for releases — use Change
 
 ### CSS
 
-Plugins must stay **CSS-framework agnostic**. Do not hardcode `data-theme`, Tailwind `.dark`, or similar in plugin source. The consumer applies styles via callbacks (e.g. `theme({ onChange })`) or app CSS (e.g. `.scroll-locked` for scroll lock).
+Plugins must stay **CSS-framework agnostic**. Do not hardcode `data-theme`, Tailwind `.dark`, or similar in plugin source. The consumer applies styles via callbacks (e.g. `theme({ onChange })`, `scroll({ onLockChange })`).
 
 ### Plugin shape
 

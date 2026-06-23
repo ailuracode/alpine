@@ -38,7 +38,12 @@ export const zustandQueryAdapter: QueryStateAdapter = {
     refetch: () => Promise<void>
   ) {
     const store = createStore<QueryStateRecord<TData>>(() => ({ ...initial }));
-    const state = createQueryStateView(() => store.getState(), staleTime, refetch);
+    const staleTimeRef = { current: staleTime };
+    const state = createQueryStateView(
+      () => store.getState(),
+      () => staleTimeRef.current,
+      refetch
+    );
 
     return {
       state,
@@ -46,6 +51,12 @@ export const zustandQueryAdapter: QueryStateAdapter = {
       patch: (patch: Partial<QueryStateRecord<TData>>) => patchZustandStore(store, patch),
       listen: (listener: (record: QueryStateRecord<TData>) => void) =>
         store.subscribe((record) => listener(record)),
+      setStaleTime(next: number) {
+        staleTimeRef.current = next;
+      },
+      getStaleTime() {
+        return staleTimeRef.current;
+      },
     };
   },
 

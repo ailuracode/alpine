@@ -24,8 +24,20 @@ Alpine.start();
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `isVisible` | `boolean` | `true` when the tab is visible |
-| `state` | `"visible" \| "hidden" \| "prerender"` | Raw `document.visibilityState` |
+| `isVisible` | `boolean` (getter) | `true` when the tab is visible |
+| `isHidden` | `boolean` (getter) | `true` when the tab is hidden |
+| `state` | `VisibilityState` (getter) | Raw `document.visibilityState` |
+| `is(state)` | `boolean` | `true` when `state` matches the current visibility |
+
+## Exported helpers
+
+```js
+import {
+  VISIBILITY_STATES,
+  createVisibilityState,
+  readVisibilityState,
+} from "@ailuracode/alpine-visibility";
+```
 
 ## HTML examples
 
@@ -39,7 +51,7 @@ Alpine.start();
   x-text="$visibility.isVisible ? 'Active tab' : 'Background tab'"
 ></span>
 
-<div x-show="$visibility.state === 'hidden'">
+<div x-show="$visibility.is('hidden')">
   Pause animations or polling while hidden
 </div>
 ```

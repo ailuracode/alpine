@@ -1,5 +1,5 @@
 ---
-import globalStyles from "../styles/global.css?raw";
+import "../styles/global.css";
 
 interface Props {
 	title?: string;
@@ -28,7 +28,6 @@ const {
 				document.documentElement.style.colorScheme = resolved;
 			})();
 		</script>
-		<style is:inline set:html={globalStyles}></style>
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,27 +35,37 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body>
-		<div class="app" x-data="{ copied: false, exportedText: null, exportedJson: null, shared: null }" x-cloak>
-			<header class="header">
-				<h1>Alpine.js + @ailuracode</h1>
-				<p class="subtitle">Demo with all nine plugins · Astro</p>
+	<body class="min-h-screen bg-base-200 text-base-content">
+		<div
+			class="min-h-screen"
+			x-data="{ copied: false, exportedText: null, exportedJson: null, shared: null }"
+			x-cloak
+		>
+			<header class="hero bg-base-100 border-b border-base-300 py-8">
+				<div class="hero-content text-center">
+					<div>
+						<h1 class="text-3xl font-bold">Alpine.js + @ailuracode</h1>
+						<p class="text-base-content/70 mt-1">
+							Interactive demo of all plugins · Astro · DaisyUI
+						</p>
+					</div>
+				</div>
 			</header>
 
-			<div class="progress-bar" aria-hidden="true">
+			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-base-300" aria-hidden="true">
 				<div
-					class="progress-bar-fill"
+					class="h-full bg-primary transition-[width] duration-100 linear"
 					x-bind:style="'width: ' + $store.scroll.progress + '%'"
 				></div>
 			</div>
 
 			<slot />
 
-			<div class="spacer" aria-hidden="true"></div>
+			<div class="h-[120vh]" aria-hidden="true"></div>
 
 			<button
 				type="button"
-				class="fab"
+				class="btn btn-primary btn-circle fixed bottom-6 right-6 shadow-lg z-40"
 				x-show="$store.scroll.showToTop"
 				x-cloak
 				@click="$store.scroll.toTop()"

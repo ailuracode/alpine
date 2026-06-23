@@ -16,6 +16,7 @@ export type {
   QueryDevtoolsEntry,
   QueryDevtoolsSnapshot,
 } from "./devtools.js";
+export { mutationOptions, queryFn, queryKey, queryOptions } from "./options.js";
 export {
   createQueryPlugin,
   default,
@@ -32,11 +33,17 @@ export {
   type QueryStateRecord,
 } from "./state/view.js";
 export type {
+  CoerceAnyToUnknown,
   FetchStatus,
+  InferQueryData,
   MutationOptions,
   MutationState,
   MutationStatus,
   QueryClientOptions,
+  QueryData,
+  QueryDefinition,
+  QueryFunction,
+  QueryFunctionContext,
   QueryKey,
   QueryOptions,
   QueryPluginOptions,

@@ -1,13 +1,17 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
 import platformPlugin, {
+  createPlatformState,
   detectPlatformName,
   isAndroidDevice,
   isIosDevice,
   isLinuxDevice,
   isMacDevice,
   isWindowsDevice,
+  PLATFORM_NAMES,
   type PlatformMagic,
+  type PlatformName,
+  type PlatformSnapshot,
   readPlatformState,
 } from "../src/index.js";
 
@@ -18,6 +22,60 @@ function installNavigator(navigator: Record<string, unknown>): void {
 function removeNavigatorMock(): void {
   vi.unstubAllGlobals();
 }
+
+describe("@ailuracode/alpine-platform type inference", () => {
+  it("exports literal platform names", () => {
+    expectTypeOf(PLATFORM_NAMES).toEqualTypeOf<
+      readonly ["macos", "windows", "linux", "ios", "android", "chromeos", "unknown"]
+    >();
+  });
+
+  it("types detectPlatformName() as PlatformName", () => {
+    installNavigator({
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      platform: "Win32",
+      maxTouchPoints: 0,
+    });
+
+    expectTypeOf(detectPlatformName()).toEqualTypeOf<PlatformName>();
+  });
+
+  it("types readPlatformState() snapshot", () => {
+    installNavigator({
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      platform: "Win32",
+      maxTouchPoints: 0,
+    });
+
+    const snapshot = readPlatformState();
+
+    expectTypeOf(snapshot).toEqualTypeOf<PlatformSnapshot>();
+    expectTypeOf(snapshot.name).toEqualTypeOf<PlatformName>();
+    expectTypeOf(snapshot.isWindows).toEqualTypeOf<boolean>();
+  });
+
+  it("types $platform magic", () => {
+    installNavigator({
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      platform: "Win32",
+      maxTouchPoints: 0,
+    });
+
+    const { platform } = createMagicHarness(platformPlugin) as { platform: PlatformMagic };
+
+    expectTypeOf(platform).toEqualTypeOf<PlatformMagic>();
+    expectTypeOf(platform.name).toEqualTypeOf<PlatformName>();
+    expectTypeOf(platform.is).parameters.toEqualTypeOf<[platform: PlatformName]>();
+    expectTypeOf(platform.is("windows")).toEqualTypeOf<boolean>();
+  });
+
+  it("types createPlatformState()", () => {
+    const state = createPlatformState();
+
+    expectTypeOf(state).toExtend<PlatformMagic>();
+    expectTypeOf(state.isMac).toEqualTypeOf<boolean>();
+  });
+});
 
 describe("@ailuracode/alpine-platform", () => {
   afterEach(() => {
@@ -153,6 +211,8 @@ describe("@ailuracode/alpine-platform", () => {
       expect(platform.name).toBe("windows");
       expect(platform.isWindows).toBe(true);
       expect(platform.isMac).toBe(false);
+      expect(platform.is("windows")).toBe(true);
+      expect(platform.is("macos")).toBe(false);
     });
   });
 });

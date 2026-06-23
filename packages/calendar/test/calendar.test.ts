@@ -3,6 +3,7 @@ import { es } from "date-fns/locale";
 import { describe, expect, it, vi } from "vitest";
 import { createMagicHarness } from "../../../test/mock-alpine.js";
 import calendarPlugin, {
+  type CalendarInstance,
   type CalendarMagic,
   createCalendar,
   createCalendarMagic,
@@ -300,6 +301,16 @@ describe("@ailuracode/alpine-calendar", () => {
 
       expect(instance.weekStartsOn).toBe(1);
       expect(instance.weekdayLabels[0]).toBe("Mo");
+    });
+
+    it("createCalendarMagic() wraps instances with Alpine.reactive when Alpine is provided", () => {
+      const reactive = vi.fn(<T>(value: T) => value);
+      const magic = createCalendarMagic({ reactive } as Pick<AlpineType.Alpine, "reactive">);
+
+      magic({ month: JAN_2024 });
+
+      expect(reactive).toHaveBeenCalledTimes(1);
+      expect((reactive.mock.calls[0]?.[0] as CalendarInstance).month.getMonth()).toBe(0);
     });
   });
 });

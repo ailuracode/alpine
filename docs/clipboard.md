@@ -24,11 +24,20 @@ Alpine.start();
 
 ```js
 await $clipboard(text)
+await $clipboard(text, { mode: "clipboard" })
+await $clipboard(text, "legacy")
 ```
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| `text` | `any` | Coerced to string before copying |
+| `text` | `string \| number \| boolean \| bigint` | Coerced to string before copying |
+| `options` | `"auto" \| "clipboard" \| "legacy" \| { mode? }` | Optional copy strategy. Default: `"auto"` |
+
+| Mode | Behavior |
+|------|----------|
+| `auto` | Clipboard API when available, otherwise legacy `execCommand` |
+| `clipboard` | Force `navigator.clipboard.writeText` |
+| `legacy` | Force hidden `<textarea>` + `document.execCommand("copy")` |
 
 Returns a `Promise` that resolves on success or rejects on failure.
 

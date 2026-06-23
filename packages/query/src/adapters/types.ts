@@ -6,6 +6,8 @@ export type QueryStateHandle<TData = unknown> = {
   get(): QueryStateRecord<TData>;
   patch(patch: Partial<QueryStateRecord<TData>>): void;
   listen(listener: (record: QueryStateRecord<TData>) => void): () => void;
+  setStaleTime?(staleTime: number): void;
+  getStaleTime?(): number;
   dispose?(): void;
 };
 

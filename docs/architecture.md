@@ -65,7 +65,8 @@ Use a **magic** when you need:
 | `@ailuracode/alpine-clipboard` | `$clipboard` | Async copy function |
 | `@ailuracode/alpine-export` | `$export` | Programmatic file exports (downloads) |
 | `@ailuracode/alpine-calendar` | `$calendar` | Calendar date logic — `$calendar({ weekStartsOn: 1 })` |
-| `@ailuracode/alpine-share` | `$share` | Web Share API — `await $share(data)`, `$share.isSupported()`, `$share.canShare()` |
+| `@ailuracode/alpine-toggle` | `$toggle` | Binary / ternary toggle — `$toggle({ states: { truly: 'on', falsely: 'off' } })` |
+| `@ailuracode/alpine-share` | `$share` | Web Share API — `await $share(data)`, `$share.isSupported`, `$share.canShare()` |
 | `@ailuracode/alpine-attention` | `$wakelock`, `$idle` | Screen Wake Lock + Idle Detection — `$wakelock.request()`, `$idle.start()` |
 | `@ailuracode/alpine-notify` | `$notify` | Web Notifications API |
 
@@ -93,7 +94,7 @@ Magics expose a namespace object with descriptive boolean properties:
 Plugins do **not** assume Tailwind, shadcn, or any CSS framework.
 
 - **Theme** — only manages state; you apply styles via `onChange`
-- **Scroll lock** — adds `.scroll-locked` classes; you define the CSS
+- **Scroll lock** — applies inline lock styles; optional `scroll({ onLockChange })` for custom classes or attributes
 - **Screen / network / touch** — no DOM styling
 
 ### Theme example (Tailwind)

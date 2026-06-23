@@ -130,7 +130,7 @@ describe("@ailuracode/alpine-share", () => {
 
       expect(store).not.toHaveBeenCalled();
       expect(typeof magicApi).toBe("function");
-      expect(magicApi?.isSupported()).toBe(true);
+      expect(magicApi?.isSupported).toBe(true);
       expect(typeof magicApi?.canShare).toBe("function");
     });
 
@@ -141,7 +141,7 @@ describe("@ailuracode/alpine-share", () => {
 
       const { share } = createMagicHarness(sharePlugin) as { share: ShareMagic };
 
-      expect(share.isSupported()).toBe(true);
+      expect(share.isSupported).toBe(true);
       expect(typeof share.canShare).toBe("function");
       await expect(share(data)).resolves.toBe(true);
       expect(navigatorShare).toHaveBeenCalledWith(data);
@@ -150,7 +150,7 @@ describe("@ailuracode/alpine-share", () => {
     it("createShareMagic() exposes the public API", () => {
       const magic = createShareMagic();
 
-      expect(magic.isSupported).toBe(isShareSupported);
+      expect(magic.isSupported).toBe(isShareSupported());
       expect(magic.canShare).toBe(canShareData);
     });
   });

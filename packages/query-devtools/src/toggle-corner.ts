@@ -1,3 +1,5 @@
+import { paintClasses } from "./ui-styles.js";
+
 export const TOGGLE_CORNERS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
 
 export type ToggleCorner = (typeof TOGGLE_CORNERS)[number];
@@ -38,11 +40,7 @@ export function saveToggleCorner(storageKey: string, corner: ToggleCorner): void
 }
 
 export function applyToggleCorner(element: HTMLElement, corner: ToggleCorner): void {
-  for (const value of TOGGLE_CORNERS) {
-    element.classList.remove(`aq-devtools-toggle--${value}`);
-  }
-
-  element.classList.add(`aq-devtools-toggle--${corner}`);
+  paintClasses(element, "aq-devtools-toggle", `aq-devtools-toggle--${corner}`);
 }
 
 export function cornerLabel(corner: ToggleCorner): string {

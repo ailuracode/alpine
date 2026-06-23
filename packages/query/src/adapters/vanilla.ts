@@ -66,9 +66,22 @@ export const vanillaQueryAdapter: QueryStateAdapter = {
     refetch: () => Promise<void>
   ): QueryStateHandle<TData> {
     const record: QueryStateRecord<TData> = { ...initial };
-    const state = createQueryStateView(() => record, staleTime, refetch);
+    const staleTimeRef = { current: staleTime };
+    const state = createQueryStateView(
+      () => record,
+      () => staleTimeRef.current,
+      refetch
+    );
 
-    return createHandle(record, state);
+    return {
+      ...createHandle(record, state),
+      setStaleTime(next) {
+        staleTimeRef.current = next;
+      },
+      getStaleTime() {
+        return staleTimeRef.current;
+      },
+    };
   },
 
   createMutationState<TData, TVariables>(

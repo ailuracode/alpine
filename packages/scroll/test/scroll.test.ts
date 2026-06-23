@@ -1,6 +1,59 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
-import scrollPlugin, { type ScrollStore } from "../src/index.js";
+import scrollPlugin, {
+  computeScrollDirection,
+  computeScrollMetrics,
+  readScrollSnapshot,
+  SCROLL_BEHAVIORS,
+  SCROLL_DIRECTIONS,
+  type ScrollDirection,
+  type ScrollSnapshot,
+  type ScrollStore,
+  scrollOptions,
+} from "../src/index.js";
+
+describe("@ailuracode/alpine-scroll type inference", () => {
+  it("exports literal scroll directions and behaviors", () => {
+    expectTypeOf(SCROLL_DIRECTIONS).toEqualTypeOf<readonly ["up", "down", "none"]>();
+    expectTypeOf(SCROLL_BEHAVIORS).toEqualTypeOf<readonly ["auto", "instant", "smooth"]>();
+  });
+
+  it("types computeScrollDirection()", () => {
+    expectTypeOf(computeScrollDirection(0, 10)).toEqualTypeOf<ScrollDirection>();
+  });
+
+  it("types computeScrollMetrics()", () => {
+    const snapshot = computeScrollMetrics({
+      x: 0,
+      y: 120,
+      previousY: 80,
+      scrollHeight: 1600,
+      innerHeight: 800,
+    });
+
+    expectTypeOf(snapshot).toEqualTypeOf<ScrollSnapshot>();
+    expectTypeOf(snapshot.direction).toEqualTypeOf<ScrollDirection>();
+  });
+
+  it("types scrollOptions()", () => {
+    const options = scrollOptions({
+      onLockChange(locked) {
+        expectTypeOf(locked).toEqualTypeOf<boolean>();
+      },
+    });
+
+    expectTypeOf(options.onLockChange).parameters.toEqualTypeOf<[locked: boolean]>();
+  });
+
+  it("types $store.scroll", () => {
+    const Alpine = startAlpine(scrollPlugin());
+    const scroll = Alpine.store("scroll") as ScrollStore;
+
+    expectTypeOf(scroll.direction).toEqualTypeOf<ScrollDirection>();
+    expectTypeOf(scroll.isDirection).parameters.toEqualTypeOf<[direction: ScrollDirection]>();
+    expectTypeOf(scroll.toTop).parameters.toEqualTypeOf<[behavior?: ScrollBehavior | undefined]>();
+  });
+});
 
 describe("@ailuracode/alpine-scroll", () => {
   let store: ScrollStore;
@@ -24,8 +77,34 @@ describe("@ailuracode/alpine-scroll", () => {
       value: 1600,
     });
 
-    const Alpine = startAlpine(scrollPlugin);
+    const Alpine = startAlpine(scrollPlugin());
     store = Alpine.store("scroll") as ScrollStore;
+  });
+
+  it("computes scroll metrics from viewport values", () => {
+    expect(
+      computeScrollMetrics({
+        x: 0,
+        y: 120,
+        previousY: 80,
+        scrollHeight: 1600,
+        innerHeight: 800,
+      })
+    ).toEqual({
+      x: 0,
+      y: 120,
+      direction: "down",
+      atTop: false,
+      atBottom: false,
+      progress: 15,
+    });
+  });
+
+  it("reads scroll snapshot from the viewport", () => {
+    expect(readScrollSnapshot(80)).toMatchObject({
+      y: 120,
+      direction: "down",
+    });
   });
 
   it("tracks scroll progress", () => {
@@ -38,7 +117,9 @@ describe("@ailuracode/alpine-scroll", () => {
   it("locks and unlocks the body with reference counting", () => {
     store.lock();
     expect(store.isLocked).toBe(true);
-    expect(document.body.classList.contains("scroll-locked")).toBe(true);
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    expect(document.body.style.position).toBe("fixed");
+    expect(document.body.style.overflow).toBe("hidden");
 
     store.lock();
     store.unlock();
@@ -46,7 +127,20 @@ describe("@ailuracode/alpine-scroll", () => {
 
     store.unlock();
     expect(store.isLocked).toBe(false);
-    expect(document.body.classList.contains("scroll-locked")).toBe(false);
+    expect(document.documentElement.style.overflow).toBe("");
+    expect(document.body.style.position).toBe("");
+  });
+
+  it("calls onLockChange when lock state changes", () => {
+    const onLockChange = vi.fn();
+    const Alpine = startAlpine(scrollPlugin({ onLockChange }));
+    const lockedStore = Alpine.store("scroll") as ScrollStore;
+
+    lockedStore.lock();
+    expect(onLockChange).toHaveBeenLastCalledWith(true);
+
+    lockedStore.unlock();
+    expect(onLockChange).toHaveBeenLastCalledWith(false);
   });
 
   it("exposes showToTop when scrolled and unlocked", () => {
@@ -109,6 +203,18 @@ describe("@ailuracode/alpine-scroll", () => {
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
+  });
+
+  it("toggleLock() decrements nested lock ref-count once", () => {
+    store.lock();
+    store.lock();
+    expect(store.isLocked).toBe(true);
+
+    store.toggleLock();
+    expect(store.isLocked).toBe(true);
+
+    store.toggleLock();
+    expect(store.isLocked).toBe(false);
   });
 
   it("skips programmatic scroll while locked", () => {

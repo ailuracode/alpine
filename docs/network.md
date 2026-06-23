@@ -24,7 +24,8 @@ Alpine.start();
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `isOnline` | `boolean` | `true` when the browser reports online |
+| `isOnline` | `boolean` (getter) | `true` when the browser reports online |
+| `isOffline` | `boolean` (getter) | `true` when the browser reports offline |
 
 ## HTML examples
 

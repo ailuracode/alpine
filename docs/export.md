@@ -35,7 +35,9 @@ Callable like `$clipboard` and `$share`:
 | Usage | Returns | Description |
 |-------|---------|-------------|
 | `await $export(source, options?)` | `Promise<boolean>` | Starts a file download. Resolves `true` on success, `false` when unsupported or invalid. Never throws. |
-| `$export.isSupported()` | `boolean` | `true` when anchor-based exports are available. |
+| `$export.isSupported` | `boolean` (getter) | `true` when anchor-based exports are available. |
+
+Use `$export.isSupported` without parentheses in templates.
 
 ### `source`
 

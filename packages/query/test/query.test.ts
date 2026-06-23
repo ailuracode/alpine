@@ -34,7 +34,7 @@ describe("@ailuracode/alpine-query", () => {
 
   it("observe() fetches data and exposes TanStack-like state", async () => {
     const queryFn = vi.fn().mockResolvedValue([{ id: 1, title: "Learn Alpine" }]);
-    const query = store.observe<Todo[]>(["todos"], queryFn);
+    const query = store.observe(["todos"], queryFn);
 
     expect(query.isLoading).toBe(true);
     expect(query.isPending).toBe(true);
@@ -98,7 +98,7 @@ describe("@ailuracode/alpine-query", () => {
 
   it("setData() updates cache optimistically", async () => {
     const queryFn = vi.fn().mockResolvedValue([{ id: 1, title: "Todo" }]);
-    const query = store.observe<Todo[]>(["todos"], queryFn);
+    const query = store.observe(["todos"], queryFn);
     await vi.runAllTimersAsync();
 
     store.setData<Todo[]>(["todos"], (current) => [...(current ?? []), { id: 2, title: "New" }]);
@@ -189,19 +189,94 @@ describe("@ailuracode/alpine-query", () => {
     expect(query.data).toBe("fetched");
   });
 
-  it("cancel() stops an in-flight query", () => {
-    const queryFn = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve("late"), 5_000);
+  it("cancel() aborts an in-flight query", async () => {
+    const queryFn = vi.fn(
+      ({ signal }: { signal: AbortSignal }) =>
+        new Promise<string>((_resolve, reject) => {
+          signal.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+          setTimeout(() => _resolve("late"), 5_000);
         })
     );
 
     const query = store.observe(["cancel-me"], queryFn);
     expect(query.isFetching).toBe(true);
     store.cancel(["cancel-me"]);
+    await vi.runAllTimersAsync();
+
     expect(query.fetchStatus).toBe("idle");
+    expect(queryFn.mock.calls[0]?.[0]?.signal.aborted).toBe(true);
     query.destroy();
+  });
+
+  it("refetch() after cancel() starts a fresh request", async () => {
+    let call = 0;
+    const queryFn = vi.fn(({ signal }: { signal: AbortSignal }) => {
+      call += 1;
+      if (call === 1) {
+        return new Promise<string>((_resolve, reject) => {
+          signal.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        });
+      }
+
+      return Promise.resolve("fresh");
+    });
+
+    const query = store.observe(["cancel-refetch"], queryFn);
+    store.cancel(["cancel-refetch"]);
+    await vi.runAllTimersAsync();
+    expect(query.fetchStatus).toBe("idle");
+
+    await query.refetch();
+    await vi.runAllTimersAsync();
+
+    expect(queryFn).toHaveBeenCalledTimes(2);
+    expect(query.data).toBe("fresh");
+    query.destroy();
+  });
+
+  it("refetch() during an active fetch aborts and restarts", async () => {
+    let call = 0;
+    const queryFn = vi.fn(({ signal }: { signal: AbortSignal }) => {
+      call += 1;
+      if (call === 1) {
+        return new Promise<string>((_resolve, reject) => {
+          signal.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        });
+      }
+
+      return Promise.resolve("fresh");
+    });
+
+    const query = store.observe(["refetch-force"], queryFn);
+    expect(query.isFetching).toBe(true);
+
+    await query.refetch();
+    await vi.runAllTimersAsync();
+
+    expect(queryFn).toHaveBeenCalledTimes(2);
+    expect(query.data).toBe("fresh");
+    query.destroy();
+  });
+
+  it("updates isStale when staleTime changes on cache reuse", async () => {
+    const queryFn = vi.fn().mockResolvedValue("data");
+
+    const first = store.observe(["stale-key"], queryFn, { staleTime: 60_000 });
+    await vi.runAllTimersAsync();
+    expect(first.isStale).toBe(false);
+    first.destroy();
+
+    vi.advanceTimersByTime(30_000);
+
+    const second = store.observe(["stale-key"], queryFn, { staleTime: 0 });
+    expect(second.isStale).toBe(true);
+    second.destroy();
   });
 
   it("invalidate() without a key refetches all active queries", async () => {

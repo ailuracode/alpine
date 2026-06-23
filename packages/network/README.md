@@ -30,7 +30,8 @@ Alpine.start();
 | | |
 |-|-|
 | **Magic** | `$network` |
-| **Properties** | `isOnline` (boolean) |
+| **Getters** | `isOnline`, `isOffline` (boolean) |
+| **Helpers** | `readNetworkState()`, `createNetworkState()` |
 
 ## License
 

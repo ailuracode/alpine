@@ -33,8 +33,10 @@ Callable like `$clipboard`:
 | Usage | Returns | Description |
 |-------|---------|-------------|
 | `await $share(data)` | `Promise<boolean>` | Opens the native share sheet. Resolves `true` on success, `false` on cancel, denial, or unsupported payloads. Never throws. |
-| `$share.isSupported()` | `boolean` | `true` when `navigator.share` is available in a secure context. |
+| `$share.isSupported` | `boolean` (getter) | `true` when `navigator.share` is available in a secure context. |
 | `$share.canShare(data?)` | `boolean` | Uses `navigator.canShare` when present; otherwise checks for shareable fields. Without `data`, returns whether sharing is generally available. |
+
+Use `$share.isSupported` without parentheses in templates.
 
 `data` follows the platform `ShareData` shape (`title`, `text`, `url`, `files`).
 
@@ -44,7 +46,7 @@ Callable like `$clipboard`:
 
 ```html
 <button
-  x-show="$share.isSupported()"
+  x-show="$share.isSupported"
   @click="shared = await $share({
     title: document.title,
     url: window.location.href

@@ -1,15 +1,21 @@
 /// <reference types="@types/alpinejs" />
 
-export type ScrollDirection = "up" | "down" | "none";
+export declare const SCROLL_DIRECTIONS: readonly ["up", "down", "none"];
 
-export interface ScrollSnapshot {
-  x: number;
-  y: number;
-  direction: ScrollDirection;
-  atTop: boolean;
-  atBottom: boolean;
-  progress: number;
-}
+export type ScrollDirection = (typeof SCROLL_DIRECTIONS)[number];
+
+export declare const SCROLL_BEHAVIORS: readonly ["auto", "instant", "smooth"];
+
+export type ScrollBehaviorOption = (typeof SCROLL_BEHAVIORS)[number];
+
+export type ScrollSnapshot = {
+  readonly x: number;
+  readonly y: number;
+  readonly direction: ScrollDirection;
+  readonly atTop: boolean;
+  readonly atBottom: boolean;
+  readonly progress: number;
+};
 
 export interface ScrollStore extends ScrollSnapshot {
   locked: boolean;
@@ -17,6 +23,7 @@ export interface ScrollStore extends ScrollSnapshot {
   lock(): boolean;
   unlock(): boolean;
   toggleLock(): boolean;
+  isDirection(direction: ScrollDirection): boolean;
   readonly isLocked: boolean;
   readonly isAtTop: boolean;
   readonly isAtBottom: boolean;
@@ -26,6 +33,27 @@ export interface ScrollStore extends ScrollSnapshot {
   toTop(behavior?: ScrollBehavior): void;
   toBottom(behavior?: ScrollBehavior): void;
 }
+
+export interface ScrollPluginOptions {
+  onLockChange?: (locked: boolean) => void;
+}
+
+export type ScrollMetricsInput = {
+  x: number;
+  y: number;
+  previousY: number;
+  scrollHeight: number;
+  innerHeight: number;
+};
+
+export function scrollOptions<const T extends ScrollPluginOptions>(options: T): T;
+export function computeScrollDirection(previousY: number, currentY: number): ScrollDirection;
+export function computeScrollMetrics(input: ScrollMetricsInput): ScrollSnapshot;
+export function readScrollSnapshot(previousY?: number): ScrollSnapshot;
+
+export default function scrollPlugin(
+  options?: ScrollPluginOptions
+): import("alpinejs").PluginCallback;
 
 declare global {
   namespace Alpine {

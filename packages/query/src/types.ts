@@ -3,6 +3,26 @@ import type { QueryDevtoolsApi } from "./devtools.js";
 
 export type QueryKey = readonly unknown[];
 
+export type QueryFunctionContext = {
+  signal: AbortSignal;
+};
+
+export type QueryFunction<TData = unknown> = (context: QueryFunctionContext) => Promise<TData>;
+
+/** Maps accidental `any` inference (e.g. untyped mocks) to `unknown`. */
+export type CoerceAnyToUnknown<T> = 0 extends 1 & T ? unknown : T;
+
+export type InferQueryData<TQueryFn extends QueryFunction<unknown>> = CoerceAnyToUnknown<
+  Awaited<ReturnType<TQueryFn>>
+>;
+
+export type QueryData<T> = CoerceAnyToUnknown<T>;
+
+export type QueryDefinition<TKey extends QueryKey = QueryKey, TData = unknown> = {
+  queryKey: TKey;
+  queryFn: QueryFunction<TData>;
+} & QueryOptions<TData>;
+
 export type QueryStatus = "pending" | "error" | "success";
 
 export type FetchStatus = "fetching" | "paused" | "idle";
@@ -91,28 +111,76 @@ export interface QueryClientOptions extends QueryPluginOptions {
 
 export interface QueryStore {
   readonly devtools: QueryDevtoolsApi;
+  /** Pass an explicit data type when `queryFn` is untyped (e.g. test mocks). */
   observe<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
+  ): QueryState<TData> & { destroy(): void };
+  observe<TQueryFn extends QueryFunction<unknown>, TData = InferQueryData<TQueryFn>>(
+    key: QueryKey,
+    queryFn: TQueryFn,
+    options?: QueryOptions<TData>
+  ): QueryState<TData> & { destroy(): void };
+  observe<
+    const TKey extends QueryKey,
+    TQueryFn extends QueryFunction<unknown>,
+    TData = InferQueryData<TQueryFn>,
+  >(
+    definition: {
+      queryKey: TKey;
+      queryFn: TQueryFn;
+    } & QueryOptions<TData>
   ): QueryState<TData> & { destroy(): void };
   fetch<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
+  ): QueryState<TData>;
+  fetch<TQueryFn extends QueryFunction<unknown>, TData = InferQueryData<TQueryFn>>(
+    key: QueryKey,
+    queryFn: TQueryFn,
+    options?: QueryOptions<TData>
+  ): QueryState<TData>;
+  fetch<
+    const TKey extends QueryKey,
+    TQueryFn extends QueryFunction<unknown>,
+    TData = InferQueryData<TQueryFn>,
+  >(
+    definition: {
+      queryKey: TKey;
+      queryFn: TQueryFn;
+    } & QueryOptions<TData>
   ): QueryState<TData>;
   get<TData>(key: QueryKey): QueryState<TData> | undefined;
   prefetch<TData>(
     key: QueryKey,
-    queryFn: () => Promise<TData>,
+    queryFn: QueryFunction<TData>,
     options?: QueryOptions<TData>
+  ): Promise<void>;
+  prefetch<TQueryFn extends QueryFunction<unknown>, TData = InferQueryData<TQueryFn>>(
+    key: QueryKey,
+    queryFn: TQueryFn,
+    options?: QueryOptions<TData>
+  ): Promise<void>;
+  prefetch<
+    const TKey extends QueryKey,
+    TQueryFn extends QueryFunction<unknown>,
+    TData = InferQueryData<TQueryFn>,
+  >(
+    definition: {
+      queryKey: TKey;
+      queryFn: TQueryFn;
+    } & QueryOptions<TData>
   ): Promise<void>;
   invalidate(key?: QueryKey | QueryKey[]): void;
   remove(key?: QueryKey | QueryKey[]): void;
   setData<TData>(key: QueryKey, data: TData | ((current: TData | undefined) => TData)): void;
   cancel(key: QueryKey): void;
   reset(): void;
+  resetQueries(key?: QueryKey | QueryKey[]): void;
+  clearMutations(): void;
   mutate<TData, TVariables = void, TContext = unknown>(
     options: MutationOptions<TData, TVariables, TContext>
-  ): MutationState<TData, TVariables>;
+  ): MutationState<QueryData<TData>, QueryData<TVariables>>;
 }

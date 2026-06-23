@@ -40,12 +40,13 @@ export function createAlpineStoreAdapter(Alpine: AlpineInstance): QueryStateAdap
       staleTime: number,
       refetch: () => Promise<void>
     ) {
+      const staleTimeRef = { current: staleTime };
       const state = Alpine.reactive({
         ...initial,
         refetch,
       }) as QueryState<TData>;
 
-      attachQueryFlags(state, staleTime);
+      attachQueryFlags(state, () => staleTimeRef.current);
 
       return {
         state,
@@ -56,6 +57,12 @@ export function createAlpineStoreAdapter(Alpine: AlpineInstance): QueryStateAdap
         listen: (listener: (record: QueryStateRecord<TData>) => void) => {
           listener(toQueryRecord(state));
           return () => undefined;
+        },
+        setStaleTime(next: number) {
+          staleTimeRef.current = next;
+        },
+        getStaleTime() {
+          return staleTimeRef.current;
         },
       };
     },

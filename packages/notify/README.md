@@ -30,7 +30,7 @@ cp node_modules/@ailuracode/alpine-notify/dist/notify-sw.js public/notify-sw.js
 <button @click="await $notify.sendAsync('Hello')">Notify</button>
 
 <button
-  x-show="$notify.isSupported() && $notify.permission() === 'default'"
+  x-show="$notify.isSupported && $notify.permission === 'default'"
   @click="await $notify.requestPermission()"
 >
   Enable notifications
@@ -39,11 +39,11 @@ cp node_modules/@ailuracode/alpine-notify/dist/notify-sw.js public/notify-sw.js
 
 ## API summary
 
-| Method | Returns | Description |
+| Member | Returns | Description |
 |--------|---------|-------------|
-| `isSupported()` | `boolean` | Whether notifications can be shown |
-| `requiresHomeScreenInstall()` | `boolean` | iOS/iPadOS Safari tab limitation |
-| `permission()` | `NotificationPermission` | Current permission state |
+| `isSupported` | `boolean` (getter) | Whether notifications can be shown |
+| `requiresHomeScreenInstall` | `boolean` (getter) | iOS/iPadOS Safari tab limitation |
+| `permission` | `NotificationPermission` (getter) | Current permission state |
 | `requestPermission()` | `Promise<NotificationPermission>` | Prompt when `default` |
 | `send(title, options?)` | `Notification \| null` | Desktop synchronous delivery |
 | `sendAsync(title, options?)` | `Promise<Notification \| null>` | Mobile-safe delivery |

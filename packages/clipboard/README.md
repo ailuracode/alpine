@@ -28,7 +28,9 @@ Alpine.start();
 
 | | |
 |-|-|
-| **Magic** | `$clipboard(text)` → `Promise<void>` |
+| **Magic** | `$clipboard(text, options?)` → `Promise<void>` |
+| **Text** | `string \| number \| boolean \| bigint` (coerced to string) |
+| **Modes** | `auto` (default), `clipboard`, `legacy` |
 | **Note** | UI feedback is handled in your component, not the plugin |
 
 ## License

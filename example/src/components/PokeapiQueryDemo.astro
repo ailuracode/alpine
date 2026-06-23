@@ -5,45 +5,36 @@ interface Props {
 	badgeClass?: string;
 }
 
-const { dataName, title, badgeClass = "" } = Astro.props;
+const { dataName, title, badgeClass = "badge-outline" } = Astro.props;
 ---
 
 <article
-	class="query-adapter"
+	class="rounded-box border border-base-300 bg-base-200/50 p-4"
 	x-data={dataName}
 	x-init="init()"
 	@destroy="destroy()"
 >
-	<h3 class="query-adapter__title">
+	<h3 class="flex flex-wrap items-center gap-2 text-base font-semibold mb-2">
 		{title}
 		<span
-			class:list={["badge", badgeClass]}
-			x-bind:class="{ on: query?.isSuccess }"
+			class:list={["badge badge-sm", badgeClass]}
+			x-bind:class="{ 'badge-primary': query?.isSuccess }"
 			x-text="badge"
 		></span>
 	</h3>
-	<p class="hint">
-		<slot name="description" />
-	</p>
 
-	<p class="hint hint--error" x-show="query?.isError" x-text="query?.error?.message"></p>
+	<p class="text-sm text-error mt-2" x-show="query?.isError" x-text="query?.error?.message"></p>
 
-	<div class="query-table-panel">
-		<p class="query-table-meta hint">
-			Page <strong x-text="page"></strong>
-			· showing <strong x-text="rows.length || pageSize"></strong>
-			of <strong x-text="totalCount || '…'"></strong> Pokémon
-		</p>
-
+	<div class="mt-3">
 		<div
-			class="query-table-wrap"
+			class="query-table-wrap relative min-h-90 overflow-auto rounded-box border border-base-300 bg-base-100"
 			x-bind:class="{
 				'is-fetching': query?.isFetching && hasCachedPage,
 				'is-awaiting-data': isAwaitingData,
 			}"
 			x-bind:aria-busy="isAwaitingData || query?.isFetching"
 		>
-			<table class="query-table">
+			<table class="table table-sm table-zebra">
 				<thead>
 					<tr>
 						<th scope="col">#</th>
@@ -53,7 +44,7 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 				<tbody>
 					<template x-for="row in tableRows" :key="page + '-' + row.id">
 						<tr x-bind:class="{ 'is-loading': row.loading }">
-							<td>
+							<td class="w-14 tabular-nums text-base-content/60">
 								<span
 									class="query-table-skeleton"
 									x-show="row.loading"
@@ -78,12 +69,18 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 		</div>
 	</div>
 
-	<div class="btn-group">
-		<button type="button" @click="prevPage()" x-bind:disabled="page <= 1 || query?.isFetching">
+	<div class="flex flex-wrap gap-2 mt-3">
+		<button
+			type="button"
+			class="btn btn-sm btn-outline"
+			@click="prevPage()"
+			x-bind:disabled="page <= 1 || query?.isFetching"
+		>
 			Previous
 		</button>
 		<button
 			type="button"
+			class="btn btn-sm btn-outline"
 			@click="query?.refetch()"
 			x-bind:disabled="!query || query.isFetching"
 		>
@@ -91,6 +88,7 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 		</button>
 		<button
 			type="button"
+			class="btn btn-sm btn-outline"
 			@click="nextPage()"
 			x-bind:disabled="!query?.data?.next || query?.isFetching"
 		>

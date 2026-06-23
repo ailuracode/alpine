@@ -11,7 +11,7 @@ export type ExportMagic = ((
   source: ExportSource,
   options?: ExportOptions | string
 ) => Promise<boolean>) & {
-  isSupported(): boolean;
+  readonly isSupported: boolean;
 };
 
 const URL_LIKE = /^(https?:|data:|blob:|\/|\.\/|\.\.\/)/i;
@@ -76,6 +76,18 @@ function isUrlLike(value: string): boolean {
   return URL_LIKE.test(value);
 }
 
+function isSameOriginUrl(value: string): boolean {
+  if (!/^https?:/i.test(value)) {
+    return true;
+  }
+
+  try {
+    return new URL(value, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 /** Exports a URL, blob, file, or text payload as a download. Resolves to `true` on success. Never throws. */
 export function exportData(
   source: ExportSource,
@@ -96,6 +108,10 @@ export function exportData(
     const value = String(source);
 
     if (isUrlLike(value)) {
+      if (!isSameOriginUrl(value)) {
+        return Promise.resolve(false);
+      }
+
       triggerAnchorExport(value, filename);
       return Promise.resolve(true);
     }
@@ -113,9 +129,9 @@ export function exportData(
 
 /** Builds callable `$export` magic with `isSupported` helper. */
 export function createExportMagic(): ExportMagic {
-  const exportFile = (source: ExportSource, options?: ExportOptions | string) =>
-    exportData(source, options);
-  exportFile.isSupported = isExportSupported;
+  const exportFile = ((source: ExportSource, options?: ExportOptions | string) =>
+    exportData(source, options)) as ExportMagic;
+  Object.defineProperty(exportFile, "isSupported", { get: isExportSupported });
   return exportFile;
 }
 

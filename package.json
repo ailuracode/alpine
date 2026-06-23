@@ -7,8 +7,8 @@
   "scripts": {
     "build": "pnpm -r --if-present build",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
+    "lint": "biome check --assist-enabled=true .",
+    "lint:fix": "biome check --write --assist-enabled=true .",
     "format": "biome format --write .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

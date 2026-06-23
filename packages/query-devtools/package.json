@@ -46,7 +46,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --sourcemap --out-dir dist && cp src/global.d.ts dist/global.d.ts",
     "prepublishOnly": "pnpm run build",
-    "test": "vitest run --config ../../vitest.config.js test"
+    "test": "vitest run --config ../../vitest.config.ts test"
   },
   "keywords": [
     "alpinejs",

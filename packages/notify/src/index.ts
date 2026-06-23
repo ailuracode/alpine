@@ -12,11 +12,11 @@ export interface NotifyPluginOptions {
 
 export interface NotifyMagic {
   /** Whether notifications can be shown in this environment. */
-  isSupported(): boolean;
+  readonly isSupported: boolean;
   /** Whether iOS/iPadOS requires adding the app to the Home Screen first. */
-  requiresHomeScreenInstall(): boolean;
+  readonly requiresHomeScreenInstall: boolean;
   /** Current notification permission (`granted`, `denied`, or `default`). */
-  permission(): NotificationPermission;
+  readonly permission: NotificationPermission;
   /** Prompt the user for notification permission when still `default`. */
   requestPermission(): Promise<NotificationPermission>;
   /** Show a notification when permission is `granted`; otherwise return `null`. */
@@ -274,20 +274,26 @@ export function closeNotification(notification: Notification): void {
 export function createNotifyMagic(options: NotifyPluginOptions = {}): NotifyMagic {
   const config = resolveNotifyConfig(options);
 
-  return {
-    isSupported: isNotifySupported,
-    requiresHomeScreenInstall,
-    permission: getNotifyPermission,
+  const magic = {
     requestPermission: () => requestNotifyPermission(config),
-    send: (title, notificationOptions) => sendNotification(title, notificationOptions, config),
-    sendAsync: (title, notificationOptions) =>
-      sendNotificationAsync(title, notificationOptions, config),
-    sendIfPermitted: (title, notificationOptions) =>
+    send: (title: string, notificationOptions?: NotificationOptions) =>
       sendNotification(title, notificationOptions, config),
-    sendIfPermittedAsync: (title, notificationOptions) =>
+    sendAsync: (title: string, notificationOptions?: NotificationOptions) =>
+      sendNotificationAsync(title, notificationOptions, config),
+    sendIfPermitted: (title: string, notificationOptions?: NotificationOptions) =>
+      sendNotification(title, notificationOptions, config),
+    sendIfPermittedAsync: (title: string, notificationOptions?: NotificationOptions) =>
       sendNotificationAsync(title, notificationOptions, config),
     close: closeNotification,
-  };
+  } as NotifyMagic;
+
+  Object.defineProperties(magic, {
+    isSupported: { get: isNotifySupported },
+    requiresHomeScreenInstall: { get: requiresHomeScreenInstall },
+    permission: { get: getNotifyPermission },
+  });
+
+  return magic;
 }
 
 function registerNotifyPlugin(Alpine: AlpineType.Alpine, options: NotifyPluginOptions): void {

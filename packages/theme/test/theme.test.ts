@@ -1,7 +1,13 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
-import themePlugin, { type ThemeMode, type ThemeStore } from "../src/index.js";
+import themePlugin, {
+  THEME_MODES,
+  type ThemeMode,
+  type ThemePluginOptions,
+  type ThemeStore,
+  type ThemeStoreOf,
+} from "../src/index.js";
 
 describe("@ailuracode/alpine-theme", () => {
   const onChange = vi.fn();
@@ -68,6 +74,47 @@ describe("@ailuracode/alpine-theme", () => {
     store.set("light");
     expect(store.refresh()).toBe(false);
   });
+
+  it("cycles through a custom mode order", () => {
+    localStorage.setItem("custom-theme", "dark");
+    const Alpine = startAlpine(
+      themePlugin({ storageKey: "custom-theme", modes: ["dark", "light"] as const })
+    );
+    const custom = Alpine.store("theme") as ThemeStoreOf<["dark", "light"]>;
+
+    expect(custom.mode).toBe("dark");
+    custom.cycle();
+    expect(custom.mode).toBe("light");
+    custom.cycle();
+    expect(custom.mode).toBe("dark");
+  });
+});
+
+describe("@ailuracode/alpine-theme type inference", () => {
+  it("infers default mode literals on the store", () => {
+    localStorage.setItem("typed-theme", "light");
+    const Alpine = startAlpine(themePlugin({ storageKey: "typed-theme" }));
+    const store = Alpine.store("theme") as ThemeStore;
+
+    expectTypeOf(store.mode).toEqualTypeOf<"light" | "dark" | "system">();
+    expectTypeOf(store.resolved).toEqualTypeOf<"light" | "dark">();
+    expectTypeOf(store.set).parameters.toEqualTypeOf<[mode: "light" | "dark" | "system"]>();
+    expectTypeOf(store.is).parameters.toEqualTypeOf<[name: "light" | "dark" | "system"]>();
+    expectTypeOf(THEME_MODES).toEqualTypeOf<readonly ["light", "dark", "system"]>();
+  });
+
+  it("infers onChange payload from custom modes", () => {
+    type Options = ThemePluginOptions<["dark", "light"]>;
+    type Payload = Parameters<NonNullable<Options["onChange"]>>[0];
+
+    expectTypeOf<Payload["mode"]>().toEqualTypeOf<"dark" | "light">();
+    expectTypeOf<Payload["resolved"]>().toEqualTypeOf<"light" | "dark">();
+  });
+
+  it("infers ThemeStoreOf from a custom modes tuple", () => {
+    type CustomStore = ThemeStoreOf<["dark", "light"]>;
+    expectTypeOf<CustomStore["mode"]>().toEqualTypeOf<"dark" | "light">();
+  });
 });
 
 describe("@ailuracode/alpine-theme system mode", () => {
@@ -104,7 +151,6 @@ describe("@ailuracode/alpine-theme system mode", () => {
     const theme = Alpine.store("theme") as ThemeStore;
 
     setMatchMedia("(prefers-color-scheme: dark)", false);
-    theme.refresh();
 
     expect(theme.resolved).toBe("light");
   });

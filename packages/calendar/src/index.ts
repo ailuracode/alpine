@@ -437,13 +437,16 @@ export function createCalendar(options: CalendarOptions = {}): CalendarInstance 
 }
 
 /** Builds callable `$calendar` magic that returns independent calendar instances. */
-export function createCalendarMagic(): CalendarMagic {
-  return (options?: CalendarOptions) => createCalendar(options);
+export function createCalendarMagic(Alpine?: Pick<AlpineType.Alpine, "reactive">): CalendarMagic {
+  return (options?: CalendarOptions) => {
+    const instance = createCalendar(options);
+    return Alpine ? Alpine.reactive(instance) : instance;
+  };
 }
 
 /** Alpine.js calendar plugin. Registers callable magic `$calendar`. */
 export default function calendarPlugin(Alpine: AlpineType.Alpine): void {
-  Alpine.magic("calendar", () => createCalendarMagic());
+  Alpine.magic("calendar", () => createCalendarMagic(Alpine));
 }
 
 declare global {

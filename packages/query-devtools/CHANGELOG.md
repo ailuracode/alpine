@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- Updated dependencies [50b6118]
+- Updated dependencies [e0c7f02]
   - @ailuracode/alpine-query@0.6.0
 
 ## 0.2.1

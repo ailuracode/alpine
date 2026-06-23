@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 50b6118: Add `@ailuracode/alpine-json-api` with a schema-driven typed JSON:API client and `$jsonapi` Alpine magic. Add `typedFetch` to `@ailuracode/alpine-query` with optional `throwOnHttpError` for JSON:API error documents.
+- e0c7f02: Add `typedFetch` helper for strongly typed JSON `fetch` calls in `queryFn` callbacks, with `HttpError` for non-OK responses.
 
 ## 0.5.0
 

@@ -228,7 +228,7 @@ describe("@ailuracode/alpine-json-api type inference", () => {
     type Schema = typeof schema;
     type Client = JsonApiClient<Schema>;
 
-    async function fetchArticle(client: Client) {
+    function fetchArticle(client: Client) {
       return client.findOne("articles", "1", { include: ["author"] });
     }
 
@@ -254,7 +254,7 @@ describe("@ailuracode/alpine-json-api type inference", () => {
     type Schema = typeof schema;
     type Client = JsonApiClient<Schema>;
 
-    async function createArticle(client: Client) {
+    function createArticle(client: Client) {
       return client.create("articles", {
         attributes: { title: "Hello", body: "World" },
         relationships: {
@@ -272,8 +272,8 @@ describe("@ailuracode/alpine-json-api type inference", () => {
       type: "people";
       id: string;
     } | null>();
-    expectTypeOf<Awaited<ReturnType<typeof createArticle>>["data"]["type"]>().toEqualTypeOf<
-      "articles"
-    >();
+    expectTypeOf<
+      Awaited<ReturnType<typeof createArticle>>["data"]["type"]
+    >().toEqualTypeOf<"articles">();
   });
 });

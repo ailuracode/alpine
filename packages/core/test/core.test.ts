@@ -29,6 +29,12 @@ function createMockAlpine(): MockAlpine {
   };
 }
 
+function alpinePluginMock(
+  run: (alpine: AlpineType.Alpine) => void = (_alpine) => undefined
+): ReturnType<typeof vi.fn> {
+  return vi.fn(run);
+}
+
 describe("@ailuracode/alpine-core", () => {
   afterEach(() => {
     resetPluginRegistry();
@@ -118,8 +124,8 @@ describe("@ailuracode/alpine-core", () => {
     });
 
     it("supports lazy factories and dynamic imports", async () => {
-      const sharePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
-      const themePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
+      const sharePlugin = alpinePluginMock();
+      const themePlugin = alpinePluginMock();
 
       registerPlugin(
         "share",
@@ -144,7 +150,7 @@ describe("@ailuracode/alpine-core", () => {
     });
 
     it("is idempotent for already initialized plugins", async () => {
-      const sharePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
+      const sharePlugin = alpinePluginMock();
 
       registerPlugin("share", defineMagicPlugin(["share"], sharePlugin));
 
@@ -181,7 +187,7 @@ describe("@ailuracode/alpine-core", () => {
 
   describe("initPluginsSync", () => {
     it("initializes sync plugins without promises", () => {
-      const sharePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
+      const sharePlugin = alpinePluginMock();
 
       registerPlugin("share", defineMagicPlugin(["share"], sharePlugin));
 
@@ -209,8 +215,8 @@ describe("@ailuracode/alpine-core", () => {
 
   describe("createAlpinePlugin", () => {
     it("bridges registered plugins into Alpine.plugin()", () => {
-      const sharePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
-      const themePlugin = vi.fn((_Alpine: AlpineType.Alpine) => {});
+      const sharePlugin = alpinePluginMock();
+      const themePlugin = alpinePluginMock();
 
       registerPlugin("share", defineMagicPlugin(["share"], sharePlugin));
       registerPlugin("theme", defineStorePlugin(["theme"], themePlugin));

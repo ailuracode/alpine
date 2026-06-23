@@ -67,7 +67,8 @@ function createPokeapiDemo(options: {
 				return this.rows;
 			}
 
-			if (this.query?.isLoading) {
+			// Avoid isLoading in the demo — it flickers on page changes. Use fetch + cache instead.
+			if (this.query?.isFetching && !this.hasCachedPage) {
 				const offset = (this.page - 1) * this.pageSize;
 				return Array.from({ length: this.pageSize }, (_, index) => ({
 					id: offset + index + 1,

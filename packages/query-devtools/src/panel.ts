@@ -1,10 +1,10 @@
+import type { QueryKey, QueryStore } from "@ailuracode/alpine-query";
 import type {
-  MutationDevtoolsEntry,
-  QueryDevtoolsEntry,
-  QueryDevtoolsSnapshot,
-  QueryKey,
-  QueryStore,
-} from "@ailuracode/alpine-query";
+  MutationDevtoolsEntryView,
+  QueryDevtoolsEntryView,
+  QueryDevtoolsSnapshotView,
+} from "./merge-stores.js";
+import { createMergedQueryDevtools, resolveQueryDevtoolsStores } from "./merge-stores.js";
 import { DEVTOOLS_STYLES } from "./styles.js";
 import { bindDevtoolsTheme } from "./theme.js";
 import {
@@ -49,7 +49,15 @@ function createBadge(label: string, modifier: string): HTMLSpanElement {
   return badge;
 }
 
-function appendQueryBadges(container: HTMLElement, entry: QueryDevtoolsEntry): void {
+function appendQueryBadges(
+  container: HTMLElement,
+  entry: QueryDevtoolsEntryView,
+  showAdapter: boolean
+): void {
+  if (showAdapter) {
+    container.append(createBadge(entry.adapterName, "muted"));
+  }
+
   container.append(
     createBadge(entry.status, entry.status === "success" ? "success" : entry.status),
     createBadge(entry.fetchStatus, entry.fetchStatus === "fetching" ? "fetching" : "muted")
@@ -72,9 +80,10 @@ function createEmptyState(message: string): HTMLDivElement {
 }
 
 function createQueryListItem(
-  entry: QueryDevtoolsEntry,
+  entry: QueryDevtoolsEntryView,
   isSelected: boolean,
-  onSelect: (entry: QueryDevtoolsEntry) => void
+  showAdapter: boolean,
+  onSelect: (entry: QueryDevtoolsEntryView) => void
 ): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -87,7 +96,7 @@ function createQueryListItem(
 
   const badges = document.createElement("div");
   badges.className = "aq-devtools-badges";
-  appendQueryBadges(badges, entry);
+  appendQueryBadges(badges, entry, showAdapter);
 
   button.append(key, badges);
   button.addEventListener("click", () => {
@@ -98,9 +107,10 @@ function createQueryListItem(
 }
 
 function createMutationListItem(
-  entry: MutationDevtoolsEntry,
+  entry: MutationDevtoolsEntryView,
   isSelected: boolean,
-  onSelect: (entry: MutationDevtoolsEntry) => void
+  showAdapter: boolean,
+  onSelect: (entry: MutationDevtoolsEntryView) => void
 ): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -113,6 +123,10 @@ function createMutationListItem(
 
   const badges = document.createElement("div");
   badges.className = "aq-devtools-badges";
+  if (showAdapter) {
+    badges.append(createBadge(entry.adapterName, "muted"));
+  }
+
   badges.append(createBadge(entry.status, entry.status === "success" ? "success" : entry.status));
 
   button.append(key, badges);
@@ -125,7 +139,6 @@ function createMutationListItem(
 
 export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDevtoolsController {
   const {
-    store,
     position = "bottom",
     initialOpen = false,
     theme = "system",
@@ -133,21 +146,17 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     persistToggleCorner = true,
     toggleCornerStorageKey = DEFAULT_TOGGLE_CORNER_STORAGE_KEY,
   } = options;
+  const merged = createMergedQueryDevtools(resolveQueryDevtoolsStores(options));
   let isOpen = initialOpen;
   let activeTab: "queries" | "mutations" = "queries";
-  let selectedQueryHash: string | null = null;
-  let selectedMutationId: string | null = null;
+  let selectedQueryEntryId: string | null = null;
+  let selectedMutationEntryId: string | null = null;
   let search = options.filter ?? "";
   let scheduled = false;
+  let showAdapterLabels = resolveQueryDevtoolsStores(options).length > 1;
   let currentToggleCorner = persistToggleCorner
     ? loadToggleCorner(toggleCornerStorageKey, toggleCorner)
     : toggleCorner;
-
-  if (!store.devtools) {
-    throw new Error(
-      "@ailuracode/alpine-query-devtools requires @ailuracode/alpine-query with devtools support"
-    );
-  }
 
   if (!document.getElementById("aq-devtools-styles")) {
     const style = document.createElement("style");
@@ -244,7 +253,8 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
   root.append(toggle, panel);
   document.body.append(root);
 
-  const renderQueryDetail = (entry: QueryDevtoolsEntry): void => {
+  const renderQueryDetail = (entry: QueryDevtoolsEntryView): void => {
+    const store = merged.getStoreForQuery(entry);
     detail.replaceChildren();
 
     const actions = document.createElement("div");
@@ -276,7 +286,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     removeButton.textContent = "Remove";
     removeButton.addEventListener("click", () => {
       store.remove(entry.key);
-      selectedQueryHash = null;
+      selectedQueryEntryId = null;
       scheduleRender();
     });
 
@@ -323,7 +333,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     detail.append(actions, stateSection, optionsSection, dataSection);
   };
 
-  const renderMutationDetail = (entry: MutationDevtoolsEntry): void => {
+  const renderMutationDetail = (entry: MutationDevtoolsEntryView): void => {
     detail.replaceChildren();
 
     const stateSection = document.createElement("div");
@@ -343,8 +353,10 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     detail.append(stateSection);
   };
 
-  const renderQueries = (snapshot: QueryDevtoolsSnapshot): void => {
-    const queries = snapshot.queries.filter((entry) => matchesFilter(formatKey(entry.key), search));
+  const renderQueries = (snapshot: QueryDevtoolsSnapshotView): void => {
+    const queries = snapshot.queries.filter((entry) =>
+      matchesFilter(`${entry.adapterName} ${formatKey(entry.key)}`, search)
+    );
 
     if (queries.length === 0) {
       list.append(
@@ -355,24 +367,29 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
     for (const entry of queries) {
       list.append(
-        createQueryListItem(entry, selectedQueryHash === entry.keyHash, (next) => {
-          selectedQueryHash = next.keyHash;
-          renderQueryDetail(next);
-          scheduleRender();
-        })
+        createQueryListItem(
+          entry,
+          selectedQueryEntryId === entry.entryId,
+          showAdapterLabels,
+          (next) => {
+            selectedQueryEntryId = next.entryId;
+            renderQueryDetail(next);
+            scheduleRender();
+          }
+        )
       );
     }
 
-    const selected = queries.find((entry) => entry.keyHash === selectedQueryHash) ?? queries[0];
+    const selected = queries.find((entry) => entry.entryId === selectedQueryEntryId) ?? queries[0];
     if (selected) {
-      selectedQueryHash = selected.keyHash;
+      selectedQueryEntryId = selected.entryId;
       renderQueryDetail(selected);
     }
   };
 
-  const renderMutations = (snapshot: QueryDevtoolsSnapshot): void => {
+  const renderMutations = (snapshot: QueryDevtoolsSnapshotView): void => {
     const mutations = snapshot.mutations.filter((entry) =>
-      matchesFilter(`${entry.id} ${formatJson(entry.variables)}`, search)
+      matchesFilter(`${entry.adapterName} ${entry.id} ${formatJson(entry.variables)}`, search)
     );
 
     if (mutations.length === 0) {
@@ -384,24 +401,31 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
     for (const entry of mutations) {
       list.append(
-        createMutationListItem(entry, selectedMutationId === entry.id, (next) => {
-          selectedMutationId = next.id;
-          renderMutationDetail(next);
-          scheduleRender();
-        })
+        createMutationListItem(
+          entry,
+          selectedMutationEntryId === entry.entryId,
+          showAdapterLabels,
+          (next) => {
+            selectedMutationEntryId = next.entryId;
+            renderMutationDetail(next);
+            scheduleRender();
+          }
+        )
       );
     }
 
-    const selected = mutations.find((entry) => entry.id === selectedMutationId) ?? mutations[0];
+    const selected =
+      mutations.find((entry) => entry.entryId === selectedMutationEntryId) ?? mutations[0];
     if (selected) {
-      selectedMutationId = selected.id;
+      selectedMutationEntryId = selected.entryId;
       renderMutationDetail(selected);
     }
   };
 
   const render = (): void => {
     scheduled = false;
-    const snapshot = store.devtools.getSnapshot();
+    const snapshot = merged.getSnapshotView();
+    showAdapterLabels = resolveQueryDevtoolsStores(options).length > 1;
 
     toggle.textContent = `Query (${snapshot.queries.length})`;
     title.textContent = snapshot.adapterName
@@ -432,7 +456,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
   };
 
   render();
-  const unsubscribe = store.devtools.subscribe(scheduleRender);
+  const unsubscribe = merged.devtools.subscribe(scheduleRender);
 
   searchInput.addEventListener("input", () => {
     search = searchInput.value;
@@ -522,5 +546,3 @@ function assertQueryStoreWithDevtools(store: QueryStore): void {
     );
   }
 }
-
-export type { QueryDevtoolsSnapshot };

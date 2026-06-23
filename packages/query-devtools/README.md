@@ -51,6 +51,7 @@ A floating **Query** button appears in the bottom-right corner. Click it to open
 | `filter` | `""` | Initial search text |
 | `theme` | `"system"` | `"light"`, `"dark"`, or follow the host (`data-theme`, `.dark`, or system preference) |
 | `storeName` | `"query"` | Alpine store name |
+| `additionalStores` | `[]` | Extra `createQueryClient()` instances to inspect alongside `$store.query` |
 
 ### Toggle corners
 

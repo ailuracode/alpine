@@ -46,7 +46,7 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(platform);
 	Alpine.plugin(NanoStores);
 	Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
-	Alpine.plugin(queryDevtools({ position: "bottom" }));
-	registerQueryDemos(Alpine);
+	const queryDemoStores = registerQueryDemos(Alpine);
+	Alpine.plugin(queryDevtools({ position: "bottom", additionalStores: queryDemoStores }));
 	Alpine.plugin(notify);
 };

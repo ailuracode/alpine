@@ -1,5 +1,6 @@
 import type { QueryStore } from "@ailuracode/alpine-query";
-import query from "@ailuracode/alpine-query";
+import query, { createQueryClient } from "@ailuracode/alpine-query";
+import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
 import { createAlpineNanostoresAdapter } from "@ailuracode/alpine-query-adapter-nanostores";
 import queryDevtoolsPlugin from "@ailuracode/alpine-query-devtools";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -157,6 +158,38 @@ describe("@ailuracode/alpine-query-devtools", () => {
     controller.destroy();
     query.destroy();
     store.reset();
+    vi.useRealTimers();
+  });
+
+  it("merges additional headless query clients into one panel", async () => {
+    vi.useFakeTimers();
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const headless = createQueryClient({ adapter: createAlpineStoreAdapter(Alpine) });
+
+    const controller = mountQueryDevtools({
+      store,
+      additionalStores: [headless],
+      initialOpen: true,
+    });
+
+    store.observe(["pokemon", 1], async () => ({ name: "bulbasaur" }));
+    headless.observe(["pokemon", "alpine", 1], async () => ({ name: "charmander" }));
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelector(".aq-devtools-toggle")?.textContent).toBe("Query (2)");
+    expect(document.querySelector(".aq-devtools-title")?.textContent).toBe(
+      "Alpine Query · Nanostores · Alpine.reactive"
+    );
+    expect(document.body.textContent).toContain("bulbasaur");
+    expect(document.body.textContent).toContain('["pokemon","alpine",1]');
+    expect(document.body.textContent).toContain("Nanostores");
+    expect(document.body.textContent).toContain("Alpine.reactive");
+
+    controller.destroy();
+    store.reset();
+    headless.reset();
     vi.useRealTimers();
   });
 

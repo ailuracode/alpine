@@ -68,7 +68,7 @@ function createPokeapiDemo(options: {
 	});
 }
 
-export function registerQueryDemos(Alpine: Alpine): void {
+export function registerQueryDemos(Alpine: Alpine): QueryStore[] {
 	const alpineClient = createQueryClient({
 		adapter: createAlpineStoreAdapter(Alpine),
 	});
@@ -114,4 +114,6 @@ export function registerQueryDemos(Alpine: Alpine): void {
 				}),
 		}),
 	);
+
+	return [alpineClient, zustandClient];
 }

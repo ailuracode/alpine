@@ -1,5 +1,12 @@
 # @ailuracode/alpine-query-adapter-nanostores
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [50b6118]
+  - @ailuracode/alpine-query@0.6.0
+
 ## 3.0.1
 
 ### Patch Changes

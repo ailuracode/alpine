@@ -25,19 +25,19 @@ type QueryCacheConfig = {
 };
 
 type QueryCacheOptions = QueryCacheConfig & {
-  reactive?: AlpineType.Alpine["reactive"];
+  alpine?: AlpineType.Alpine;
 };
 
 export class QueryCache {
   private readonly entries = new Map<string, QueryEntry>();
   private readonly config: QueryCacheConfig;
-  private readonly reactive?: AlpineType.Alpine["reactive"];
+  private readonly alpine?: AlpineType.Alpine;
   private readonly devtools = new DevtoolsRegistry();
   private focusListenerAttached = false;
 
   constructor(options: QueryCacheOptions) {
     this.config = options;
-    this.reactive = options.reactive;
+    this.alpine = options.alpine;
   }
 
   getDevtools() {
@@ -145,6 +145,7 @@ export class QueryCache {
     const targets = this.resolveTargets(key);
 
     for (const entry of targets) {
+      this.disposeEntryBridge(entry);
       this.clearTimers(entry);
       this.entries.delete(entry.keyHash);
     }
@@ -178,6 +179,7 @@ export class QueryCache {
 
   reset(): void {
     for (const entry of this.entries.values()) {
+      this.disposeEntryBridge(entry);
       this.clearTimers(entry);
     }
 
@@ -222,8 +224,9 @@ export class QueryCache {
       },
     });
 
-    if (this.reactive) {
-      return bridgeMutationStateToAlpine(state, $state, this.reactive);
+    if (this.alpine) {
+      const bridge = bridgeMutationStateToAlpine(this.alpine, state, $state);
+      return bridge.state;
     }
 
     return state;
@@ -271,9 +274,7 @@ export class QueryCache {
       queryFn,
       options: resolvedOptions,
       $state,
-      state: this.reactive
-        ? bridgeQueryStateToAlpine(state, $state, this.reactive, resolvedOptions.staleTime)
-        : state,
+      state,
       observers: 0,
       gcTimeout: null,
       intervalId: null,
@@ -281,6 +282,17 @@ export class QueryCache {
       abortController: null,
       isInvalidated: false,
     };
+
+    if (this.alpine) {
+      const bridge = bridgeQueryStateToAlpine(
+        this.alpine,
+        state,
+        $state,
+        resolvedOptions.staleTime
+      );
+      entryRef.state = bridge.state;
+      entryRef.alpineUnbind = bridge.unbind;
+    }
 
     this.entries.set(keyHash, entryRef as QueryEntry);
     this.devtools.notify();
@@ -317,6 +329,7 @@ export class QueryCache {
 
     entry.gcTimeout = setTimeout(() => {
       if (entry.observers === 0) {
+        this.disposeEntryBridge(entry);
         this.clearTimers(entry);
         this.entries.delete(entry.keyHash);
         this.devtools.notify();
@@ -520,5 +533,10 @@ export class QueryCache {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
+  }
+
+  private disposeEntryBridge<TData>(entry: QueryEntry<TData>): void {
+    entry.alpineUnbind?.();
+    entry.alpineUnbind = undefined;
   }
 }

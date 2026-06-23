@@ -9,6 +9,7 @@ export type QueryEntry<TData = unknown> = {
   options: ResolvedQueryOptions<TData>;
   $state: MapStore<QueryStateRecord<TData>>;
   state: QueryState<TData>;
+  alpineUnbind?: () => void;
   observers: number;
   gcTimeout: ReturnType<typeof setTimeout> | null;
   intervalId: ReturnType<typeof setInterval> | null;

@@ -24,6 +24,18 @@ describe("@ailuracode/alpine-query", () => {
     expect(typeof store.mutate).toBe("function");
   });
 
+  it("exports @nanostores/alpine integration", async () => {
+    const plugin = await import("../src/index.js");
+    expect(plugin.NanoStores).toBeTypeOf("function");
+    expect(plugin.directivePlugin).toBeTypeOf("function");
+    expect(plugin.magicPlugin).toBeTypeOf("function");
+  });
+
+  it("supports registerNanoStores: false", () => {
+    const Alpine = startAlpine(queryPlugin({ registerNanoStores: false }));
+    expect(Alpine.store("query")).toBeDefined();
+  });
+
   it("observe() fetches data and exposes TanStack-like state", async () => {
     const queryFn = vi.fn().mockResolvedValue([{ id: 1, title: "Learn Alpine" }]);
 

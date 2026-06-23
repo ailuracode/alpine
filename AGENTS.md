@@ -103,8 +103,8 @@ export default function themePlugin(options = {}) {
 `@ailuracode/alpine-query` uses [Nanostores](https://github.com/nanostores/nanostores) as its **internal** state layer — not `Alpine.reactive` as the source of truth.
 
 - **`createQueryClient()`** — framework-agnostic query cache (tests, SSR setup, non-Alpine usage). Exported from `@ailuracode/alpine-query`.
-- **`query()` plugin** — thin Alpine bridge: creates a `QueryCache`, syncs Nanostores into reactive objects, registers `$store.query`.
-- **Per-query/mutation state** — Nanostores `map()` stores in `packages/query/src/nano-state.ts`; Alpine bridge in `alpine-bridge.ts`.
+- **`query()` plugin** — registers `@nanostores/alpine` (`x-nano`, `$nano`) by default, bridges Nanostores into reactive `$store.query` objects using the same `Alpine.reactive` + `store.listen` pattern as `x-nano`.
+- **Per-query/mutation state** — Nanostores `map()` stores in `packages/query/src/nano-state.ts`; Alpine bridge in `alpine-bridge.ts` (follows `@nanostores/alpine` directive pattern).
 - **Public Alpine API unchanged** — templates still use `$store.query.observe()`, `$store.query.mutate()`, etc.
 - **Devtools unchanged** — `@ailuracode/alpine-query-devtools` uses `$store.query.devtools` and store methods; also accepts `createQueryClient()` via `getQueryStore(client)`.
 

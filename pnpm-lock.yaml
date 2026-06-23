@@ -201,6 +201,9 @@ importers:
 
   packages/query:
     dependencies:
+      '@nanostores/alpine':
+        specifier: ^0.1.1
+        version: 0.1.1(alpinejs@3.15.12)(nanostores@1.3.0)
       '@types/alpinejs':
         specifier: ^3.13.11
         version: 3.13.11
@@ -1045,6 +1048,13 @@ packages:
 
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
+
+  '@nanostores/alpine@0.1.1':
+    resolution: {integrity: sha512-4K6VpI/hviKo87jDcmghDUUTwkUCld1s/FthCG+9ODmrczz9BQB/9BPEAtYTBE+Q0nJRXAKJBPZ4gpyD945vnQ==}
+    engines: {node: ^20.0.0 || >=22.0.0}
+    peerDependencies:
+      alpinejs: '>=3.0.0'
+      nanostores: ^0.11.3 || ^1.0.0
 
   '@napi-rs/wasm-runtime@1.1.5':
     resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
@@ -3406,6 +3416,11 @@ snapshots:
       fs-extra: 8.1.0
       globby: 11.1.0
       read-yaml-file: 1.1.0
+
+  '@nanostores/alpine@0.1.1(alpinejs@3.15.12)(nanostores@1.3.0)':
+    dependencies:
+      alpinejs: 3.15.12
+      nanostores: 1.3.0
 
   '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

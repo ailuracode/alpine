@@ -108,6 +108,8 @@ export interface QueryPluginOptions {
       retryDelay?: number | ((attempt: number) => number);
     };
   };
+  /** Register `@nanostores/alpine` (`x-nano`, `$nano`). Default: `true`. */
+  registerNanoStores?: boolean;
 }
 
 export interface QueryStore {

@@ -28,9 +28,11 @@ Alpine.plugin(
 Alpine.start();
 ```
 
+The plugin registers [`@nanostores/alpine`](https://github.com/nanostores/alpine) by default (`x-nano`, `$nano`). Disable with `query({ registerNanoStores: false })` if you register it yourself.
+
 ## Framework-agnostic client
 
-Use `createQueryClient()` when you need the query cache outside Alpine.js (tests, SSR setup, or other frameworks). State is backed by [Nanostores](https://github.com/nanostores/nanostores); the Alpine plugin bridges it to `$store.query` for templates.
+Use `createQueryClient()` when you need the query cache outside Alpine.js (tests, SSR setup, or other frameworks). State is backed by [Nanostores](https://github.com/nanostores/nanostores); the Alpine plugin bridges it to `$store.query` using the same `@nanostores/alpine` reactive pattern as `x-nano`.
 
 ```js
 import { createQueryClient } from "@ailuracode/alpine-query";
@@ -129,7 +131,7 @@ Framework-agnostic entry point. Returns the same method surface as `$store.query
 |--------|-------------|
 | Same as `$store.query` below | See table — `observe`, `fetch`, `get`, `prefetch`, `invalidate`, `remove`, `setData`, `cancel`, `reset`, `mutate` |
 
-Internal cache state is backed by Nanostores. The Alpine plugin bridges that cache into reactive template bindings.
+Internal cache state is backed by Nanostores. The Alpine plugin bridges that cache into reactive template bindings via `@nanostores/alpine`.
 
 ### `$store.query`
 

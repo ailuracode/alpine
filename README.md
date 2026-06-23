@@ -18,6 +18,7 @@ Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common
 | [`@ailuracode/alpine-notify`](./packages/notify/README.md) | Magic | Web Notifications API |
 | [`@ailuracode/alpine-geo`](./packages/geo/README.md) | Store | Browser geolocation state and tracking |
 | [`@ailuracode/alpine-share`](./packages/share/README.md) | Magic | Web Share API wrapper |
+| [`@ailuracode/alpine-attention`](./packages/attention/README.md) | Magic | Screen Wake Lock and Idle Detection |
 
 ## Quick start
 
@@ -77,6 +78,7 @@ See [AGENTS.md](./AGENTS.md) for the full checklist.
 - [Notify](./docs/notify.md)
 - [Geo](./docs/geo.md)
 - [Share](./docs/share.md)
+- [Attention](./docs/attention.md)
 - [Contributing](./docs/contributing.md)
 - [AGENTS.md](./AGENTS.md) — guide for AI agents and maintainers
 

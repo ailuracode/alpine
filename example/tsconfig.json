@@ -4,6 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
+      "@ailuracode/alpine-attention": ["../packages/attention/src/index.ts"],
       "@ailuracode/alpine-battery": ["../packages/battery/src/index.ts"],
       "@ailuracode/alpine-clipboard": ["../packages/clipboard/src/index.ts"],
       "@ailuracode/alpine-geo": ["../packages/geo/src/index.ts"],

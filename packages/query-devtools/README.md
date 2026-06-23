@@ -5,19 +5,24 @@ TanStack Query-style devtools panel for [`@ailuracode/alpine-query`](../query/RE
 ## Install
 
 ```bash
-npm install @ailuracode/alpine-query-devtools @ailuracode/alpine-query alpinejs
+npm install @ailuracode/alpine-query-devtools @ailuracode/alpine-query @ailuracode/alpine-query-adapter-nanostores alpinejs nanostores @nanostores/alpine
 ```
 
 ## Setup
 
-Register **after** the query plugin:
+Register **after** `query({ adapter })`:
 
 ```js
 import Alpine from "alpinejs";
 import query from "@ailuracode/alpine-query";
+import {
+  createAlpineNanostoresAdapter,
+  NanoStores,
+} from "@ailuracode/alpine-query-adapter-nanostores";
 import queryDevtools from "@ailuracode/alpine-query-devtools";
 
-Alpine.plugin(query());
+Alpine.plugin(NanoStores);
+Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
 Alpine.plugin(queryDevtools({ initialOpen: false, position: "bottom" }));
 Alpine.start();
 ```
@@ -32,6 +37,7 @@ A floating **Query** button appears in the bottom-right corner. Click it to open
 - Search filter by query key
 - Actions: **Refetch**, **Invalidate**, **Remove**
 - Tabs for **Queries** and **Mutations**
+- Light and dark themes (follows your app theme by default)
 
 ## Options
 
@@ -43,7 +49,9 @@ A floating **Query** button appears in the bottom-right corner. Click it to open
 | `toggleCornerStorageKey` | `"alpine-query-devtools:toggle-corner"` | Storage key for the corner |
 | `initialOpen` | `false` | Open the panel on mount |
 | `filter` | `""` | Initial search text |
+| `theme` | `"system"` | `"light"`, `"dark"`, or follow the host (`data-theme`, `.dark`, or system preference) |
 | `storeName` | `"query"` | Alpine store name |
+| `additionalStores` | `[]` | Extra `createQueryClient()` instances to inspect alongside `$store.query` |
 
 ### Toggle corners
 
@@ -58,17 +66,24 @@ Set the initial corner with `toggleCorner`. When `persistToggleCorner` is `true`
 
 ## Imperative API
 
+Works with both `$store.query` (via Alpine) and `createQueryClient()`:
+
 ```js
+import { createQueryClient } from "@ailuracode/alpine-query";
 import { mountQueryDevtools, getQueryStore } from "@ailuracode/alpine-query-devtools";
 
-const controller = mountQueryDevtools({
+// Option A — Alpine store (after Alpine.plugin(query()))
+const fromAlpine = mountQueryDevtools({
   store: getQueryStore(Alpine),
   position: "right",
 });
 
-controller.open();
-controller.setToggleCorner("top-left");
-controller.destroy();
+// Option B — framework-agnostic client (no Alpine.store required)
+const query = createQueryClient();
+const fromClient = mountQueryDevtools({ store: getQueryStore(query) });
+
+fromAlpine.open();
+fromClient.destroy();
 ```
 
 ## Production

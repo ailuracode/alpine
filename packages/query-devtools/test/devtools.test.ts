@@ -1,9 +1,14 @@
-import queryPlugin, { type QueryStore } from "@ailuracode/alpine-query";
+import type { QueryStore } from "@ailuracode/alpine-query";
+import query, { createQueryClient } from "@ailuracode/alpine-query";
+import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
+import { createAlpineNanostoresAdapter } from "@ailuracode/alpine-query-adapter-nanostores";
 import queryDevtoolsPlugin from "@ailuracode/alpine-query-devtools";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { getQueryStore, mountQueryDevtools } from "../src/panel.js";
 import { DEFAULT_TOGGLE_CORNER_STORAGE_KEY } from "../src/toggle-corner.js";
+
+const nanostoresQuery = () => query({ adapter: createAlpineNanostoresAdapter });
 
 describe("@ailuracode/alpine-query-devtools", () => {
   beforeEach(() => {
@@ -19,13 +24,16 @@ describe("@ailuracode/alpine-query-devtools", () => {
   it("mounts a panel and reflects query cache updates", async () => {
     vi.useFakeTimers();
 
-    const Alpine = startAlpine(queryPlugin());
+    const Alpine = startAlpine(nanostoresQuery());
     const store = Alpine.store("query") as QueryStore;
 
     const controller = mountQueryDevtools({ store, initialOpen: true });
     const toggle = document.querySelector(".aq-devtools-toggle") as HTMLButtonElement;
 
     expect(toggle.textContent).toBe("Query (0)");
+    expect(document.querySelector(".aq-devtools-title")?.textContent).toBe(
+      "Alpine Query · Nanostores"
+    );
 
     const query = store.observe(["pokemon", 1], async () => ({ name: "bulbasaur" }));
     await vi.runAllTimersAsync();
@@ -41,7 +49,7 @@ describe("@ailuracode/alpine-query-devtools", () => {
   });
 
   it("positions the toggle in a selected corner and persists it", () => {
-    const Alpine = startAlpine(queryPlugin());
+    const Alpine = startAlpine(nanostoresQuery());
     const store = Alpine.store("query") as QueryStore;
 
     const controller = mountQueryDevtools({
@@ -66,7 +74,7 @@ describe("@ailuracode/alpine-query-devtools", () => {
   });
 
   it("supports panel interactions and filtering", async () => {
-    const Alpine = startAlpine(queryPlugin());
+    const Alpine = startAlpine(nanostoresQuery());
     const store = Alpine.store("query") as QueryStore;
     const controller = mountQueryDevtools({ store, initialOpen: true });
 
@@ -113,7 +121,7 @@ describe("@ailuracode/alpine-query-devtools", () => {
   });
 
   it("registers through the alpine plugin on alpine:initialized", () => {
-    const Alpine = startAlpine(queryPlugin(), queryDevtoolsPlugin());
+    const Alpine = startAlpine(nanostoresQuery(), queryDevtoolsPlugin());
     document.dispatchEvent(new Event("alpine:initialized"));
 
     expect(document.querySelector(".aq-devtools-toggle")).toBeTruthy();
@@ -125,5 +133,134 @@ describe("@ailuracode/alpine-query-devtools", () => {
     expect(() => getQueryStore({ store: () => undefined })).toThrow(
       "@ailuracode/alpine-query-devtools could not find"
     );
+  });
+
+  it("getQueryStore() accepts a createQueryClient() instance", async () => {
+    vi.useFakeTimers();
+
+    const { createQueryClient } = await import("@ailuracode/alpine-query");
+    const store = getQueryStore(createQueryClient());
+
+    const controller = mountQueryDevtools({ store, initialOpen: true });
+    const query = store.observe(["standalone"], async () => "nanostores");
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelector(".aq-devtools-toggle")?.textContent).toBe("Query (1)");
+    expect(document.body.textContent).toContain("nanostores");
+
+    store.invalidate(["standalone"]);
+    await vi.runAllTimersAsync();
+    expect(query.data).toBe("nanostores");
+
+    store.remove(["standalone"]);
+    expect(store.get(["standalone"])).toBeUndefined();
+
+    controller.destroy();
+    query.destroy();
+    store.reset();
+    vi.useRealTimers();
+  });
+
+  it("merges additional headless query clients into one panel", async () => {
+    vi.useFakeTimers();
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const headless = createQueryClient({ adapter: createAlpineStoreAdapter(Alpine) });
+
+    const controller = mountQueryDevtools({
+      store,
+      additionalStores: [headless],
+      initialOpen: true,
+    });
+
+    store.observe(["pokemon", 1], async () => ({ name: "bulbasaur" }));
+    headless.observe(["pokemon", "alpine", 1], async () => ({ name: "charmander" }));
+    await vi.runAllTimersAsync();
+
+    expect(document.querySelector(".aq-devtools-toggle")?.textContent).toBe("Query (2)");
+    expect(document.querySelector(".aq-devtools-title")?.textContent).toBe(
+      "Alpine Query · Nanostores · Alpine.reactive"
+    );
+    expect(document.body.textContent).toContain("bulbasaur");
+    expect(document.body.textContent).toContain('["pokemon","alpine",1]');
+    expect(document.body.textContent).toContain("Nanostores");
+    expect(document.body.textContent).toContain("Alpine.reactive");
+
+    controller.destroy();
+    store.reset();
+    headless.reset();
+    vi.useRealTimers();
+  });
+
+  it("applies dark theme from the host document in system mode", () => {
+    document.documentElement.dataset.theme = "dark";
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const controller = mountQueryDevtools({ store, theme: "system" });
+
+    const root = document.querySelector(".aq-devtools-root") as HTMLElement;
+    expect(root.classList.contains("aq-devtools-root--dark")).toBe(true);
+
+    controller.destroy();
+  });
+
+  it("respects a forced light theme option", () => {
+    document.documentElement.dataset.theme = "dark";
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const controller = mountQueryDevtools({ store, theme: "light" });
+
+    const root = document.querySelector(".aq-devtools-root") as HTMLElement;
+    expect(root.classList.contains("aq-devtools-root--light")).toBe(true);
+    expect(root.classList.contains("aq-devtools-root--dark")).toBe(false);
+
+    controller.destroy();
+  });
+
+  it("devtools actions refetch, invalidate, and remove queries", async () => {
+    vi.useFakeTimers();
+
+    const Alpine = startAlpine(nanostoresQuery());
+    const store = Alpine.store("query") as QueryStore;
+    const queryFn = vi
+      .fn()
+      .mockResolvedValueOnce("v1")
+      .mockResolvedValueOnce("v2")
+      .mockResolvedValueOnce("v3");
+
+    const query = store.observe(["actions"], queryFn, { staleTime: 60_000 });
+    await vi.runAllTimersAsync();
+    expect(query.data).toBe("v1");
+
+    const controller = mountQueryDevtools({ store, initialOpen: true });
+
+    const invalidateButton = [...document.querySelectorAll(".aq-devtools-btn")].find(
+      (button) => button.textContent === "Invalidate"
+    ) as HTMLButtonElement;
+    invalidateButton.click();
+    await vi.runAllTimersAsync();
+    expect(queryFn).toHaveBeenCalledTimes(2);
+    expect(query.data).toBe("v2");
+
+    const refetchButton = [...document.querySelectorAll(".aq-devtools-btn")].find(
+      (button) => button.textContent === "Refetch"
+    ) as HTMLButtonElement;
+    refetchButton.click();
+    await vi.runAllTimersAsync();
+    expect(queryFn).toHaveBeenCalledTimes(3);
+    expect(query.data).toBe("v3");
+
+    const removeButton = [...document.querySelectorAll(".aq-devtools-btn")].find(
+      (button) => button.textContent === "Remove"
+    ) as HTMLButtonElement;
+    removeButton.click();
+    expect(store.get(["actions"])).toBeUndefined();
+
+    controller.destroy();
+    query.destroy();
+    vi.useRealTimers();
   });
 });

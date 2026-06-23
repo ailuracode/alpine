@@ -1,12 +1,14 @@
+import query from "@ailuracode/alpine-query";
+import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
-import queryPlugin, { type QueryStore } from "../src/index.js";
+import type { QueryStore } from "../src/index.js";
 
 describe("@ailuracode/alpine-query devtools", () => {
   let store: QueryStore;
 
   beforeEach(() => {
-    const Alpine = startAlpine(queryPlugin());
+    const Alpine = startAlpine(query({ adapter: createAlpineStoreAdapter }));
     store = Alpine.store("query") as QueryStore;
   });
 
@@ -24,6 +26,7 @@ describe("@ailuracode/alpine-query devtools", () => {
     });
 
     const snapshot = store.devtools.getSnapshot();
+    expect(snapshot.adapterName).toBe("Alpine.reactive");
     expect(snapshot.queries).toHaveLength(1);
     expect(snapshot.queries[0]?.key).toEqual(["devtools"]);
     expect(snapshot.queries[0]?.data).toBe("ok");

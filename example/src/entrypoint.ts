@@ -10,12 +10,17 @@ import visibility from "@ailuracode/alpine-visibility";
 import notify from "@ailuracode/alpine-notify";
 import platform from "@ailuracode/alpine-platform";
 import query from "@ailuracode/alpine-query";
+import {
+	createAlpineNanostoresAdapter,
+	NanoStores,
+} from "@ailuracode/alpine-query-adapter-nanostores";
 import queryDevtools from "@ailuracode/alpine-query-devtools";
 import screen from "@ailuracode/alpine-screen";
 import scroll from "@ailuracode/alpine-scroll";
 import share from "@ailuracode/alpine-share";
 import theme from "@ailuracode/alpine-theme";
 import touch from "@ailuracode/alpine-touch";
+import { registerQueryDemos } from "./query-demos.js";
 
 export default (Alpine: Alpine) => {
 	Alpine.plugin(
@@ -39,7 +44,9 @@ export default (Alpine: Alpine) => {
 	Alpine.plugin(geo);
 	Alpine.plugin(touch);
 	Alpine.plugin(platform);
-	Alpine.plugin(query());
-	Alpine.plugin(queryDevtools({ position: "bottom" }));
+	Alpine.plugin(NanoStores);
+	Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
+	const queryDemoStores = registerQueryDemos(Alpine);
+	Alpine.plugin(queryDevtools({ position: "bottom", additionalStores: queryDemoStores }));
 	Alpine.plugin(notify);
 };

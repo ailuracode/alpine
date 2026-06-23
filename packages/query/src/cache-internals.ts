@@ -1,16 +1,12 @@
-import type {
-  FetchStatus,
-  QueryKey,
-  QueryState,
-  QueryStatus,
-  ResolvedQueryOptions,
-} from "./types.js";
+import type { QueryStateHandle } from "./adapters/types.js";
+import type { QueryKey, QueryState, ResolvedQueryOptions } from "./types.js";
 
 export type QueryEntry<TData = unknown> = {
   key: QueryKey;
   keyHash: string;
   queryFn: () => Promise<TData>;
   options: ResolvedQueryOptions<TData>;
+  handle: QueryStateHandle<TData>;
   state: QueryState<TData>;
   observers: number;
   gcTimeout: ReturnType<typeof setTimeout> | null;
@@ -27,6 +23,3 @@ export type QueryCacheInternals = {
   invalidateEntry(keyHash: string): void;
   removeEntry(keyHash: string): void;
 };
-
-export type FetchStatusValue = FetchStatus;
-export type QueryStatusValue = QueryStatus;

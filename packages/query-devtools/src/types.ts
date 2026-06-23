@@ -19,8 +19,12 @@ export interface QueryDevtoolsPluginOptions {
   initialOpen?: boolean;
   /** Filter queries and mutations by search text. */
   filter?: string;
+  /** Color theme. Default: follows host (`data-theme`, `.dark`, or system preference). */
+  theme?: "light" | "dark" | "system";
   /** Custom store name. Default: `query`. */
   storeName?: string;
+  /** Extra query clients to inspect alongside `$store.query` (e.g. headless `createQueryClient()`). */
+  additionalStores?: QueryStore[];
 }
 
 export interface QueryDevtoolsController {
@@ -33,7 +37,10 @@ export interface QueryDevtoolsController {
 }
 
 export type QueryDevtoolsMountOptions = QueryDevtoolsPluginOptions & {
-  store: QueryStore;
+  /** Primary query store. */
+  store?: QueryStore;
+  /** Replace `store` with an explicit list of query stores. */
+  stores?: QueryStore[];
 };
 
 export type { QueryDevtoolsEntry, QueryDevtoolsSnapshot };

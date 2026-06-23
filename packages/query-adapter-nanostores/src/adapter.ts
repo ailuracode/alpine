@@ -1,0 +1,69 @@
+import type { MutationState, QueryStateAdapter } from "@ailuracode/alpine-query";
+import {
+  createMutationStateView,
+  createQueryStateView,
+  type MutationStateRecord,
+  type QueryStateRecord,
+} from "@ailuracode/alpine-query";
+import { type MapStore, map } from "nanostores";
+
+function patchMapStore<TRecord extends Record<string, unknown>>(
+  store: MapStore<TRecord>,
+  patch: Partial<TRecord>
+): void {
+  const current = store.get();
+  let next: TRecord | null = null;
+
+  for (const key of Object.keys(patch) as (keyof TRecord)[]) {
+    const value = patch[key];
+    if (current[key] !== value) {
+      next ??= { ...current };
+      next[key] = value as TRecord[keyof TRecord];
+    }
+  }
+
+  if (next) {
+    store.set(next);
+  }
+}
+
+/** Nanostores `map()` adapter for `@ailuracode/alpine-query`. */
+export const nanostoresQueryAdapter: QueryStateAdapter = {
+  name: "Nanostores",
+
+  createQueryState<TData>(
+    initial: QueryStateRecord<TData>,
+    staleTime: number,
+    refetch: () => Promise<void>
+  ) {
+    const store = map(initial);
+    const state = createQueryStateView(() => store.get(), staleTime, refetch);
+
+    return {
+      state,
+      get: () => store.get(),
+      patch: (patch: Partial<QueryStateRecord<TData>>) => patchMapStore(store, patch),
+      listen: (listener: (record: QueryStateRecord<TData>) => void) =>
+        store.listen((record) => listener({ ...record })),
+    };
+  },
+
+  createMutationState<TData, TVariables>(
+    handlers: Pick<MutationState<TData, TVariables>, "mutate" | "reset">
+  ) {
+    const store = map<MutationStateRecord<TData>>({
+      data: undefined,
+      error: null,
+      status: "idle",
+    });
+    const state = createMutationStateView(() => store.get(), handlers);
+
+    return {
+      state,
+      get: () => store.get(),
+      patch: (patch: Partial<MutationStateRecord<TData>>) => patchMapStore(store, patch),
+      listen: (listener: (record: MutationStateRecord<TData>) => void) =>
+        store.listen((record) => listener({ ...record })),
+    };
+  },
+};

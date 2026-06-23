@@ -1,5 +1,11 @@
 # @ailuracode/alpine-query
 
+## 0.6.1
+
+### Patch Changes
+
+- Add `throwOnHttpError` option to `typedFetch` for JSON:API error document parsing.
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # @ailuracode/alpine-json-api
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @ailuracode/alpine-query@0.6.1
+
 ## 0.1.1
 
 ### Patch Changes

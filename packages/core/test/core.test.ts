@@ -1,6 +1,7 @@
 import type AlpineType from "alpinejs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  type AlpinePluginCallback,
   createAlpinePlugin,
   defineHybridPlugin,
   defineMagicPlugin,
@@ -30,8 +31,8 @@ function createMockAlpine(): MockAlpine {
 }
 
 function alpinePluginMock(
-  run: (alpine: AlpineType.Alpine) => void = (_alpine) => undefined
-): ReturnType<typeof vi.fn> {
+  run: AlpinePluginCallback = (_alpine) => undefined
+): AlpinePluginCallback {
   return vi.fn(run);
 }
 

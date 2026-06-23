@@ -478,31 +478,26 @@ kbd {
 	border-bottom: 0;
 }
 
-.query-table tbody tr.is-loading td {
-	color: transparent;
-}
-
 .query-table-skeleton {
-	display: block;
-	width: min(100%, 6.5rem);
-	height: 0.75rem;
-	border-radius: 999px;
+	display: inline-block;
+	color: transparent;
+	font: inherit;
+	font-variant-numeric: tabular-nums;
+	line-height: inherit;
+	vertical-align: baseline;
+	border-radius: 0.2em;
 	background: linear-gradient(
 		90deg,
-		color-mix(in srgb, var(--border) 70%, transparent) 0%,
-		color-mix(in srgb, var(--muted) 28%, transparent) 50%,
-		color-mix(in srgb, var(--border) 70%, transparent) 100%
+		color-mix(in srgb, var(--border) 82%, transparent) 0%,
+		color-mix(in srgb, var(--muted) 24%, transparent) 50%,
+		color-mix(in srgb, var(--border) 82%, transparent) 100%
 	);
 	background-size: 200% 100%;
 	animation: query-table-shimmer 1.2s ease-in-out infinite;
 }
 
-.query-table-skeleton--short {
-	width: 1.75rem;
-}
-
 .query-table-wrap.is-awaiting-data .query-table tbody tr.is-loading td {
-	color: transparent;
+	vertical-align: baseline;
 }
 
 @keyframes query-table-shimmer {

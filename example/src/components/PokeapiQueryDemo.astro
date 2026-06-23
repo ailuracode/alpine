@@ -54,11 +54,21 @@ const { dataName, title, badgeClass = "" } = Astro.props;
 					<template x-for="row in tableRows" :key="page + '-' + row.id">
 						<tr x-bind:class="{ 'is-loading': row.loading }">
 							<td>
-								<span class="query-table-skeleton query-table-skeleton--short" x-show="row.loading" aria-hidden="true"></span>
+								<span
+									class="query-table-skeleton"
+									x-show="row.loading"
+									x-text="row.id"
+									aria-hidden="true"
+								></span>
 								<span x-show="!row.loading" x-text="row.id"></span>
 							</td>
 							<td>
-								<span class="query-table-skeleton" x-show="row.loading" aria-hidden="true"></span>
+								<span
+									class="query-table-skeleton"
+									x-show="row.loading"
+									x-text="row.name"
+									aria-hidden="true"
+								></span>
 								<span x-show="!row.loading" x-text="row.name"></span>
 							</td>
 						</tr>

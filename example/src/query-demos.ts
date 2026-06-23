@@ -7,6 +7,20 @@ import type { Alpine } from "alpinejs";
 const POKEAPI = "https://pokeapi.co/api/v2/pokemon";
 const PAGE_SIZE = 12;
 const STALE_TIME = 5 * 60_000;
+const SKELETON_NAMES = [
+	"bulbasaur",
+	"ivysaur",
+	"charmander",
+	"squirtle",
+	"caterpie",
+	"weedle",
+	"pidgey",
+	"rattata",
+	"spearow",
+	"ekans",
+	"pikachu",
+	"sandshrew",
+] as const;
 
 type PokemonListResponse = {
 	count: number;
@@ -22,6 +36,16 @@ type PokemonRow = {
 	name: string;
 	loading?: boolean;
 };
+
+function createSkeletonRows(page: number, pageSize: number): PokemonRow[] {
+	const offset = (page - 1) * pageSize;
+
+	return Array.from({ length: pageSize }, (_, index) => ({
+		id: offset + index + 1,
+		name: SKELETON_NAMES[index % SKELETON_NAMES.length] ?? "pokemon",
+		loading: true,
+	}));
+}
 
 async function fetchPokemonPage(page: number): Promise<PokemonListResponse> {
 	const response = await fetch(
@@ -69,12 +93,7 @@ function createPokeapiDemo(options: {
 
 			// Skeleton while the query resolves — avoid isLoading (flickers on page changes).
 			if (this.query && !this.hasCachedPage) {
-				const offset = (this.page - 1) * this.pageSize;
-				return Array.from({ length: this.pageSize }, (_, index) => ({
-					id: offset + index + 1,
-					name: "",
-					loading: true,
-				}));
+				return createSkeletonRows(this.page, this.pageSize);
 			}
 
 			return [];

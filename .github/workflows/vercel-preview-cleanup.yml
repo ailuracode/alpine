@@ -1,0 +1,35 @@
+name: Vercel Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Remove preview deployment for merged branch
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          echo "Cleaning up preview deployments for branch: $BRANCH_NAME"
+
+          # Pull project configuration (needed for vercel remove to know scope)
+          vercel pull --yes --environment=preview \
+            --token="$VERCEL_TOKEN" \
+            --scope="$VERCEL_ORG_ID" \
+            "$VERCEL_PROJECT_ID" 2>/dev/null || true
+
+          # Remove preview deployments whose name contains the branch name
+          vercel remove --yes \
+            --token="$VERCEL_TOKEN" \
+            --scope="$VERCEL_ORG_ID" \
+            "$BRANCH_NAME" 2>/dev/null || echo "No preview deployments found for branch $BRANCH_NAME"

@@ -5,22 +5,10 @@ on:
     branches: [main, master]
     paths:
       - "packages/**"
-      - ".github/workflows/ci.yml"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "tsconfig.json"
-      - "vitest.config.ts"
-      - "biome.json"
   pull_request:
     branches: [main, master]
     paths:
       - "packages/**"
-      - ".github/workflows/ci.yml"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "tsconfig.json"
-      - "vitest.config.ts"
-      - "biome.json"
 
 jobs:
   lint:

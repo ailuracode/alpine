@@ -3,6 +3,8 @@ name: Vercel Preview Cleanup
 on:
   pull_request:
     types: [closed]
+    paths:
+      - "example/**"
 
 jobs:
   cleanup:

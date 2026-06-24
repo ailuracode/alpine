@@ -290,6 +290,7 @@ export default function scrollPlugin(options: ScrollPluginOptions = {}): AlpineT
     };
 
     Alpine.store("scroll", scrollStore);
+    Alpine.magic("scroll", () => Alpine.store("scroll"));
     const store = Alpine.store("scroll") as ScrollStore;
     let ticking = false;
 

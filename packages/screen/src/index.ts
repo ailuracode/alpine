@@ -1,232 +1,246 @@
 import type AlpineType from "alpinejs";
 
-export const DEVICE_TYPES = ["mobile", "tablet", "desktop"] as const;
+// ── Types ──────────────────────────────────────────────────────────
 
-export type DeviceType = (typeof DEVICE_TYPES)[number];
+export interface ScreenInterval<Name extends string = string> {
+  readonly name: Name;
+  readonly maxWidth: number;
+}
 
-export const DEFAULT_DEVICE_BREAKPOINTS = {
-  mobileMax: 767,
-  tabletMax: 1023,
-} as const;
+export interface ScreenPluginOptions<Name extends string = string> {
+  /** Intervals sorted by maxWidth ascending. Smallest-first check priority. */
+  intervals?: readonly ScreenInterval<Name>[];
+}
 
-export type DeviceBreakpoints = {
-  mobileMax?: number;
-  tabletMax?: number;
-};
-
-export type DeviceSnapshot = {
-  readonly width: number;
-  readonly mobileMax: number;
-  readonly tabletMax: number;
-  readonly type: DeviceType;
-};
-
-export interface DeviceStore {
-  mobileMax: number;
-  tabletMax: number;
+export interface ScreenStore<Name extends string = string> {
   width: number;
-  type: DeviceType;
-  is(name: DeviceType): boolean;
-  readonly isMobile: boolean;
-  readonly isTablet: boolean;
-  readonly isDesktop: boolean;
-  refreshType(): void;
-  refreshWidth(): void;
-  refresh(): void;
-  setBreakpoints(breakpoints?: DeviceBreakpoints): void;
+  type: Name;
+  readonly intervals: readonly ScreenInterval<Name>[];
+  is(name: Name): boolean;
+  refresh(): boolean;
+  refreshWidth(): boolean;
 }
 
-const WIDTH_DEBOUNCE_MS = 100;
+export type ScreenSnapshot<Name extends string = string> = {
+  readonly width: number;
+  readonly type: Name;
+};
 
-function resolveBreakpoints(breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS): {
-  mobileMax: number;
-  tabletMax: number;
-} {
-  return {
-    mobileMax: breakpoints.mobileMax ?? DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
-    tabletMax: breakpoints.tabletMax ?? DEFAULT_DEVICE_BREAKPOINTS.tabletMax,
-  };
+// ── Defaults ───────────────────────────────────────────────────────
+
+export const DEFAULT_SCREEN_INTERVALS: readonly [
+  ScreenInterval<"mobile">,
+  ScreenInterval<"desktop">,
+] = [
+  { name: "mobile", maxWidth: 767 },
+  { name: "desktop", maxWidth: Number.POSITIVE_INFINITY },
+] as const;
+
+// ── Helpers ────────────────────────────────────────────────────────
+
+/** Asserts literal types on an intervals array for const inference. */
+export function screenIntervals<const T extends readonly ScreenInterval[]>(intervals: T): T {
+  return intervals;
 }
 
-/** Builds a typed breakpoints object for `setBreakpoints()`. */
-export function deviceBreakpoints<const T extends DeviceBreakpoints>(breakpoints: T): T {
-  return breakpoints;
-}
-
-/** Resolves device type from viewport width and breakpoint bounds. */
-export function resolveDeviceTypeFromWidth(
+/**
+ * Resolves which interval a width falls into (smallest-first priority).
+ * Iterates intervals in order; the first whose `maxWidth >= width` wins.
+ */
+export function resolveScreenType<Name extends string>(
   width: number,
-  breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS
-): DeviceType {
-  const { mobileMax, tabletMax } = resolveBreakpoints(breakpoints);
-
-  if (width <= mobileMax) {
-    return "mobile";
+  intervals: readonly ScreenInterval<Name>[]
+): Name {
+  for (const interval of intervals) {
+    if (width <= interval.maxWidth) {
+      return interval.name;
+    }
   }
-
-  if (width <= tabletMax) {
-    return "tablet";
-  }
-
-  return "desktop";
+  return intervals[intervals.length - 1]?.name;
 }
 
-/** Reads a width-based device snapshot (store type uses `matchMedia` at runtime). */
-export function readDeviceSnapshot(
-  breakpoints: DeviceBreakpoints = DEFAULT_DEVICE_BREAKPOINTS
-): DeviceSnapshot {
-  const resolved = resolveBreakpoints(breakpoints);
+/** Reads a width-based screen snapshot (useful for SSR or testing). */
+export function readScreenSnapshot<Name extends string = string>(
+  intervals: readonly ScreenInterval<Name>[] = DEFAULT_SCREEN_INTERVALS as unknown as readonly ScreenInterval<Name>[]
+): ScreenSnapshot<Name> {
   const width = typeof window !== "undefined" ? window.innerWidth : 0;
 
   return {
     width,
-    mobileMax: resolved.mobileMax,
-    tabletMax: resolved.tabletMax,
-    type: resolveDeviceTypeFromWidth(width, resolved),
+    type: resolveScreenType(width, intervals),
   };
 }
 
-function createQueries(mobileMax: number, tabletMax: number) {
-  return {
-    mobile: window.matchMedia(`(max-width: ${mobileMax}px)`),
-    tablet: window.matchMedia(`(min-width: ${mobileMax + 1}px) and (max-width: ${tabletMax}px)`),
-  };
+// ── Internal helpers ───────────────────────────────────────────────
+
+type IntervalQuery<Name extends string> = {
+  interval: ScreenInterval<Name>;
+  media: MediaQueryList;
+};
+
+function createQueries<Name extends string>(
+  intervals: readonly ScreenInterval<Name>[]
+): IntervalQuery<Name>[] {
+  // One query per interval except the last (catch-all fallback)
+  return intervals.slice(0, -1).map((interval) => ({
+    interval,
+    media: window.matchMedia(`(max-width: ${interval.maxWidth}px)`),
+  }));
 }
 
-type DeviceQueries = ReturnType<typeof createQueries>;
-
-function resolveType(queries: DeviceQueries): DeviceType {
-  if (queries.mobile.matches) {
-    return "mobile";
+function resolveTypeFromQueries<Name extends string>(
+  queries: IntervalQuery<Name>[],
+  fallback: Name
+): Name {
+  for (const q of queries) {
+    if (q.media.matches) {
+      return q.interval.name;
+    }
   }
-  if (queries.tablet.matches) {
-    return "tablet";
-  }
-  return "desktop";
+  return fallback;
 }
 
-function applyType(target: Pick<DeviceStore, "type">, queries: DeviceQueries): boolean {
-  const type = resolveType(queries);
-  if (target.type === type) {
-    return false;
-  }
+const WIDTH_DEBOUNCE_MS = 100;
 
-  target.type = type;
-  return true;
-}
+// ── Plugin (factory) ───────────────────────────────────────────────
 
-function applyWidth(target: Pick<DeviceStore, "width">): boolean {
-  const width = window.innerWidth;
-  if (target.width === width) {
-    return false;
-  }
+/**
+ * Creates the screen plugin from a set of intervals.
+ *
+ * When you pass `intervals` with `as const`, the interval names are
+ * preserved as literal types for full type inference.
+ *
+ * @example
+ * ```ts
+ * Alpine.plugin(screen({
+ *   intervals: [
+ *     { name: "mobile",  maxWidth: 767 },
+ *     { name: "desktop", maxWidth: Number.POSITIVE_INFINITY },
+ *   ] as const,
+ * }));
+ * ```
+ */
+export default function screenPlugin<
+  const Intervals extends readonly ScreenInterval[] = typeof DEFAULT_SCREEN_INTERVALS,
+>(options: { intervals?: Intervals } = {}): AlpineType.PluginCallback {
+  type Name = Intervals[number]["name"];
 
-  target.width = width;
-  return true;
-}
+  const intervals: readonly ScreenInterval<Name>[] = (options.intervals ??
+    DEFAULT_SCREEN_INTERVALS) as unknown as readonly ScreenInterval<Name>[];
 
-/** Alpine.js screen plugin. Registers `$store.device`. */
-export default function screenPlugin(Alpine: AlpineType.Alpine): void {
-  let queries = createQueries(
-    DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
-    DEFAULT_DEVICE_BREAKPOINTS.tabletMax
-  );
-  let typeHandler: (() => void) | null = null;
-  let widthTimer: ReturnType<typeof setTimeout> | null = null;
+  return function registerScreen(Alpine) {
+    const queries = createQueries(intervals);
+    const fallbackName = intervals[intervals.length - 1].name;
+    let typeHandler: (() => void) | null = null;
+    let widthTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const deviceStore: DeviceStore = {
-    mobileMax: DEFAULT_DEVICE_BREAKPOINTS.mobileMax,
-    tabletMax: DEFAULT_DEVICE_BREAKPOINTS.tabletMax,
-    width: window.innerWidth,
-    type: "desktop",
+    const screenStore: ScreenStore<Name> = {
+      width: window.innerWidth,
+      type: resolveTypeFromQueries(queries, fallbackName),
+      intervals,
 
-    is(name: DeviceType) {
-      return this.type === name;
-    },
+      is(name: Name) {
+        return this.type === name;
+      },
 
-    get isMobile() {
-      return this.type === "mobile";
-    },
+      refresh() {
+        const newType = resolveTypeFromQueries(queries, fallbackName);
+        const newWidth = window.innerWidth;
+        let changed = false;
 
-    get isTablet() {
-      return this.type === "tablet";
-    },
+        if (this.type !== newType) {
+          this.type = newType;
+          changed = true;
+        }
+        if (this.width !== newWidth) {
+          this.width = newWidth;
+          changed = true;
+        }
+        return changed;
+      },
 
-    get isDesktop() {
-      return this.type === "desktop";
-    },
+      refreshWidth() {
+        const newWidth = window.innerWidth;
+        if (this.width !== newWidth) {
+          this.width = newWidth;
+          return true;
+        }
+        return false;
+      },
+    };
 
-    refreshType() {
-      applyType(this, queries);
-      applyWidth(this);
-    },
+    Alpine.store("device", screenStore);
+    Alpine.magic("device", () => Alpine.store("device"));
 
-    refreshWidth() {
-      applyWidth(this);
-    },
-
-    refresh() {
-      applyType(this, queries);
-      applyWidth(this);
-    },
-
-    setBreakpoints({ mobileMax, tabletMax }: DeviceBreakpoints = {}) {
+    function bindListeners() {
       unbindListeners();
-      if (mobileMax != null) {
-        this.mobileMax = mobileMax;
+      typeHandler = () => {
+        screenStore.refresh();
+      };
+      for (const q of queries) {
+        q.media.addEventListener("change", typeHandler);
       }
-      if (tabletMax != null) {
-        this.tabletMax = tabletMax;
-      }
-      queries = createQueries(this.mobileMax, this.tabletMax);
-      bindListeners();
-      this.refresh();
-    },
-  };
+      window.addEventListener("resize", scheduleWidthUpdate, { passive: true });
+    }
 
-  Alpine.store("device", deviceStore);
-  const store = Alpine.store("device") as DeviceStore;
-
-  function scheduleWidthUpdate() {
-    clearTimeout(widthTimer ?? undefined);
-    widthTimer = setTimeout(() => {
+    function unbindListeners() {
+      clearTimeout(widthTimer ?? undefined);
       widthTimer = null;
-      store.refreshWidth();
-    }, WIDTH_DEBOUNCE_MS);
-  }
-
-  function bindListeners() {
-    unbindListeners();
-    typeHandler = () => store.refreshType();
-    for (const media of Object.values(queries)) {
-      media.addEventListener("change", typeHandler);
-    }
-    window.addEventListener("resize", scheduleWidthUpdate, { passive: true });
-  }
-
-  function unbindListeners() {
-    clearTimeout(widthTimer ?? undefined);
-    widthTimer = null;
-
-    if (!typeHandler) {
-      return;
+      if (!typeHandler) {
+        return;
+      }
+      for (const q of queries) {
+        q.media.removeEventListener("change", typeHandler);
+      }
+      window.removeEventListener("resize", scheduleWidthUpdate);
+      typeHandler = null;
     }
 
-    for (const media of Object.values(queries)) {
-      media.removeEventListener("change", typeHandler);
+    function scheduleWidthUpdate() {
+      clearTimeout(widthTimer ?? undefined);
+      widthTimer = setTimeout(() => {
+        widthTimer = null;
+        screenStore.refreshWidth();
+      }, WIDTH_DEBOUNCE_MS);
     }
-    window.removeEventListener("resize", scheduleWidthUpdate);
-    typeHandler = null;
-  }
 
-  bindListeners();
-  store.refresh();
+    bindListeners();
+    screenStore.refresh();
+  };
+}
+
+/**
+ * Creates a typed accessor for the device store, preserving literal
+ * interval names from your intervals array.
+ *
+ * Pass the *same* intervals array (with `as const`) so that the
+ * returned getter knows the exact set of interval names.
+ *
+ * @example
+ * ```ts
+ * const intervals = [
+ *   { name: "mobile",  maxWidth: 767 },
+ *   { name: "tablet",  maxWidth: 900 },
+ *   { name: "desktop", maxWidth: Number.POSITIVE_INFINITY },
+ * ] as const;
+ *
+ * Alpine.plugin(screen({ intervals }));
+ *
+ * const getDevice = createDeviceAccessor(intervals);
+ * const device = getDevice(Alpine);
+ * device.type // "mobile" | "tablet" | "desktop"
+ * ```
+ */
+export function createDeviceAccessor<const Intervals extends readonly ScreenInterval[]>(
+  _intervals: Intervals
+): (alpine: AlpineType.Alpine) => ScreenStore<Intervals[number]["name"]> {
+  return (alpine) => alpine.store("device") as unknown as ScreenStore<Intervals[number]["name"]>;
 }
 
 declare global {
   namespace Alpine {
     interface Stores {
-      device: DeviceStore;
+      device: ScreenStore;
     }
   }
 }

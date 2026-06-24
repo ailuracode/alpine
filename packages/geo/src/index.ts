@@ -187,6 +187,7 @@ export default function geoPlugin(Alpine: AlpineType.Alpine): void {
   };
 
   Alpine.store("geo", geoStore);
+  Alpine.magic("geo", () => Alpine.store("geo"));
 }
 
 declare global {

@@ -14,6 +14,7 @@ Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common
 | [`@ailuracode/alpine-export`](./packages/export/README.md) | Magic | Programmatic file exports (downloads) |
 | [`@ailuracode/alpine-calendar`](./packages/calendar/README.md) | Magic | Calendar date logic powered by date-fns |
 | [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
+| [`@ailuracode/alpine-sidebar`](./packages/sidebar/README.md) | Store | Sidebar open/close state, scroll lock, and overlay |
 | [`@ailuracode/alpine-touch`](./packages/touch/README.md) | Magic | Touch and pointer capabilities |
 | [`@ailuracode/alpine-toggle`](./packages/toggle/README.md) | Magic | Binary and ternary toggle state |
 | [`@ailuracode/alpine-platform`](./packages/platform/README.md) | Magic | Client OS and platform detection |

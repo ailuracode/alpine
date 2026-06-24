@@ -175,6 +175,7 @@ export default function themePlugin<const TModes extends readonly ThemeMode[] = 
     const themeStore = createThemeStore(config, initialTheme);
 
     Alpine.store("theme", themeStore);
+    Alpine.magic("theme", () => Alpine.store("theme"));
 
     systemQuery.addEventListener("change", () => {
       const current = Alpine.store("theme") as ThemeStore;

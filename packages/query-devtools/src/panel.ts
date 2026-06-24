@@ -408,6 +408,7 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
     preferencesStorageKey = DEFAULT_PREFERENCES_STORAGE_KEY,
     followLatest: followLatestOption = false,
     rememberOpenState: rememberOpenStateOption = false,
+    zIndex = 60,
   } = options;
   const merged = createMergedQueryDevtools(resolveQueryDevtoolsStores(options));
   const savedPreferences = persistPreferences
@@ -1323,8 +1324,22 @@ export function mountQueryDevtools(options: QueryDevtoolsMountOptions): QueryDev
 
   window.addEventListener("resize", syncMobilePanelHeight);
 
-  unbindTheme = bindDevtoolsTheme(root, theme, scheduleRender);
+  const applyZIndex = (): void => {
+    if (zIndex === undefined) {
+      return;
+    }
+    root.style.position = "relative";
+    root.style.zIndex = String(zIndex);
+    toggle.style.zIndex = String(zIndex);
+    panel.style.zIndex = String(zIndex);
+  };
 
+  unbindTheme = bindDevtoolsTheme(root, theme, () => {
+    scheduleRender();
+    applyZIndex();
+  });
+
+  applyZIndex();
   render();
   const unsubscribe = merged.devtools.subscribe(scheduleRender);
 

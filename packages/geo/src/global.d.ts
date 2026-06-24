@@ -35,5 +35,8 @@ declare global {
     interface Stores {
       geo: GeoStore;
     }
+    interface Magics<T> {
+      $geo: GeoStore;
+    }
   }
 }

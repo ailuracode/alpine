@@ -1,24 +1,64 @@
 /// <reference types="astro/client" />
 /// <reference types="@types/alpinejs" />
-/// <reference path="../../packages/theme/src/global.d.ts" />
-/// <reference path="../../packages/screen/src/global.d.ts" />
-/// <reference path="../../packages/scroll/src/global.d.ts" />
-/// <reference path="../../packages/share/src/global.d.ts" />
-/// <reference path="../../packages/network/src/global.d.ts" />
-/// <reference path="../../packages/visibility/src/global.d.ts" />
-/// <reference path="../../packages/attention/src/global.d.ts" />
-/// <reference path="../../packages/battery/src/global.d.ts" />
-/// <reference path="../../packages/calendar/src/global.d.ts" />
-/// <reference path="../../packages/clipboard/src/global.d.ts" />
-/// <reference path="../../packages/export/src/global.d.ts" />
-/// <reference path="../../packages/geo/src/global.d.ts" />
-/// <reference path="../../packages/json-api/src/global.d.ts" />
-/// <reference path="../../packages/toggle/src/global.d.ts" />
-/// <reference path="../../packages/touch/src/global.d.ts" />
-/// <reference path="../../packages/platform/src/global.d.ts" />
-/// <reference path="../../packages/query/src/global.d.ts" />
-/// <reference path="../../packages/notify/src/global.d.ts" />
 
-interface Window {
-	Alpine: import("alpinejs").Alpine;
+// ── Type imports for Alpine augmentation ──────────────────────────────
+type ThemeStore = import("@ailuracode/alpine-theme").ThemeStore;
+type ScreenStore = import("@ailuracode/alpine-screen").ScreenStore;
+type ScrollStore = import("@ailuracode/alpine-scroll").ScrollStore;
+type SidebarStore = import("@ailuracode/alpine-sidebar").SidebarStore;
+type GeoStore = import("@ailuracode/alpine-geo").GeoStore;
+type QueryStore = import("@ailuracode/alpine-query").QueryStore;
+type NetworkMagic = import("@ailuracode/alpine-network").NetworkMagic;
+type VisibilityMagic = import("@ailuracode/alpine-visibility").VisibilityMagic;
+type BatteryMagic = import("@ailuracode/alpine-battery").BatteryMagic;
+type ClipboardMagic = import("@ailuracode/alpine-clipboard").ClipboardMagic;
+type ExportMagic = import("@ailuracode/alpine-export").ExportMagic;
+type CalendarMagic = import("@ailuracode/alpine-calendar").CalendarMagic;
+type TouchMagic = import("@ailuracode/alpine-touch").TouchMagic;
+type ToggleMagic = import("@ailuracode/alpine-toggle").ToggleMagic;
+type PlatformMagic = import("@ailuracode/alpine-platform").PlatformMagic;
+type NotifyMagic = import("@ailuracode/alpine-notify").NotifyMagic;
+type ShareMagic = import("@ailuracode/alpine-share").ShareMagic;
+type WakeLockMagic = import("@ailuracode/alpine-attention").WakeLockMagic;
+type IdleMagic = import("@ailuracode/alpine-attention").IdleMagic;
+type JsonApiMagic = import("@ailuracode/alpine-json-api").JsonApiClient;
+
+declare module "alpinejs" {
+  namespace Alpine {
+    interface Stores {
+      theme: ThemeStore;
+      device: ScreenStore;
+      scroll: ScrollStore;
+      sidebar: SidebarStore;
+      geo: GeoStore;
+      query: QueryStore;
+    }
+    interface Magics<T> {
+      $theme: ThemeStore;
+      $device: ScreenStore;
+      $scroll: ScrollStore;
+      $sidebar: SidebarStore;
+      $geo: GeoStore;
+      $network: NetworkMagic;
+      $visibility: VisibilityMagic;
+      $battery: BatteryMagic;
+      $clipboard: ClipboardMagic;
+      $export: ExportMagic;
+      $calendar: CalendarMagic;
+      $touch: TouchMagic;
+      $toggle: ToggleMagic;
+      $platform: PlatformMagic;
+      $notify: NotifyMagic;
+      $share: ShareMagic;
+      $wakelock: WakeLockMagic;
+      $idle: IdleMagic;
+      $jsonapi: JsonApiMagic;
+    }
+  }
+}
+
+import { Alpine as AlpineType } from "alpinejs";
+
+declare global {
+  var Alpine: AlpineType;
 }

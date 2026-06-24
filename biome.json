@@ -12,9 +12,12 @@
       "**/*.ts",
       "**/*.mjs",
       "**/*.json",
+      "**/*.astro",
       "!**/pnpm-lock.yaml",
       "!**/.changeset/*.json",
-      "!example"
+      "!**/node_modules",
+      "!example/dist",
+      "!example/.astro"
     ]
   },
   "formatter": {
@@ -103,6 +106,12 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "enabled": false
+      }
+    },
     {
       "includes": ["scripts/**"],
       "linter": {

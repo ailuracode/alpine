@@ -16,13 +16,25 @@ npm install @ailuracode/alpine-screen alpinejs
 import Alpine from "alpinejs";
 import screen from "@ailuracode/alpine-screen";
 
-Alpine.plugin(screen);
+Alpine.plugin(screen());
 Alpine.start();
 ```
 
 ```html
-<nav x-show="$store.device.isMobile">Mobile menu</nav>
+<nav x-show="$store.device.is('mobile')">Mobile menu</nav>
 <p>Width: <span x-text="$store.device.width"></span>px</p>
+```
+
+## Custom intervals
+
+```js
+Alpine.plugin(screen({
+  intervals: [
+    { name: "phone", maxWidth: 480 },
+    { name: "tablet", maxWidth: 768 },
+    { name: "desktop", maxWidth: Infinity },
+  ],
+}));
 ```
 
 ## API summary
@@ -30,11 +42,10 @@ Alpine.start();
 | | |
 |-|-|
 | **Store** | `$store.device` |
-| **State** | `type` (`DeviceType`), `width`, `mobileMax`, `tabletMax` |
-| **Getters** | `isMobile`, `isTablet`, `isDesktop` |
-| **Methods** | `is(DeviceType)`, `setBreakpoints()`, `refresh()` |
-| **Helpers** | `DEVICE_TYPES`, `deviceBreakpoints()`, `readDeviceSnapshot()`, `resolveDeviceTypeFromWidth()` |
-| **Defaults** | mobile ≤767px · tablet 768–1023px · desktop ≥1024px |
+| **State** | `type` (interval name), `width`, `intervals` (readonly) |
+| **Methods** | `is(name)`, `refresh()`, `refreshWidth()` |
+| **Helpers** | `DEFAULT_SCREEN_INTERVALS`, `screenIntervals()`, `readScreenSnapshot()`, `resolveScreenType()` |
+| **Defaults** | mobile ≤767px · desktop ≥768px |
 
 ## License
 

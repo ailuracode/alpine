@@ -33,6 +33,12 @@ export interface QueryDevtoolsPluginOptions {
   storeName?: string;
   /** Extra query clients to inspect alongside `$store.query` (e.g. headless `createQueryClient()`). */
   additionalStores?: QueryStore[];
+  /**
+   * Custom z-index for the devtools panel and toggle button.
+   * Default: `2147483646` (panel) and `2147483647` (toggle).
+   * Set lower if the devtools overlaps other UI elements (e.g. a sidebar).
+   */
+  zIndex?: number;
 }
 
 export interface QueryDevtoolsController {

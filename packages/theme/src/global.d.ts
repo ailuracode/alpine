@@ -40,5 +40,8 @@ declare global {
     interface Stores {
       theme: ThemeStore;
     }
+    interface Magics<T> {
+      $theme: ThemeStore;
+    }
   }
 }

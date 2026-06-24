@@ -12,6 +12,7 @@ Alpine.js plugin monorepo by **ailuracode**. Twenty-one independent npm packages
 | `@ailuracode/alpine-theme` | Store | `$store.theme` |
 | `@ailuracode/alpine-screen` | Store | `$store.device` |
 | `@ailuracode/alpine-scroll` | Store | `$store.scroll` |
+| `@ailuracode/alpine-sidebar` | Store | `$store.sidebar` |
 | `@ailuracode/alpine-network` | Magic | `$network` |
 | `@ailuracode/alpine-visibility` | Magic | `$visibility` |
 | `@ailuracode/alpine-battery` | Magic | `$battery` |

@@ -2,7 +2,7 @@
 
 Package: `@ailuracode/alpine-screen`
 
-Responsive device detection and live viewport width. Uses `matchMedia` for device type and `requestAnimationFrame`-coalesced `resize` updates for width.
+Responsive device detection and live viewport width. Uses `matchMedia` for device type detection and debounced `resize` updates for width.
 
 ## Install
 
@@ -16,17 +16,47 @@ npm install @ailuracode/alpine-screen alpinejs
 import Alpine from "alpinejs";
 import screen from "@ailuracode/alpine-screen";
 
-Alpine.plugin(screen);
+Alpine.plugin(screen());
 Alpine.start();
 ```
 
-## Default breakpoints
+## Default intervals
 
-| Type | Range |
+| Name | Range |
 |------|-------|
 | Mobile | ≤ 767px |
-| Tablet | 768px – 1023px |
-| Desktop | ≥ 1024px |
+| Desktop | ≥ 768px |
+
+## Custom intervals
+
+You can define arbitrary interval names and breakpoints. Intervals are checked **smallest-first** — the first interval whose `maxWidth >= window.innerWidth` wins.
+
+```js
+import Alpine from "alpinejs";
+import screen from "@ailuracode/alpine-screen";
+
+Alpine.plugin(screen({
+  intervals: [
+    { name: "phone", maxWidth: 480 },
+    { name: "tablet", maxWidth: 768 },
+    { name: "desktop", maxWidth: Infinity },
+  ],
+}));
+Alpine.start();
+```
+
+For full TypeScript inference of interval names, use `as const`:
+
+```js
+Alpine.plugin(screen({
+  intervals: [
+    { name: "phone", maxWidth: 480 },
+    { name: "tablet", maxWidth: 768 },
+    { name: "desktop", maxWidth: Infinity },
+  ] as const,
+}));
+// $store.device.type is "phone" | "tablet" | "desktop"
+```
 
 ## Store API
 
@@ -36,34 +66,23 @@ Store name: `$store.device`
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `type` | `DeviceType` | `mobile`, `tablet`, or `desktop` (via `matchMedia`) |
+| `type` | `Name` | Current interval name (resolved via `matchMedia`) |
 | `width` | `number` | Current `window.innerWidth` |
-| `mobileMax` | `number` | Mobile upper bound (default `767`) |
-| `tabletMax` | `number` | Tablet upper bound (default `1023`) |
-
-### Getters
-
-| Getter | Description |
-|--------|-------------|
-| `isMobile` | `type === 'mobile'` |
-| `isTablet` | `type === 'tablet'` |
-| `isDesktop` | `type === 'desktop'` |
+| `intervals` | `readonly ScreenInterval<Name>[]` | The configured intervals array |
 
 ### Methods
 
 | Method | Description |
 |--------|-------------|
-| `is(name)` | Generic type check: `is('mobile')` — `name` is `DeviceType` |
-| `refresh()` | Update type and width |
-| `refreshType()` | Update type only |
-| `refreshWidth()` | Update width only |
-| `setBreakpoints({ mobileMax, tabletMax })` | Custom breakpoints and rebind listeners |
+| `is(name)` | Check if current type matches: `is('mobile')` |
+| `refresh()` | Update type and width, returns `true` if changed |
+| `refreshWidth()` | Update width only, returns `true` if changed |
 
 ## HTML examples
 
 ```html
-<span x-show="$store.device.isMobile">Mobile nav</span>
-<span x-show="$store.device.isDesktop">Desktop nav</span>
+<span x-show="$store.device.is('mobile')">Mobile nav</span>
+<span x-show="$store.device.is('desktop')">Desktop nav</span>
 
 <p>Width: <span x-text="$store.device.width"></span>px</p>
 <p>Device: <span x-text="$store.device.type"></span></p>
@@ -73,28 +92,20 @@ Store name: `$store.device`
 
 ```js
 import {
-  DEVICE_TYPES,
-  DEFAULT_DEVICE_BREAKPOINTS,
-  deviceBreakpoints,
-  readDeviceSnapshot,
-  resolveDeviceTypeFromWidth,
+  DEFAULT_SCREEN_INTERVALS,
+  screenIntervals,
+  readScreenSnapshot,
+  resolveScreenType,
 } from "@ailuracode/alpine-screen";
 ```
 
-`readDeviceSnapshot()` and `resolveDeviceTypeFromWidth()` derive type from width. `$store.device.type` uses `matchMedia` at runtime and may differ in edge cases.
-
-## Custom breakpoints
-
-```js
-// After Alpine.start(), from a component or script:
-Alpine.store("device").setBreakpoints(
-  deviceBreakpoints({ mobileMax: 640, tabletMax: 1024 }),
-);
-```
-
-Or call during plugin init via a wrapper if you need custom defaults at startup.
+| Helper | Description |
+|--------|-------------|
+| `screenIntervals(intervals)` | Asserts literal types (`as const`) on an intervals array |
+| `resolveScreenType(width, intervals)` | Pure: resolves which interval a width belongs to |
+| `readScreenSnapshot(intervals?)` | Reads a snapshot from current `window.innerWidth` |
 
 ## Performance
 
 - Device **type** updates via `matchMedia` `change` events (no resize polling)
-- **Width** updates on `resize`, coalesced to one refresh per animation frame
+- **Width** updates on `resize`, debounced to 100 ms

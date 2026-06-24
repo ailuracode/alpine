@@ -60,5 +60,8 @@ declare global {
     interface Stores {
       scroll: ScrollStore;
     }
+    interface Magics<T> {
+      $scroll: ScrollStore;
+    }
   }
 }

@@ -1,10 +1,13 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
 import PokeapiQueryDemo from "../components/PokeapiQueryDemo.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-	<main class="container max-w-3xl mx-auto px-6 py-4 grid gap-4 pb-16">
+	<main
+		class="px-6 py-4 grid gap-4 pb-16 transition-[margin-left] duration-300"
+		x-bind:class="$store.device?.is('desktop') ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : 'max-w-3xl mx-auto'"
+	>
 		<section class="card bg-base-100 shadow-sm border border-base-200">
 			<div class="card-body">
 				<h2 class="card-title text-base">Theme <code class="text-base-content/60 font-normal">$store.theme</code></h2>
@@ -83,13 +86,10 @@ import PokeapiQueryDemo from "../components/PokeapiQueryDemo.astro";
 					<strong x-text="$store.device.width"></strong>px
 				</p>
 				<div class="flex flex-wrap gap-2 mt-2">
-					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isMobile }">
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.is('mobile') }">
 						Mobile
 					</span>
-					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isTablet }">
-						Tablet
-					</span>
-					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.isDesktop }">
+					<span class="badge badge-outline" x-bind:class="{ 'badge-primary': $store.device.is('desktop') }">
 						Desktop
 					</span>
 				</div>
@@ -608,6 +608,122 @@ import PokeapiQueryDemo from "../components/PokeapiQueryDemo.astro";
 				</div>
 			</div>
 		</section>
+
+		<!-- Sidebar overlay — mobile only -->
+		<div
+			x-show="!$store.device?.is('desktop') && $store.sidebar.hasOverlay"
+			x-transition.opacity
+			class="fixed inset-0 bg-black/50 z-30"
+			@click="$store.sidebar.hide()"
+			style="display: none;"
+		></div>
+
+		<!-- Left sidebar — persistent on desktop, drawer on mobile -->
+		<aside
+			x-show="$store.device?.is('desktop') || $store.sidebar.open"
+			x-transition:enter="transition ease-out duration-300"
+			x-transition:enter-start="-translate-x-full"
+			x-transition:enter-end="translate-x-0"
+			x-transition:leave="transition ease-in duration-200"
+			x-transition:leave-start="translate-x-0"
+			x-transition:leave-end="-translate-x-full"
+			class="fixed left-0 z-40 bg-base-100 shadow-xl flex flex-col overflow-hidden transition-[width] duration-300 ease-out"
+			style="display: none;"
+			x-bind:class="{
+				'inset-y-0': true,
+				'w-64': !$store.device?.is('desktop') || !$store.sidebar.collapsed,
+				'w-16': $store.device?.is('desktop') && $store.sidebar.collapsed,
+			}"
+		>
+			<!-- Logo -->
+			<div class="flex items-center h-14 px-4 border-b border-base-200 shrink-0" :class="$store.sidebar.collapsed ? 'px-2' : 'px-4'">
+				<div class="flex items-center gap-3 overflow-hidden">
+					<img src="/logo.png" alt="ailuracode" class="w-8 h-8 rounded-lg shrink-0" />
+					<span
+						class="font-bold text-sm whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Alpine Plugins
+					</span>
+				</div>
+			</div>
+
+			<!-- Navigation -->
+			<nav class="flex flex-col gap-0.5 p-2 flex-1 min-h-0 overflow-y-auto">
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Dashboard
+					</span>
+				</a>
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Pages
+					</span>
+				</a>
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Media
+					</span>
+				</a>
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Calendar
+					</span>
+				</a>
+
+				<div class="divider my-1" x-show="!$store.sidebar.collapsed"></div>
+				<div class="h-px bg-base-200 my-1 mx-3" x-show="$store.sidebar.collapsed"></div>
+
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Analytics
+					</span>
+				</a>
+				<a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-base-200 transition-colors">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+					</svg>
+					<span
+						class="whitespace-nowrap overflow-hidden transition-[max-width,opacity] duration-300"
+						x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+					>
+						Settings
+					</span>
+				</a>
+			</nav>
+
+		</aside>
 	</main>
 
 	<footer class="footer footer-center p-6 text-base-content/60 text-sm">

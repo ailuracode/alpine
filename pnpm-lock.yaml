@@ -96,6 +96,9 @@ importers:
       '@ailuracode/alpine-share':
         specifier: workspace:*
         version: link:../packages/share
+      '@ailuracode/alpine-sidebar':
+        specifier: workspace:*
+        version: link:../packages/sidebar
       '@ailuracode/alpine-theme':
         specifier: workspace:*
         version: link:../packages/theme
@@ -321,6 +324,15 @@ importers:
         version: 3.15.12
 
   packages/share:
+    dependencies:
+      '@types/alpinejs':
+        specifier: ^3.13.11
+        version: 3.13.11
+      alpinejs:
+        specifier: ^3.0.0
+        version: 3.15.12
+
+  packages/sidebar:
     dependencies:
       '@types/alpinejs':
         specifier: ^3.13.11

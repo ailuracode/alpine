@@ -35,6 +35,7 @@
     "@ailuracode/alpine-screen": "workspace:*",
     "@ailuracode/alpine-scroll": "workspace:*",
     "@ailuracode/alpine-share": "workspace:*",
+    "@ailuracode/alpine-sidebar": "workspace:*",
     "@ailuracode/alpine-theme": "workspace:*",
     "@ailuracode/alpine-toggle": "workspace:*",
     "@ailuracode/alpine-touch": "workspace:*",

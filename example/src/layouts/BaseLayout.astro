@@ -2,13 +2,13 @@
 import "../styles/global.css";
 
 interface Props {
-	title?: string;
-	description?: string;
+  title?: string;
+  description?: string;
 }
 
 const {
-	title = "Alpine.js + @ailuracode",
-	description = "Interactive demo of @ailuracode plugins for Alpine.js",
+  title = "Alpine.js + @ailuracode",
+  description = "Interactive demo of @ailuracode plugins for Alpine.js",
 } = Astro.props;
 ---
 
@@ -41,13 +41,21 @@ const {
 			x-data="{ copied: false, exportedText: null, exportedJson: null, shared: null }"
 			x-cloak
 		>
-			<header class="hero bg-base-100 border-b border-base-300 py-8">
-				<div class="hero-content text-center">
-					<div>
-						<h1 class="text-3xl font-bold">Alpine.js + @ailuracode</h1>
-						<p class="text-base-content/70 mt-1">
-							Interactive demo of all plugins · Astro · DaisyUI
-						</p>
+			<header class="sticky top-0 z-30 bg-base-100 border-b border-base-300 transition-[margin] duration-300" x-bind:class="$store.device?.is('desktop') ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''">
+				<div class="flex items-center gap-3 px-4 h-14">
+					<button
+						type="button"
+						class="btn btn-sm btn-ghost btn-square shrink-0"
+						@click="$store.device?.is('desktop') ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
+						aria-label="Toggle sidebar"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+						</svg>
+					</button>
+					<div class="min-w-0">
+						<h1 class="text-lg font-bold truncate">Alpine.js + @ailuracode</h1>
+						<p class="text-xs text-base-content/70 truncate leading-tight">Interactive demo of all plugins · Astro · DaisyUI</p>
 					</div>
 				</div>
 			</header>

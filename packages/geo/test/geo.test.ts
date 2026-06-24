@@ -190,12 +190,16 @@ describe("@ailuracode/alpine-geo", () => {
     });
 
     const stores: Record<string, unknown> = {};
+    const magics: Record<string, unknown> = {};
     const Alpine = {
       store(name: string, value?: unknown) {
         if (value !== undefined) {
           stores[name] = value;
         }
         return stores[name];
+      },
+      magic(name: string, factory: () => unknown) {
+        magics[name] = factory();
       },
     };
 
@@ -239,12 +243,16 @@ describe("@ailuracode/alpine-geo", () => {
     });
 
     const stores: Record<string, unknown> = {};
+    const magics: Record<string, unknown> = {};
     const Alpine = {
       store(name: string, value?: unknown) {
         if (value !== undefined) {
           stores[name] = value;
         }
         return stores[name];
+      },
+      magic(name: string, factory: () => unknown) {
+        magics[name] = factory();
       },
     };
 

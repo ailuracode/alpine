@@ -4,6 +4,7 @@ import type {
   ToastPluginOptions,
   ToastVariant,
 } from "./types.js";
+import { TOAST_STORE_KEY } from "./types.js";
 
 const DEFAULT_PLUGIN_OPTIONS = {
   defaultPosition: "bottom-right",
@@ -63,7 +64,7 @@ export function resolveToastPluginConfig<
     maxVisible,
     listenToWindowEvents:
       options.listenToWindowEvents ?? DEFAULT_PLUGIN_OPTIONS.listenToWindowEvents,
-    storeKey: options.storeKey ?? "toast",
+    storeKey: options.storeKey ?? TOAST_STORE_KEY,
     variants,
     positions,
     promise: resolvePromiseConfig(variants, options.promise),

@@ -2,7 +2,7 @@ import type AlpineType from "alpinejs";
 import { resolveToastPluginConfig } from "./config.js";
 import { createToastMagic } from "./magic.js";
 import { createToastStore } from "./store.js";
-import type { ToastEventPayload, ToastPluginOptions, ToastStore } from "./types.js";
+import type { ToastEventPayload, ToastPluginOptions, ToastStore, ToastStoreKey } from "./types.js";
 
 export {
   resolveToastPluginConfig,
@@ -39,12 +39,29 @@ export type {
   ToastPromiseMessages,
   ToastPromiseOptions,
   ToastStore,
+  ToastStoreKey,
   ToastVariant,
   ToastVariantMethods,
 } from "./types.js";
 
-/** Internal Alpine store key used by the toast plugin. */
-export const TOAST_STORE_KEY = "toast";
+export { TOAST_STORE_KEY } from "./types.js";
+
+function registerAlpineToastStore<TPositions extends readonly string[], TContent>(
+  Alpine: AlpineType.Alpine,
+  storeKey: ToastStoreKey,
+  store: ToastStore<readonly [], TPositions, TContent>
+): void {
+  const registerStore = Alpine.store as (name: ToastStoreKey, value: unknown) => void;
+  registerStore(storeKey, store);
+}
+
+function getToastStore<
+  TVariants extends readonly string[],
+  TPositions extends readonly string[],
+  TContent,
+>(Alpine: AlpineType.Alpine, storeKey: ToastStoreKey): ToastStore<TVariants, TPositions, TContent> {
+  return Alpine.store(storeKey) as unknown as ToastStore<TVariants, TPositions, TContent>;
+}
 
 function registerToastPlugin<
   TVariants extends readonly string[],
@@ -80,11 +97,10 @@ function registerToastPlugin<
     baseDestroy();
   };
 
-  Alpine.store(config.storeKey, store);
-  reactiveStore = Alpine.store(config.storeKey) as ToastStore<TVariants, TPositions, TContent>;
-  const toast = createToastMagic(
-    config,
-    () => Alpine.store(config.storeKey) as ToastStore<TVariants, TPositions, TContent>
+  registerAlpineToastStore<TPositions, TContent>(Alpine, config.storeKey, store);
+  reactiveStore = getToastStore<TVariants, TPositions, TContent>(Alpine, config.storeKey);
+  const toast = createToastMagic(config, () =>
+    getToastStore<TVariants, TPositions, TContent>(Alpine, config.storeKey)
   );
   Alpine.magic("toast", () => toast);
 
@@ -128,6 +144,9 @@ export default function toastPlugin<
 
 declare global {
   namespace Alpine {
+    interface Stores {
+      toast: import("./types.js").ToastStore;
+    }
     interface Magics<T> {
       $toast: import("./types.js").ToastMagic;
     }

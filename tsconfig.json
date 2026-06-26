@@ -29,6 +29,7 @@
       "@ailuracode/alpine-query-adapter-zustand": ["./packages/query-adapter-zustand/src/index.ts"],
       "@ailuracode/alpine-query-devtools": ["./packages/query-devtools/src/index.ts"],
       "@ailuracode/alpine-screen": ["./packages/screen/src/index.ts"],
+      "@ailuracode/alpine-sidebar": ["./packages/sidebar/src/index.ts"],
       "@ailuracode/alpine-scroll": ["./packages/scroll/src/index.ts"],
       "@ailuracode/alpine-theme": ["./packages/theme/src/index.ts"],
       "@ailuracode/alpine-toggle": ["./packages/toggle/src/index.ts"],

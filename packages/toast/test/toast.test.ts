@@ -607,7 +607,7 @@ describe("@ailuracode/alpine-toast", () => {
     expect(toast.success).toBeTypeOf("function");
     expect(toast.dismiss).toBeTypeOf("function");
     expect(toast.promise).toBeTypeOf("function");
-    expect((toast as Record<string, unknown>).dismiss).toBe(toast.dismiss);
+    expect("dismiss" in toast && toast.dismiss).toBe(toast.dismiss);
   });
 
   it("marks trimmed toasts as removed instead of dropping them immediately", () => {

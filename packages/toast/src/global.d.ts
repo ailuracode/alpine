@@ -2,6 +2,8 @@
 
 export declare const TOAST_STORE_KEY: "toast";
 
+export type ToastStoreKey = typeof TOAST_STORE_KEY;
+
 export type DefaultToastPosition = "bottom-right";
 
 export type ToastPosition<TPositions extends readonly string[] = readonly []> =
@@ -82,7 +84,7 @@ export interface ToastPluginOptions<
   maxToasts?: number;
   maxVisible?: number;
   listenToWindowEvents?: boolean;
-  storeKey?: string;
+  storeKey?: ToastStoreKey;
 }
 
 export interface ToastPromiseMessages<
@@ -189,7 +191,7 @@ export type ResolvedToastPluginConfig<
   maxToasts: number;
   maxVisible: number;
   listenToWindowEvents: boolean;
-  storeKey: string;
+  storeKey: ToastStoreKey;
   variants: TVariants;
   positions: TPositions;
   promise: ResolvedPromiseConfig<TVariants>;
@@ -254,6 +256,9 @@ export default toastPlugin;
 
 declare global {
   namespace Alpine {
+    interface Stores {
+      toast: ToastStore;
+    }
     interface Magics<T> {
       $toast: ToastMagic;
     }

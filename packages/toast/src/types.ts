@@ -1,3 +1,8 @@
+/** Built-in Alpine store key for the toast queue. */
+export const TOAST_STORE_KEY = "toast" as const;
+
+export type ToastStoreKey = typeof TOAST_STORE_KEY;
+
 /** Built-in position used when none is provided. Map to CSS in your UI layer. */
 export type DefaultToastPosition = "bottom-right";
 
@@ -100,7 +105,7 @@ export interface ToastPluginOptions<
   /** Listen for `toast` window events. Default: `true`. */
   listenToWindowEvents?: boolean;
   /** Internal store key. Default: `"toast"`. */
-  storeKey?: string;
+  storeKey?: ToastStoreKey;
 }
 
 export interface ToastPromiseMessages<
@@ -222,7 +227,7 @@ export type ResolvedToastPluginConfig<
   maxToasts: number;
   maxVisible: number;
   listenToWindowEvents: boolean;
-  storeKey: string;
+  storeKey: ToastStoreKey;
   variants: TVariants;
   positions: TPositions;
   promise: ResolvedPromiseConfig<TVariants>;

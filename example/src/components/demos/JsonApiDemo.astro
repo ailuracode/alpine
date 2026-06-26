@@ -1,0 +1,34 @@
+---
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="JSON:API" api="$jsonapi" x-data="jsonApiDemo" x-init="init()">
+	<p class="text-sm text-muted-foreground">
+		Typed JSON:API client backed by a static compound document. Articles load via
+		<code>jsonApiQueryOptions()</code> and <code>$store.query.observe()</code> with
+		<code>include: ['author']</code>. Author names come from
+		<code>relationships.author.resolved</code>.
+	</p>
+	<p class="text-sm text-muted-foreground" x-show="query?.isLoading" x-cloak>Loading articles…</p>
+	<p class="text-sm text-destructive" x-show="query?.isError" x-cloak x-text="query?.error?.message"></p>
+	<div class="relative w-full overflow-x-auto mt-3" x-show="query?.isSuccess" x-cloak>
+		<table class="w-full caption-bottom text-sm">
+			<thead class="[&_tr]:border-b">
+				<tr class="border-b">
+					<th class="h-10 px-2 text-left align-middle font-medium">ID</th>
+					<th class="h-10 px-2 text-left align-middle font-medium">Title</th>
+					<th class="h-10 px-2 text-left align-middle font-medium">Author</th>
+				</tr>
+			</thead>
+			<tbody class="[&_tr:last-child]:border-0">
+				<template x-for="row in rows" :key="row.id">
+					<tr class="border-b transition-colors hover:bg-muted/50">
+						<td class="p-2 align-middle" x-text="row.id"></td>
+						<td class="p-2 align-middle" x-text="row.title"></td>
+						<td class="p-2 align-middle" x-text="row.author"></td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+	</div>
+</DemoSection>

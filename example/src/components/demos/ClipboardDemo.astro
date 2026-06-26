@@ -1,0 +1,14 @@
+---
+import Alert from "../astro/Alert.astro";
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Clipboard" api="$clipboard">
+	<Button @click="await $clipboard('Hello from Alpine!'); copied = true; setTimeout(function () { copied = false }, 2000)">
+		Copy text
+	</Button>
+	<Alert variant="success" class="mt-3" x-show="copied" x-cloak>
+		<span>Copied to clipboard!</span>
+	</Alert>
+</DemoSection>

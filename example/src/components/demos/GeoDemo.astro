@@ -1,0 +1,35 @@
+---
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Geo" api="$store.geo">
+	<p class="text-sm text-muted-foreground" x-show="!$store.geo.isSupported" x-cloak>
+		Geolocation is not available in this browser.
+	</p>
+	<template x-if="$store.geo.isSupported">
+		<div>
+			<div class="flex flex-wrap gap-2 mt-1">
+				<Button
+					@click="$store.geo.request({ enableHighAccuracy: true })"
+					x-bind:disabled="$store.geo.isLoading"
+				>
+					<span x-text="$store.geo.isLoading ? 'Locating…' : 'Get location'"></span>
+				</Button>
+				<Button x-show="!$store.geo.isWatching" x-cloak @click="$store.geo.watch()">
+					Start tracking
+				</Button>
+				<Button x-show="$store.geo.isWatching" x-cloak @click="$store.geo.unwatch()">
+					Stop tracking
+				</Button>
+				<Button @click="$store.geo.reset()">Reset</Button>
+			</div>
+			<p class="mt-3" x-show="$store.geo.hasPosition" x-cloak>
+				Lat: <strong x-text="$store.geo.latitude?.toFixed(4)"></strong>,
+				Lng: <strong x-text="$store.geo.longitude?.toFixed(4)"></strong>
+				(±<strong x-text="Math.round($store.geo.accuracy ?? 0)"></strong> m)
+			</p>
+			<p class="text-sm text-destructive mt-2" x-show="$store.geo.hasError" x-cloak x-text="$store.geo.error"></p>
+		</div>
+	</template>
+</DemoSection>

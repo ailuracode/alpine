@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
@@ -7,14 +8,17 @@ const pkg = (name: string) => `${root}../packages/${name}/src/index.ts`;
 
 // https://astro.build/config
 export default defineConfig({
+  integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
       alias: {
+        "@": `${root}src`,
         "@ailuracode/alpine-attention": pkg("attention"),
         "@ailuracode/alpine-battery": pkg("battery"),
         "@ailuracode/alpine-calendar": pkg("calendar"),
         "@ailuracode/alpine-clipboard": pkg("clipboard"),
+        "@ailuracode/alpine-toast": pkg("toast"),
         "@ailuracode/alpine-export": pkg("export"),
         "@ailuracode/alpine-geo": pkg("geo"),
         "@ailuracode/alpine-network": pkg("network"),
@@ -26,6 +30,7 @@ export default defineConfig({
         "@ailuracode/alpine-query-adapter-zustand": pkg("query-adapter-zustand"),
         "@ailuracode/alpine-query-devtools": pkg("query-devtools"),
         "@ailuracode/alpine-screen": pkg("screen"),
+        "@ailuracode/alpine-sidebar": pkg("sidebar"),
         "@ailuracode/alpine-scroll": pkg("scroll"),
         "@ailuracode/alpine-share": pkg("share"),
         "@ailuracode/alpine-theme": pkg("theme"),

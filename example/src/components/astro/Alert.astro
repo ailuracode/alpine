@@ -1,0 +1,30 @@
+---
+import { alertVariants } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+
+type AlertTone = "default" | "destructive" | "success" | "warning" | "info";
+
+interface Props {
+  variant?: AlertTone;
+  class?: string;
+}
+
+const toneClasses: Record<AlertTone, string> = {
+  default: "",
+  destructive: "",
+  success: "border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400",
+  warning: "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  info: "border-blue-500/50 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+};
+
+const { variant = "default", class: className, ...rest } = Astro.props as Props;
+const shadcnVariant = variant === "destructive" ? "destructive" : "default";
+---
+
+<div
+	role="alert"
+	class={cn(alertVariants({ variant: shadcnVariant }), toneClasses[variant], "py-2", className)}
+	{...rest}
+>
+	<slot />
+</div>

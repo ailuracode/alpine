@@ -1,0 +1,37 @@
+---
+import Alert from "../astro/Alert.astro";
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Notify" api="$notify">
+	<ul class="list-disc list-inside space-y-1">
+		<li>Supported: <strong x-text="$notify.isSupported"></strong></li>
+		<li>Permission: <strong x-text="$notify.permission"></strong></li>
+	</ul>
+	<Alert variant="warning" class="mt-3" x-show="$notify.requiresHomeScreenInstall" x-cloak>
+		<span>On iPhone and iPad, add this site to your Home Screen and open it from there to enable notifications.</span>
+	</Alert>
+	<div class="flex flex-wrap gap-2 mt-3">
+		<Button
+			x-show="$notify.isSupported && $notify.permission === 'default'"
+			x-cloak
+			@click="await $notify.requestPermission()"
+		>
+			Request permission
+		</Button>
+		<Button
+			x-show="$notify.isSupported && $notify.permission === 'granted'"
+			x-cloak
+			@click="await $notify.sendAsync('Task complete', { body: 'Plugins are working correctly.' })"
+		>
+			Send notification
+		</Button>
+		<Button x-show="$notify.isSupported" x-cloak @click="await $notify.sendIfPermittedAsync('Silent notification')">
+			sendIfPermitted
+		</Button>
+	</div>
+	<Alert variant="destructive" class="mt-3" x-show="$notify.isSupported && $notify.permission === 'denied'" x-cloak>
+		<span>Permission denied — enable notifications in your browser settings.</span>
+	</Alert>
+</DemoSection>

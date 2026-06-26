@@ -19,18 +19,37 @@ import scroll from "@ailuracode/alpine-scroll";
 import share from "@ailuracode/alpine-share";
 import sidebar from "@ailuracode/alpine-sidebar";
 import theme from "@ailuracode/alpine-theme";
+import toast, { toastPositions, toastVariants } from "@ailuracode/alpine-toast";
 import toggle from "@ailuracode/alpine-toggle";
 import touch from "@ailuracode/alpine-touch";
 import visibility from "@ailuracode/alpine-visibility";
 import type { Alpine } from "alpinejs";
+import { registerCalendarDemo } from "./calendar-demo.js";
+import { registerDemoShell, registerToastDemoHandlers } from "./demo-shell.js";
 import { jsonApiDemoOptions, registerJsonApiDemo } from "./json-api-demo.js";
 import { registerQueryDemos } from "./query-demos.js";
+import { registerToastSonner } from "./sonner-demo.js";
+import { registerToggleDemos } from "./toggle-demos.js";
+
+export const toastDemoVariants = toastVariants([
+  "success",
+  "info",
+  "warning",
+  "error",
+  "loading",
+] as const);
+
+export const toastDemoPositions = toastPositions(["top-center", "bottom-right"] as const);
+
+export type ToastDemoContent =
+  | { kind: "badge"; label: string; seats?: number }
+  | { kind: "undo-demo" };
 
 export default (Alpine: Alpine) => {
   Alpine.plugin(
     theme({
       onChange({ resolved }) {
-        document.documentElement.dataset.theme = resolved;
+        document.documentElement.classList.toggle("dark", resolved === "dark");
         document.documentElement.style.colorScheme = resolved;
       },
     })
@@ -72,6 +91,19 @@ export default (Alpine: Alpine) => {
   Alpine.plugin(clipboard);
   Alpine.plugin(exportPlugin);
   Alpine.plugin(geo);
+  Alpine.plugin(
+    toast({
+      variants: toastDemoVariants,
+      positions: toastDemoPositions,
+      promise: {
+        loadingVariant: "loading",
+        successVariant: "success",
+        errorVariant: "error",
+      },
+      maxToasts: 5,
+      maxVisible: 3,
+    })
+  );
   Alpine.plugin(toggle);
   Alpine.plugin(touch);
   Alpine.plugin(platform);
@@ -80,6 +112,17 @@ export default (Alpine: Alpine) => {
   Alpine.plugin(jsonApi(jsonApiDemoOptions));
   const queryDemoStores = registerQueryDemos(Alpine);
   registerJsonApiDemo(Alpine);
-  Alpine.plugin(queryDevtools({ position: "bottom", additionalStores: queryDemoStores }));
+  registerToggleDemos(Alpine);
+  registerCalendarDemo(Alpine);
+  registerDemoShell(Alpine);
+  registerToastDemoHandlers(Alpine);
+  registerToastSonner(Alpine);
+  Alpine.plugin(
+    queryDevtools({
+      position: "bottom",
+      toggleCorner: "bottom-left",
+      additionalStores: queryDemoStores,
+    })
+  );
   Alpine.plugin(notify);
 };

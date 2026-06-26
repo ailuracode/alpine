@@ -1,0 +1,21 @@
+---
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Scroll" api="$store.scroll">
+	<ul class="list-disc list-inside space-y-1">
+		<li>Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
+		<li>Direction: <strong x-text="$store.scroll.direction || '—'"></strong></li>
+		<li>Progress: <strong x-text="Math.round($store.scroll.progress)"></strong>%</li>
+		<li>Locked: <strong x-text="$store.scroll.isLocked"></strong></li>
+	</ul>
+	<div class="flex flex-wrap gap-2 mt-3">
+		<Button @click="$store.scroll.toggleLock()">
+			<span x-text="$store.scroll.isLocked ? 'Unlock scroll' : 'Lock scroll'"></span>
+		</Button>
+		<Button x-show="$store.scroll.showToTop" x-cloak @click="$store.scroll.toTop()">
+			Back to top
+		</Button>
+	</div>
+</DemoSection>

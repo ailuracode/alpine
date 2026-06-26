@@ -1,0 +1,33 @@
+---
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface Props {
+  title?: string;
+  api?: string;
+  class?: string;
+}
+
+const { title, api, class: className, ...rest } = Astro.props;
+---
+
+<Card class={className} {...rest}>
+	{
+		Astro.slots.has("title") || title ? (
+			<CardHeader>
+				{Astro.slots.has("title") ? (
+					<CardTitle>
+						<slot name="title" />
+					</CardTitle>
+				) : (
+					<CardTitle>
+						{title}
+						{api && <code class="text-muted-foreground font-normal ml-1.5">{api}</code>}
+					</CardTitle>
+				)}
+			</CardHeader>
+		) : null
+	}
+	<CardContent>
+		<slot />
+	</CardContent>
+</Card>

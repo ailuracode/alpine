@@ -1,4 +1,5 @@
 ---
+import SonnerToasts from "../components/SonnerToasts.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -24,7 +25,7 @@ const {
 					saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
 				var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 				var resolved = mode === "system" ? (dark ? "dark" : "light") : mode;
-				document.documentElement.dataset.theme = resolved;
+				document.documentElement.classList.toggle("dark", resolved === "dark");
 				document.documentElement.style.colorScheme = resolved;
 			})();
 		</script>
@@ -35,18 +36,17 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="min-h-screen bg-base-200 text-base-content">
-		<div
-			class="min-h-screen"
-			x-data="{ copied: false, exportedText: null, exportedJson: null, shared: null }"
-			x-cloak
-		>
-			<header class="sticky top-0 z-30 bg-base-100 border-b border-base-300 transition-[margin] duration-300" x-bind:class="$store.device?.is('desktop') ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''">
+	<body class="min-h-screen bg-background text-foreground" x-data="demoShell" x-cloak>
+		<div class="min-h-screen">
+			<header
+				class="sticky top-0 z-30 border-b border-border bg-background transition-[margin] duration-300"
+				x-bind:class="$store.device.type === 'desktop' ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''"
+			>
 				<div class="flex items-center gap-3 px-4 h-14">
 					<button
 						type="button"
-						class="btn btn-sm btn-ghost btn-square shrink-0"
-						@click="$store.device?.is('desktop') ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
+						class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-muted"
+						x-on:click="$store.device.type === 'desktop' ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
 						aria-label="Toggle sidebar"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -55,12 +55,12 @@ const {
 					</button>
 					<div class="min-w-0">
 						<h1 class="text-lg font-bold truncate">Alpine.js + @ailuracode</h1>
-						<p class="text-xs text-base-content/70 truncate leading-tight">Interactive demo of all plugins · Astro · DaisyUI</p>
+						<p class="text-xs text-muted-foreground truncate leading-tight">Interactive demo of all plugins · Astro · shadcn/ui</p>
 					</div>
 				</div>
 			</header>
 
-			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-base-300" aria-hidden="true">
+			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-muted" aria-hidden="true">
 				<div
 					class="h-full bg-primary transition-[width] duration-100 linear"
 					x-bind:style="'width: ' + $store.scroll.progress + '%'"
@@ -69,18 +69,7 @@ const {
 
 			<slot />
 
-			<div class="h-[120vh]" aria-hidden="true"></div>
-
-			<button
-				type="button"
-				class="btn btn-primary btn-circle fixed bottom-6 right-6 shadow-lg z-40"
-				x-show="$store.scroll.showToTop"
-				x-cloak
-				@click="$store.scroll.toTop()"
-				aria-label="Back to top"
-			>
-				↑
-			</button>
+			<SonnerToasts />
 		</div>
 
 		<script>

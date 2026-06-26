@@ -1,0 +1,19 @@
+---
+import Badge from "../astro/Badge.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Screen" api="$store.device">
+	<p>
+		Type: <strong x-text="$store.device.type"></strong> · Width:
+		<strong x-text="$store.device.width"></strong>px
+	</p>
+	<div class="flex flex-wrap gap-2 mt-2">
+		<Badge x-bind:class="{ 'bg-primary text-primary-foreground': $store.device.type === 'mobile' }">
+			Mobile
+		</Badge>
+		<Badge x-bind:class="{ 'bg-primary text-primary-foreground': $store.device.type === 'desktop' }">
+			Desktop
+		</Badge>
+	</div>
+</DemoSection>

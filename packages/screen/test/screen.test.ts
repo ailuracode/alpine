@@ -1,3 +1,4 @@
+import Alpine from "alpinejs";
 import { afterEach, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
@@ -239,5 +240,43 @@ describe("@ailuracode/alpine-screen with custom intervals", () => {
 
     expect(device.type).toBe("all");
     expect(device.is("all")).toBe(true);
+  });
+});
+
+describe("@ailuracode/alpine-screen DOM reactivity", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("updates x-text bindings when width changes on resize", async () => {
+    vi.useFakeTimers();
+    setMatchMedia("(max-width: 767px)", true);
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: 500,
+    });
+
+    startAlpine(screenPlugin());
+    document.body.innerHTML = `
+      <div x-data>
+        <span id="device-width" x-text="$store.device.width"></span>
+        <span id="device-type" x-text="$store.device.type"></span>
+      </div>
+    `;
+    Alpine.initTree(document.body);
+
+    expect(document.getElementById("device-width")?.textContent).toBe("500");
+    expect(document.getElementById("device-type")?.textContent).toBe("mobile");
+
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      writable: true,
+      value: 1200,
+    });
+    window.dispatchEvent(new Event("resize"));
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(document.getElementById("device-width")?.textContent).toBe("1200");
   });
 });

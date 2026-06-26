@@ -1,6 +1,6 @@
-# Alpine.js plugins example
+# Alpine.js plugins — docs & playground
 
-Interactive [Astro](https://astro.build) demo for all `@ailuracode/alpine-*` packages. Styled with [Tailwind CSS](https://tailwindcss.com) and [shadcn/ui](https://ui.shadcn.com/docs/installation/astro). Part of the pnpm workspace (`example/`). **Private** — not published to npm.
+[Starlight](https://starlight.astro.build/) documentation site plus an interactive Alpine.js playground for all `@ailuracode/alpine-*` packages. Part of the pnpm workspace (`example/`). **Private** — not published to npm.
 
 ## Run locally
 
@@ -17,7 +17,22 @@ Or from this directory:
 pnpm dev
 ```
 
-Open [http://localhost:4321](http://localhost:4321).
+Open [http://localhost:4321](http://localhost:4321) for documentation. Interactive demos:
+
+- [/playground/](http://localhost:4321/playground/) — catalog overview
+- [/playground/theme/](http://localhost:4321/playground/theme/) — one demo per plugin
+
+## Architecture
+
+| Path | Purpose |
+|------|---------|
+| `../docs/` | **Source of truth** for Markdown reference (edit here) |
+| `scripts/sync-docs.mjs` | Syncs `docs/` → `src/content/docs/` with Starlight frontmatter |
+| `src/content/docs/` | Starlight content (generated guides + `index.md`) |
+| `src/pages/playground/` | Overview + `[plugin].astro` subpages |
+| `src/playground-demos.ts` | Demo component registry |
+
+`pnpm dev` and `pnpm build` run `sync:docs` automatically.
 
 ## Build
 
@@ -26,15 +41,11 @@ pnpm run build
 pnpm run preview
 ```
 
-## Alpine setup
+## Alpine playground
 
-This demo loads Alpine manually from `BaseLayout.astro` (not `@astrojs/alpinejs`).
+The playground loads Alpine manually from `BaseLayout.astro` (not `@astrojs/alpinejs`).
 
-Two requirements for directives in `.astro` files to work:
+1. **Root `x-data`** on `<body>` — Alpine only walks the DOM from `x-data` roots.
+2. **Register plugins before `Alpine.start()`** — see `src/entrypoint.ts`.
 
-1. **Root `x-data`** on `<body>` — Alpine only walks the DOM from `x-data` roots. Without it, `$store` bindings in the layout and page never initialize.
-2. **Register plugins before `Alpine.start()`** — see `src/entrypoint.ts`, called from the layout script at the end of `<body>`.
-
-## Plugin registration
-
-Plugins are registered in `src/entrypoint.ts`.
+Plugins are registered in `src/entrypoint.ts`. Demo sections live under `src/components/demos/`.

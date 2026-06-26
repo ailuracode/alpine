@@ -1,20 +1,21 @@
 ---
 import { badgeVariants } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import Button from "../astro/Button.astro";
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("toggle")!;
 ---
 
-<DemoSection title="Toggle" api="$toggle">
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
 	<div class="grid gap-4">
 		<div x-data="toggleBinaryDemo">
-			<p>
-				Binary:
-				<strong x-text="power.value"></strong>
-			</p>
+			<p>Binary: <strong x-text="power.value"></strong></p>
 			<div class="flex flex-wrap gap-2 mt-2">
-				<Button @click="power.toggle()">Toggle</Button>
-				<Button @click="power.cycle()">Cycle</Button>
+				<DemoButton @click="power.toggle()">toggle()</DemoButton>
+				<DemoButton @click="power.cycle()">cycle()</DemoButton>
+				<DemoButton @click="power.reset()">reset()</DemoButton>
 				<span
 					class={cn(badgeVariants({ variant: "outline" }))}
 					x-bind:class="{ 'bg-primary text-primary-foreground': power.is(power.truly), 'text-muted-foreground': power.is(power.falsely) }"
@@ -24,18 +25,18 @@ import DemoSection from "../DemoSection.astro";
 		</div>
 		<div x-data="toggleTernaryDemo">
 			<p>
-				Ternary:
-				<strong x-text="answer.value"></strong>
-				<span
-					class="ml-2 inline-flex h-5 items-center rounded-4xl border border-amber-500/50 bg-amber-500/10 px-2 text-xs font-medium text-amber-700 dark:text-amber-400"
-					x-show="answer.is(answer.ternary)"
-				>neutral</span>
+				Ternary: <strong x-text="answer.value"></strong>
+				<span class="ml-2 inline-flex h-5 items-center rounded-4xl border border-amber-500/50 bg-amber-500/10 px-2 text-xs font-medium text-amber-700 dark:text-amber-400" x-show="answer.is(answer.ternary)">neutral</span>
 			</p>
 			<div class="flex flex-wrap gap-2 mt-2">
-				<Button @click="answer.toggle()">Yes / No</Button>
-				<Button @click="answer.cycle()">Cycle all</Button>
-				<Button variant="ghost" @click="answer.set(answer.ternary)">Unknown</Button>
+				<DemoButton @click="answer.toggle()">toggle()</DemoButton>
+				<DemoButton @click="answer.cycle()">cycle()</DemoButton>
+				<DemoButton @click="answer.reset()">reset()</DemoButton>
+				<DemoButton @click="answer.set(answer.ternary)">set(unknown)</DemoButton>
 			</div>
 		</div>
 	</div>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
+	</p>
 </DemoSection>

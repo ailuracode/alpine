@@ -1,4 +1,4 @@
-import type { QueryState, QueryStore } from "@ailuracode/alpine-query";
+import type { MutationState, QueryState, QueryStore } from "@ailuracode/alpine-query";
 import { createQueryClient, typedFetch } from "@ailuracode/alpine-query";
 import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
 import { createAlpineZustandAdapter } from "@ailuracode/alpine-query-adapter-zustand";
@@ -53,6 +53,9 @@ type PokeapiDemoData = {
   loadPage(): void;
   prevPage(): void;
   nextPage(): void;
+  invalidateCurrent(): void;
+  prefetchNext(): void;
+  removeCurrent(): void;
   init(): void;
   destroy(): void;
 };
@@ -81,6 +84,9 @@ function createPokeapiDemo(options: {
   adapterName: string;
   badge: string;
   observePage: (page: number) => QueryObserver;
+  invalidate: (page: number) => void;
+  prefetch: (page: number) => void;
+  remove: (page: number) => void;
 }) {
   return (): PokeapiDemoData => ({
     page: 1,
@@ -147,6 +153,22 @@ function createPokeapiDemo(options: {
         this.ensurePage(this.page);
       }
     },
+    invalidateCurrent() {
+      options.invalidate(this.page);
+      this.queries[this.page]?.destroy();
+      delete this.queries[this.page];
+      this.ensurePage(this.page);
+    },
+    prefetchNext() {
+      if (this.query?.data?.next) {
+        options.prefetch(this.page + 1);
+      }
+    },
+    removeCurrent() {
+      options.remove(this.page);
+      this.queries[this.page]?.destroy();
+      delete this.queries[this.page];
+    },
     init() {
       this.ensurePage(1);
     },
@@ -180,6 +202,19 @@ export function registerQueryDemos(Alpine: Alpine): QueryStore[] {
           staleTime: STALE_TIME,
         });
       },
+      invalidate: (page) => {
+        (Alpine.store("query") as QueryStore).invalidate(["pokemon", page]);
+      },
+      prefetch: (page) => {
+        (Alpine.store("query") as QueryStore).prefetch(
+          ["pokemon", page],
+          () => fetchPokemonPage(page),
+          { staleTime: STALE_TIME }
+        );
+      },
+      remove: (page) => {
+        (Alpine.store("query") as QueryStore).remove(["pokemon", page]);
+      },
     })
   );
 
@@ -192,6 +227,17 @@ export function registerQueryDemos(Alpine: Alpine): QueryStore[] {
         alpineClient.observe(["pokemon", "alpine", page], () => fetchPokemonPage(page), {
           staleTime: STALE_TIME,
         }),
+      invalidate: (page) => {
+        alpineClient.invalidate(["pokemon", "alpine", page]);
+      },
+      prefetch: (page) => {
+        alpineClient.prefetch(["pokemon", "alpine", page], () => fetchPokemonPage(page), {
+          staleTime: STALE_TIME,
+        });
+      },
+      remove: (page) => {
+        alpineClient.remove(["pokemon", "alpine", page]);
+      },
     })
   );
 
@@ -204,8 +250,92 @@ export function registerQueryDemos(Alpine: Alpine): QueryStore[] {
         zustandClient.observe(["pokemon", "zustand", page], () => fetchPokemonPage(page), {
           staleTime: STALE_TIME,
         }),
+      invalidate: (page) => {
+        zustandClient.invalidate(["pokemon", "zustand", page]);
+      },
+      prefetch: (page) => {
+        zustandClient.prefetch(["pokemon", "zustand", page], () => fetchPokemonPage(page), {
+          staleTime: STALE_TIME,
+        });
+      },
+      remove: (page) => {
+        zustandClient.remove(["pokemon", "zustand", page]);
+      },
     })
   );
 
   return [alpineClient, zustandClient];
+}
+
+let retryAttemptCounter = 0;
+
+type RenameMutation = MutationState<string, { name: string }>;
+type RetryResult = { ok: boolean; attempts: number };
+type PollResult = { fetchedAt: number };
+
+type QueryAdvancedDemoData = {
+  renameMutation: RenameMutation | null;
+  retryQuery: (QueryState<RetryResult> & { destroy(): void }) | null;
+  pollQuery: (QueryState<PollResult> & { destroy(): void }) | null;
+  init(): void;
+  destroy(): void;
+  renamePokemon(): Promise<void>;
+  resetRetryDemo(): void;
+};
+
+function createRetryObserver(store: QueryStore) {
+  retryAttemptCounter = 0;
+
+  return store.observe(
+    ["query-demo", "retry", Date.now()],
+    () => {
+      retryAttemptCounter++;
+
+      if (retryAttemptCounter < 3) {
+        return Promise.reject(new Error(`Attempt ${retryAttemptCounter} failed`));
+      }
+
+      return Promise.resolve({ ok: true, attempts: retryAttemptCounter });
+    },
+    { retry: 2, retryDelay: 300 }
+  );
+}
+
+export function registerQueryAdvancedDemo(Alpine: Alpine): void {
+  Alpine.data(
+    "queryAdvancedDemo",
+    (): QueryAdvancedDemoData => ({
+      renameMutation: null,
+      retryQuery: null,
+      pollQuery: null,
+      init() {
+        const store = Alpine.store("query") as QueryStore;
+
+        this.renameMutation = store.mutate({
+          mutationFn: async ({ name }) => `nickname:${name}`,
+        });
+        this.retryQuery = createRetryObserver(store);
+        this.pollQuery = store.observe(
+          ["query-demo", "poll"],
+          () => Promise.resolve({ fetchedAt: Date.now() }),
+          { refetchInterval: 3000, staleTime: 0 }
+        );
+      },
+      async renamePokemon() {
+        await this.renameMutation?.mutate({ name: "pikachu" });
+      },
+      resetRetryDemo() {
+        this.retryQuery?.destroy();
+        this.retryQuery = createRetryObserver(Alpine.store("query") as QueryStore);
+      },
+      destroy() {
+        this.renameMutation?.reset();
+        this.retryQuery?.destroy();
+        this.pollQuery?.destroy();
+        this.renameMutation = null;
+        this.retryQuery = null;
+        this.pollQuery = null;
+      },
+    })
+  );
 }

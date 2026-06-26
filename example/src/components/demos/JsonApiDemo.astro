@@ -1,34 +1,84 @@
 ---
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("json-api")!;
 ---
 
-<DemoSection title="JSON:API" api="$jsonapi" x-data="jsonApiDemo" x-init="init()">
-	<p class="text-sm text-muted-foreground">
-		Typed JSON:API client backed by a static compound document. Articles load via
-		<code>jsonApiQueryOptions()</code> and <code>$store.query.observe()</code> with
-		<code>include: ['author']</code>. Author names come from
-		<code>relationships.author.resolved</code>.
-	</p>
-	<p class="text-sm text-muted-foreground" x-show="query?.isLoading" x-cloak>Loading articles…</p>
-	<p class="text-sm text-destructive" x-show="query?.isError" x-cloak x-text="query?.error?.message"></p>
-	<div class="relative w-full overflow-x-auto mt-3" x-show="query?.isSuccess" x-cloak>
+<DemoSection
+	id={plugin.id}
+	title={plugin.title}
+	api={plugin.api}
+	description={plugin.description}
+>
+	<div x-data="jsonApiDemo" x-init="init()">
+	<div class="flex flex-wrap gap-2">
+		<DemoButton @click="toggleSort()">
+			Sort: <span class="tabular-nums" x-text="sort"></span>
+		</DemoButton>
+		<DemoButton @click="createArticle()">create()</DemoButton>
+		<DemoButton x-show="selectedId" x-cloak @click="updateSelected()">update()</DemoButton>
+		<DemoButton variant="destructive" x-show="selectedId" x-cloak @click="deleteSelected()">delete()</DemoButton>
+		<DemoButton x-show="selectedId" x-cloak @click="clearDetail()">Clear Detail</DemoButton>
+	</div>
+
+	<p class="text-sm text-muted-foreground" x-show="query?.isLoading" x-cloak aria-live="polite">Loading articles…</p>
+	<p class="text-sm text-destructive" x-show="query?.isError" x-cloak x-text="query?.error?.message" role="alert"></p>
+
+	<div class="relative w-full overflow-x-auto rounded-xl ring-1 ring-foreground/10" x-show="query?.isSuccess" x-cloak>
 		<table class="w-full caption-bottom text-sm">
 			<thead class="[&_tr]:border-b">
-				<tr class="border-b">
-					<th class="h-10 px-2 text-left align-middle font-medium">ID</th>
-					<th class="h-10 px-2 text-left align-middle font-medium">Title</th>
-					<th class="h-10 px-2 text-left align-middle font-medium">Author</th>
+				<tr class="border-b transition-colors hover:bg-muted/50">
+					<th scope="col" class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">ID</th>
+					<th scope="col" class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">Title</th>
+					<th scope="col" class="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">Author</th>
 				</tr>
 			</thead>
 			<tbody class="[&_tr:last-child]:border-0">
 				<template x-for="row in rows" :key="row.id">
-					<tr class="border-b transition-colors hover:bg-muted/50">
-						<td class="p-2 align-middle" x-text="row.id"></td>
-						<td class="p-2 align-middle" x-text="row.title"></td>
+					<tr
+						class="cursor-pointer border-b transition-colors hover:bg-muted/50"
+						x-bind:class="{ 'bg-primary/10': selectedId === row.id }"
+						@click="selectArticle(row.id)"
+					>
+						<td class="p-2 align-middle tabular-nums" x-text="row.id"></td>
+						<td class="max-w-xs truncate p-2 align-middle" x-text="row.title"></td>
 						<td class="p-2 align-middle" x-text="row.author"></td>
 					</tr>
 				</template>
 			</tbody>
 		</table>
+	</div>
+
+	<Card size="sm" x-show="detailQuery" x-cloak>
+		<CardHeader>
+			<CardTitle class="text-sm">jsonApiFindOneQueryOptions</CardTitle>
+		</CardHeader>
+		<CardContent class="space-y-2">
+			<p class="text-sm text-muted-foreground" x-show="detailQuery?.isLoading" aria-live="polite">Loading article…</p>
+			<template x-if="detailQuery?.isSuccess">
+				<div class="space-y-1 text-sm">
+					<p>
+						<strong x-text="detailQuery.data.data.attributes.title"></strong>
+					</p>
+					<p class="text-muted-foreground text-pretty" x-text="detailQuery.data.data.attributes.body"></p>
+					<p>
+						Author:
+						<strong x-text="detailQuery.data.data.relationships?.author?.resolved?.attributes.name ?? 'Unknown'"></strong>
+					</p>
+				</div>
+			</template>
+		</CardContent>
+	</Card>
+
+	<p class="text-xs text-muted-foreground">
+		Package: <code class="rounded bg-muted px-1 py-0.5 font-mono">{plugin.package}</code>
+		<span aria-hidden="true"> · </span>
+		Click a row for <code>findOne</code> with <code>include: ['author']</code>
+		<span aria-hidden="true"> · </span>
+		<code>create</code>/<code>update</code>/<code>delete</code> use an in-memory mock API
+	</p>
 	</div>
 </DemoSection>

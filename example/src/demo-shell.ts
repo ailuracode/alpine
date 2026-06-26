@@ -4,6 +4,7 @@ export type DemoShellData = {
   copied: boolean;
   exportedText: boolean | null;
   exportedJson: boolean | null;
+  exportedUrl: boolean | null;
   shared: boolean | null;
 };
 
@@ -14,6 +15,7 @@ export function registerDemoShell(Alpine: Alpine): void {
       copied: false,
       exportedText: null,
       exportedJson: null,
+      exportedUrl: null,
       shared: null,
     })
   );

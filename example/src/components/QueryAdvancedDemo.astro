@@ -1,0 +1,68 @@
+---
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Badge from "./astro/Badge.astro";
+import DemoButton from "./astro/DemoButton.astro";
+---
+
+<div x-data="queryAdvancedDemo" x-init="init()" @destroy="destroy()">
+	<Card size="sm" class="mt-4">
+		<CardHeader>
+			<CardTitle>Mutations, Retry & Polling</CardTitle>
+			<CardDescription>
+				Uses the Nanostores <code class="text-xs">$store.query</code> cache — same store as the adapters above.
+			</CardDescription>
+		</CardHeader>
+		<CardContent>
+			<div class="grid gap-4 md:grid-cols-3">
+				<Card size="sm">
+					<CardHeader>
+						<CardTitle class="text-sm">mutate()</CardTitle>
+					</CardHeader>
+					<CardContent class="space-y-2">
+						<DemoButton @click="renamePokemon()" x-bind:disabled="renameMutation?.isPending">
+							Rename Pokemon
+						</DemoButton>
+						<p class="text-sm" x-show="renameMutation?.isPending" x-cloak aria-live="polite">Pending…</p>
+						<p class="text-sm text-green-600 dark:text-green-400" x-show="renameMutation?.isSuccess" x-cloak aria-live="polite">
+							Result: <strong x-text="renameMutation?.data"></strong>
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card size="sm">
+					<CardHeader>
+						<CardTitle class="text-sm">retry</CardTitle>
+					</CardHeader>
+					<CardContent class="space-y-2">
+						<div class="flex flex-wrap gap-2">
+							<Badge x-show="retryQuery?.isFetching" x-cloak>Fetching</Badge>
+							<Badge variant="destructive" x-show="retryQuery?.isError" x-cloak>Error</Badge>
+							<Badge class="bg-green-600 text-white" x-show="retryQuery?.isSuccess" x-cloak>Success</Badge>
+						</div>
+						<p class="text-sm text-destructive" x-show="retryQuery?.isError" x-text="retryQuery?.error?.message" role="alert"></p>
+						<p class="text-sm" x-show="retryQuery?.isSuccess" x-cloak>
+							Succeeded after <strong class="tabular-nums" x-text="retryQuery?.data?.attempts"></strong> attempts
+						</p>
+						<DemoButton @click="resetRetryDemo()">Reset Demo</DemoButton>
+					</CardContent>
+				</Card>
+
+				<Card size="sm">
+					<CardHeader>
+						<CardTitle class="text-sm">refetchInterval</CardTitle>
+					</CardHeader>
+					<CardContent class="space-y-2">
+						<p class="text-sm">
+							Last fetch:
+							<strong
+								class="tabular-nums"
+								x-text="pollQuery?.data?.fetchedAt ? new Date(pollQuery.data.fetchedAt).toLocaleTimeString() : '—'"
+							></strong>
+						</p>
+						<p class="text-xs text-muted-foreground">Polls every 3s while this panel is mounted.</p>
+					</CardContent>
+				</Card>
+			</div>
+		</CardContent>
+	</Card>
+</div>

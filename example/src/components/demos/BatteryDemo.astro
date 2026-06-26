@@ -1,9 +1,12 @@
 ---
+import { getPluginNavItem } from "../../plugin-nav";
 import Alert from "../astro/Alert.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("battery")!;
 ---
 
-<DemoSection title="Battery" api="$battery">
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
 	<template x-if="$battery.isAvailable">
 		<div>
 			<div class="flex items-center gap-3 mb-3" aria-hidden="true">
@@ -42,5 +45,8 @@ import DemoSection from "../DemoSection.astro";
 	</template>
 	<p class="text-sm text-muted-foreground" x-show="!$battery.isAvailable" x-cloak>
 		Battery status is not available on this device or browser.
+	</p>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
 	</p>
 </DemoSection>

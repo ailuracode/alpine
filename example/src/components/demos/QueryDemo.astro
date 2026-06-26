@@ -1,21 +1,29 @@
 ---
+import { getPluginNavItem } from "../../plugin-nav";
 import DemoSection from "../DemoSection.astro";
 import PokeapiQueryDemo from "../PokeapiQueryDemo.astro";
+import QueryAdvancedDemo from "../QueryAdvancedDemo.astro";
+
+const plugin = getPluginNavItem("query")!;
 ---
 
-<DemoSection title="Query" api="$store.query">
-	<p class="text-sm text-muted-foreground">
-		Three state adapters — pick one for <code>query(&#123; adapter &#125;)</code>, then register
-		<code>$store.query</code>. Each column runs the same paginated
-		<a href="https://pokeapi.co/" target="_blank" rel="noreferrer" class="text-primary underline-offset-4 hover:underline">PokeAPI</a>
-		demo. Nanostores uses <code>$store.query</code> globally; Alpine.reactive and Zustand use
-		<code>createQueryClient</code>. Open the <strong>Query</strong> devtools button (bottom-right) to inspect
-		caches from all three adapters.
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<p class="text-sm text-muted-foreground text-pretty">
+		Three adapters — pick one for <code class="rounded bg-muted px-1 py-0.5 font-mono text-xs">query(&#123; adapter &#125;)</code>.
+		Each card runs the same paginated PokeAPI demo. Use <strong>Invalidate</strong>, <strong>Prefetch Next</strong>, and
+		<strong>Remove Cache</strong> to exercise the cache API. Open <strong>Query Devtools</strong> (bottom-right) to inspect observers.
 	</p>
-
-	<div class="grid gap-4 mt-4">
+	<div class="grid gap-4">
 		<PokeapiQueryDemo dataName="queryNanostoresAdapterDemo" title="Nanostores" badgeClass="bg-primary text-primary-foreground" />
 		<PokeapiQueryDemo dataName="queryAlpineAdapterDemo" title="Alpine.reactive" />
 		<PokeapiQueryDemo dataName="queryZustandAdapterDemo" title="Zustand" />
 	</div>
+	<QueryAdvancedDemo />
+	<p class="text-xs text-muted-foreground mt-3">
+		Packages: <code>{plugin.package}</code>,
+		<code>@ailuracode/alpine-query-adapter-nanostores</code>,
+		<code>@ailuracode/alpine-query-adapter-alpine</code>,
+		<code>@ailuracode/alpine-query-adapter-zustand</code>,
+		<code>@ailuracode/alpine-query-devtools</code>
+	</p>
 </DemoSection>

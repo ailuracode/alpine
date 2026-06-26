@@ -1,6 +1,7 @@
 ---
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Badge from "./astro/Badge.astro";
-import Button from "./astro/Button.astro";
+import DemoButton from "./astro/DemoButton.astro";
 
 interface Props {
   dataName: string;
@@ -11,66 +12,71 @@ interface Props {
 const { dataName, title, badgeClass = "" } = Astro.props;
 ---
 
-<article
-	class="rounded-xl border border-border bg-muted/50 p-4"
-	x-data={dataName}
-	x-init="init()"
-	@destroy="destroy()"
->
-	<h3 class="flex flex-wrap items-center gap-2 text-base font-semibold mb-2">
-		{title}
-		<Badge class={badgeClass} x-bind:class="{ 'bg-primary text-primary-foreground': query?.isSuccess }" x-text="badge" />
-	</h3>
+<div x-data={dataName} x-init="init()" @destroy="destroy()">
+	<Card size="sm">
+		<CardHeader>
+			<CardTitle class="flex flex-wrap items-center gap-2">
+				{title}
+				<Badge
+					class={badgeClass}
+					x-bind:class="{ 'bg-primary text-primary-foreground': query?.isSuccess }"
+					x-text="badge"
+				/>
+			</CardTitle>
+		</CardHeader>
+		<CardContent class="space-y-3">
+			<p class="text-sm text-destructive" x-show="query?.isError" x-text="query?.error?.message" role="alert"></p>
 
-	<p class="text-sm text-destructive mt-2" x-show="query?.isError" x-text="query?.error?.message"></p>
-
-	<div class="mt-3">
-		<div
-			class="query-table-wrap relative min-h-90 overflow-auto rounded-xl border border-border bg-card"
-			x-bind:class="{
-				'is-fetching': query?.isFetching && hasCachedPage,
-				'is-awaiting-data': isAwaitingData,
-			}"
-			x-bind:aria-busy="isAwaitingData || query?.isFetching"
-		>
-			<table class="w-full caption-bottom text-sm">
-				<thead class="[&_tr]:border-b">
-					<tr class="border-b">
-						<th scope="col" class="h-10 px-2 text-left align-middle font-medium">#</th>
-						<th scope="col" class="h-10 px-2 text-left align-middle font-medium">Name</th>
-					</tr>
-				</thead>
-				<tbody class="[&_tr:last-child]:border-0">
-					<template x-for="row in tableRows" :key="page + '-' + row.id">
-						<tr class="border-b transition-colors hover:bg-muted/50" x-bind:class="{ 'is-loading': row.loading }">
-							<td class="w-14 p-2 align-middle tabular-nums text-muted-foreground">
-								<span
-									class="query-table-skeleton"
-									x-show="row.loading"
-									x-text="row.id"
-									aria-hidden="true"
-								></span>
-								<span x-show="!row.loading" x-text="row.id"></span>
-							</td>
-							<td class="p-2 align-middle">
-								<span
-									class="query-table-skeleton"
-									x-show="row.loading"
-									x-text="row.name"
-									aria-hidden="true"
-								></span>
-								<span x-show="!row.loading" x-text="row.name"></span>
-							</td>
+			<div
+				class="query-table-wrap relative min-h-90 overflow-auto rounded-xl ring-1 ring-foreground/10 bg-card"
+				x-bind:class="{
+					'is-fetching': query?.isFetching && hasCachedPage,
+					'is-awaiting-data': isAwaitingData,
+				}"
+				x-bind:aria-busy="isAwaitingData || query?.isFetching"
+			>
+				<table class="w-full caption-bottom text-sm">
+					<thead class="[&_tr]:border-b">
+						<tr class="border-b">
+							<th scope="col" class="h-10 px-2 text-left align-middle font-medium">#</th>
+							<th scope="col" class="h-10 px-2 text-left align-middle font-medium">Name</th>
 						</tr>
-					</template>
-				</tbody>
-			</table>
-		</div>
-	</div>
+					</thead>
+					<tbody class="[&_tr:last-child]:border-0">
+						<template x-for="row in tableRows" :key="page + '-' + row.id">
+							<tr class="border-b transition-colors hover:bg-muted/50" x-bind:class="{ 'is-loading': row.loading }">
+								<td class="w-14 p-2 align-middle font-variant-numeric tabular-nums text-muted-foreground">
+									<span
+										class="query-table-skeleton"
+										x-show="row.loading"
+										x-text="row.id"
+										aria-hidden="true"
+									></span>
+									<span x-show="!row.loading" x-text="row.id"></span>
+								</td>
+								<td class="p-2 align-middle">
+									<span
+										class="query-table-skeleton"
+										x-show="row.loading"
+										x-text="row.name"
+										aria-hidden="true"
+									></span>
+									<span x-show="!row.loading" x-text="row.name"></span>
+								</td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+			</div>
 
-	<div class="flex flex-wrap gap-2 mt-3">
-		<Button @click="prevPage()" x-bind:disabled="page <= 1 || query?.isFetching">Previous</Button>
-		<Button @click="query?.refetch()" x-bind:disabled="!query || query.isFetching">Refresh</Button>
-		<Button @click="nextPage()" x-bind:disabled="!query?.data?.next || query?.isFetching">Next</Button>
-	</div>
-</article>
+			<div class="flex flex-wrap gap-2">
+				<DemoButton @click="prevPage()" x-bind:disabled="page <= 1 || query?.isFetching">Previous</DemoButton>
+				<DemoButton @click="query?.refetch()" x-bind:disabled="!query || query.isFetching">Refresh</DemoButton>
+				<DemoButton @click="nextPage()" x-bind:disabled="!query?.data?.next || query?.isFetching">Next</DemoButton>
+				<DemoButton @click="invalidateCurrent()" x-bind:disabled="!query">Invalidate</DemoButton>
+				<DemoButton @click="prefetchNext()" x-bind:disabled="!query?.data?.next">Prefetch Next</DemoButton>
+				<DemoButton @click="removeCurrent()" x-bind:disabled="!query">Remove Cache</DemoButton>
+			</div>
+		</CardContent>
+	</Card>
+</div>

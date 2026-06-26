@@ -1,37 +1,51 @@
 ---
+import { getPluginNavItem } from "../../plugin-nav";
 import Alert from "../astro/Alert.astro";
-import Button from "../astro/Button.astro";
+import DemoButton from "../astro/DemoButton.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("notify")!;
 ---
 
-<DemoSection title="Notify" api="$notify">
-	<ul class="list-disc list-inside space-y-1">
-		<li>Supported: <strong x-text="$notify.isSupported"></strong></li>
-		<li>Permission: <strong x-text="$notify.permission"></strong></li>
-	</ul>
-	<Alert variant="warning" class="mt-3" x-show="$notify.requiresHomeScreenInstall" x-cloak>
-		<span>On iPhone and iPad, add this site to your Home Screen and open it from there to enable notifications.</span>
-	</Alert>
-	<div class="flex flex-wrap gap-2 mt-3">
-		<Button
-			x-show="$notify.isSupported && $notify.permission === 'default'"
-			x-cloak
-			@click="await $notify.requestPermission()"
-		>
-			Request permission
-		</Button>
-		<Button
-			x-show="$notify.isSupported && $notify.permission === 'granted'"
-			x-cloak
-			@click="await $notify.sendAsync('Task complete', { body: 'Plugins are working correctly.' })"
-		>
-			Send notification
-		</Button>
-		<Button x-show="$notify.isSupported" x-cloak @click="await $notify.sendIfPermittedAsync('Silent notification')">
-			sendIfPermitted
-		</Button>
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div x-data="{ lastNote: null }">
+		<ul class="list-disc list-inside space-y-1 text-sm">
+			<li>Supported: <strong x-text="$notify.isSupported"></strong></li>
+			<li>Permission: <strong x-text="$notify.permission"></strong></li>
+		</ul>
+		<Alert variant="warning" class="mt-3" x-show="$notify.requiresHomeScreenInstall" x-cloak>
+			<span>On iPhone and iPad, add this site to your Home Screen and open it from there to enable notifications.</span>
+		</Alert>
+		<div class="flex flex-wrap gap-2 mt-3">
+			<DemoButton x-show="$notify.isSupported && $notify.permission === 'default'" x-cloak @click="await $notify.requestPermission()">
+				requestPermission()
+			</DemoButton>
+			<DemoButton
+				x-show="$notify.isSupported && $notify.permission === 'granted'"
+				x-cloak
+				@click="lastNote = $notify.send('Desktop sync', { body: 'Synchronous send() on desktop.' })"
+			>
+				send()
+			</DemoButton>
+			<DemoButton
+				x-show="$notify.isSupported && $notify.permission === 'granted'"
+				x-cloak
+				@click="lastNote = await $notify.sendAsync('Task complete', { body: 'Plugins are working correctly.', icon: '/logo.png' })"
+			>
+				sendAsync()
+			</DemoButton>
+			<DemoButton x-show="$notify.isSupported" x-cloak @click="await $notify.sendIfPermittedAsync('Silent notification')">
+				sendIfPermittedAsync()
+			</DemoButton>
+			<DemoButton x-show="lastNote" x-cloak @click="$notify.close(lastNote); lastNote = null">
+				close()
+			</DemoButton>
+		</div>
+		<Alert variant="destructive" class="mt-3" x-show="$notify.isSupported && $notify.permission === 'denied'" x-cloak>
+			<span>Permission denied — enable notifications in your browser settings.</span>
+		</Alert>
 	</div>
-	<Alert variant="destructive" class="mt-3" x-show="$notify.isSupported && $notify.permission === 'denied'" x-cloak>
-		<span>Permission denied — enable notifications in your browser settings.</span>
-	</Alert>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
+	</p>
 </DemoSection>

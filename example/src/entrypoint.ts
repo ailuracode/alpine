@@ -27,7 +27,7 @@ import type { Alpine } from "alpinejs";
 import { registerCalendarDemo } from "./calendar-demo.js";
 import { registerDemoShell, registerToastDemoHandlers } from "./demo-shell.js";
 import { jsonApiDemoOptions, registerJsonApiDemo } from "./json-api-demo.js";
-import { registerQueryDemos } from "./query-demos.js";
+import { registerQueryAdvancedDemo, registerQueryDemos } from "./query-demos.js";
 import { registerToastSonner } from "./sonner-demo.js";
 import { registerToggleDemos } from "./toggle-demos.js";
 
@@ -111,6 +111,7 @@ export default (Alpine: Alpine) => {
   Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
   Alpine.plugin(jsonApi(jsonApiDemoOptions));
   const queryDemoStores = registerQueryDemos(Alpine);
+  registerQueryAdvancedDemo(Alpine);
   registerJsonApiDemo(Alpine);
   registerToggleDemos(Alpine);
   registerCalendarDemo(Alpine);

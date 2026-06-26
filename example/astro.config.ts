@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import react from "@astrojs/react";
+import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
@@ -8,7 +9,50 @@ const pkg = (name: string) => `${root}../packages/${name}/src/index.ts`;
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react()],
+  integrations: [
+    starlight({
+      title: "Alpine.js + @ailuracode",
+      description: "Documentation and interactive demos for @ailuracode Alpine.js plugins",
+      logo: { src: "./public/logo.png", alt: "ailuracode" },
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/ailuracode/alpine",
+        },
+      ],
+      editLink: {
+        baseUrl: "https://github.com/ailuracode/alpine/edit/master/docs/",
+      },
+      sidebar: [
+        {
+          label: "Playground",
+          link: "/playground/",
+        },
+        {
+          label: "Guides",
+          items: [
+            { label: "Getting started", link: "/getting-started/" },
+            { label: "Architecture", link: "/architecture/" },
+            { label: "Contributing", link: "/contributing/" },
+            { label: "Core", link: "/core/" },
+          ],
+        },
+        {
+          label: "Query",
+          items: [
+            { label: "Query cache", link: "/query/" },
+            { label: "Query devtools", link: "/query-devtools/" },
+          ],
+        },
+        {
+          label: "Plugins",
+          items: [{ autogenerate: { directory: "plugins" } }],
+        },
+      ],
+    }),
+    react(),
+  ],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -21,6 +65,7 @@ export default defineConfig({
         "@ailuracode/alpine-toast": pkg("toast"),
         "@ailuracode/alpine-export": pkg("export"),
         "@ailuracode/alpine-geo": pkg("geo"),
+        "@ailuracode/alpine-json-api": pkg("json-api"),
         "@ailuracode/alpine-network": pkg("network"),
         "@ailuracode/alpine-notify": pkg("notify"),
         "@ailuracode/alpine-platform": pkg("platform"),

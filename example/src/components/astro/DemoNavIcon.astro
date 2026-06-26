@@ -1,0 +1,13 @@
+---
+import { getPluginNavIcon } from "../../plugin-nav-icons";
+
+interface Props {
+  id: string;
+  class?: string;
+}
+
+const { id, class: className = "h-5 w-5 shrink-0" } = Astro.props;
+const Icon = getPluginNavIcon(id);
+---
+
+<Icon class={className} aria-hidden="true" stroke-width={2} />

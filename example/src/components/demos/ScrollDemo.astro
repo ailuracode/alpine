@@ -1,21 +1,31 @@
 ---
-import Button from "../astro/Button.astro";
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("scroll")!;
 ---
 
-<DemoSection title="Scroll" api="$store.scroll">
-	<ul class="list-disc list-inside space-y-1">
-		<li>Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<ul class="list-disc list-inside space-y-1 text-sm">
+		<li>X: <strong x-text="Math.round($store.scroll.x)"></strong>px · Y: <strong x-text="Math.round($store.scroll.y)"></strong>px</li>
 		<li>Direction: <strong x-text="$store.scroll.direction || '—'"></strong></li>
 		<li>Progress: <strong x-text="Math.round($store.scroll.progress)"></strong>%</li>
+		<li>At top: <strong x-text="$store.scroll.atTop"></strong> · At bottom: <strong x-text="$store.scroll.atBottom"></strong></li>
 		<li>Locked: <strong x-text="$store.scroll.isLocked"></strong></li>
 	</ul>
 	<div class="flex flex-wrap gap-2 mt-3">
-		<Button @click="$store.scroll.toggleLock()">
-			<span x-text="$store.scroll.isLocked ? 'Unlock scroll' : 'Lock scroll'"></span>
-		</Button>
-		<Button x-show="$store.scroll.showToTop" x-cloak @click="$store.scroll.toTop()">
-			Back to top
-		</Button>
+		<DemoButton @click="$store.scroll.lock()">lock()</DemoButton>
+		<DemoButton @click="$store.scroll.unlock()">unlock()</DemoButton>
+		<DemoButton @click="$store.scroll.toggleLock()">toggleLock()</DemoButton>
+		<DemoButton x-show="$store.scroll.showToTop" x-cloak @click="$store.scroll.toTop()">toTop()</DemoButton>
+		<DemoButton @click="$store.scroll.toBottom()">toBottom()</DemoButton>
+		<DemoButton @click="$store.scroll.refresh()">refresh()</DemoButton>
 	</div>
+	<p class="text-sm text-muted-foreground mt-3">
+		Sticky progress bar in the header uses <code>$store.scroll.progress</code>. Mobile sidebar open also locks scroll via <code>onOpen</code> in <code>entrypoint.ts</code>.
+	</p>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
+	</p>
 </DemoSection>

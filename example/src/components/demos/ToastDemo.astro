@@ -1,32 +1,68 @@
 ---
-import Button from "../astro/Button.astro";
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
 import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("toast")!;
 ---
 
-<DemoSection title="Toast" api="$toast">
-	<p class="text-sm text-muted-foreground">
-		Headless queue — this demo renders Sonner-style stacks (shadcn/ui) in
-		<code class="text-muted-foreground">SonnerToasts.astro</code> via
-		<code class="text-muted-foreground">@ailuracode/alpine-toast</code> (not part of the plugin).
-	</p>
-	<div class="flex flex-wrap gap-2 mt-3">
-		<Button @click="$toast('Hello from Alpine!')">Default</Button>
-		<Button class="border-green-500/50 text-green-700 hover:bg-green-500/10 dark:text-green-400" @click="$toast.success('Saved')">
-			Success
-		</Button>
-		<Button class="border-blue-500/50 text-blue-700 hover:bg-blue-500/10 dark:text-blue-400" @click="$toast.info({ content: { kind: 'badge', label: 'Pro plan', seats: 3 } })">
-			Custom content
-		</Button>
-		<Button class="border-amber-500/50 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400" @click="$toast.warning('Careful')">
-			Warning
-		</Button>
-		<Button variant="destructive" @click="$toast.error('Failed')">Error</Button>
-		<Button @click="$toast('Top center', { position: 'top-center' })">Top center</Button>
-		<Button @click="$toast.warning({ title: 'File deleted', duration: false, action: { label: 'Undo' }, content: { kind: 'undo-demo' } })">
-			Undo demo
-		</Button>
-		<Button @click="$toast.promise(function () { return new Promise(function (resolve) { setTimeout(function () { resolve('done') }, 1200) }) }, { loading: 'Saving...', success: 'Saved!', error: 'Failed' })">
-			Promise
-		</Button>
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div class="grid gap-4">
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Variants</p>
+			<div class="flex flex-wrap gap-2">
+				<DemoButton @click="$toast('Hello from Alpine!')">Default</DemoButton>
+				<DemoButton @click="$toast.success('Saved')">Success</DemoButton>
+				<DemoButton @click="$toast.info({ title: 'Heads up', description: 'Title + description fields' })">Info</DemoButton>
+				<DemoButton @click="$toast.warning('Careful')">Warning</DemoButton>
+				<DemoButton variant="destructive" @click="$toast.error('Failed')">Error</DemoButton>
+				<DemoButton @click="$toast.loading('Uploading…')">Loading</DemoButton>
+			</div>
+		</div>
+
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Position & Content</p>
+			<div class="flex flex-wrap gap-2">
+				<DemoButton @click="$toast('Top center', { position: 'top-center' })">Top Center</DemoButton>
+				<DemoButton @click="$toast.info({ content: { kind: 'badge', label: 'Pro plan', seats: 3 } })">Custom Content</DemoButton>
+				<DemoButton @click="$toast.warning({ title: 'File deleted', duration: false, action: { label: 'Undo' }, content: { kind: 'undo-demo' } })">Undo Action</DemoButton>
+			</div>
+		</div>
+
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Queue API</p>
+			<div class="flex flex-wrap gap-2" x-data="{ lastToastId: null }">
+				<DemoButton @click="$toast.pushUnique('sync', { title: 'Syncing…', variant: 'loading', duration: false })">pushUnique</DemoButton>
+				<DemoButton @click="$toast.fromPayload({ title: 'Flash message', variant: 'success', description: 'fromPayload()' })">fromPayload</DemoButton>
+				<DemoButton @click="lastToastId = $toast.info('Will update…'); setTimeout(function () { $toast.update(lastToastId, { title: 'Updated in place', variant: 'success' }) }, 1200)">update()</DemoButton>
+				<DemoButton @click="$toast.dismissAt('top-center')">dismissAt top-center</DemoButton>
+				<DemoButton @click="$toast.dismissAll()">dismissAll</DemoButton>
+				<DemoButton @click="for (var i = 0; i < 5; i++) { $toast('Toast ' + (i + 1)) }">Flood Stack (5)</DemoButton>
+			</div>
+		</div>
+
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Promise</p>
+			<div class="flex flex-wrap gap-2">
+				<DemoButton @click="$toast.promise(function () { return new Promise(function (r) { setTimeout(function () { r('done') }, 1200) }) }, { loading: 'Saving…', success: 'Saved!', error: 'Failed' })">
+					Resolve
+				</DemoButton>
+				<DemoButton variant="destructive" @click="$toast.promise(function () { return Promise.reject(new Error('nope')) }, { loading: 'Saving…', success: 'Saved!', error: 'Could not save' })">
+					Reject
+				</DemoButton>
+			</div>
+		</div>
+
+		<div>
+			<p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Window Event</p>
+			<DemoButton
+				@click="window.dispatchEvent(new CustomEvent('toast', { detail: { title: 'From window event', variant: 'info' } }))"
+			>
+				Dispatch Toast Event
+			</DemoButton>
+		</div>
 	</div>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code> · Renderer: <code>SonnerToasts.astro</code>
+	</p>
 </DemoSection>

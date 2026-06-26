@@ -1,0 +1,33 @@
+---
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
+import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("sidebar")!;
+---
+
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<ul class="list-disc list-inside space-y-1 text-sm">
+		<li>Open: <strong x-text="$store.sidebar.open"></strong></li>
+		<li>Collapsed: <strong x-text="$store.sidebar.collapsed"></strong></li>
+		<li>matchesBreakpoint: <strong x-text="$store.sidebar.matchesBreakpoint"></strong></li>
+		<li>hasOverlay: <strong x-text="$store.sidebar.hasOverlay"></strong></li>
+		<li>Device: <strong x-text="$store.device.type"></strong></li>
+	</ul>
+
+	<div class="flex flex-wrap gap-2 mt-3">
+		<DemoButton @click="$store.sidebar.show()">show()</DemoButton>
+		<DemoButton @click="$store.sidebar.hide()">hide()</DemoButton>
+		<DemoButton @click="$store.sidebar.toggle()">toggle()</DemoButton>
+		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.collapse()">collapse()</DemoButton>
+		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.expand()">expand()</DemoButton>
+		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.toggleCollapse()">toggleCollapse()</DemoButton>
+	</div>
+
+	<p class="text-sm text-muted-foreground mt-3">
+		On mobile, overlay click and Escape close the drawer. Opening the sidebar locks body scroll through <code>$store.scroll</code>.
+	</p>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
+	</p>
+</DemoSection>

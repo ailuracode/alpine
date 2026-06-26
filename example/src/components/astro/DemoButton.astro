@@ -1,12 +1,19 @@
 ---
+/**
+ * Playground demo actions — single DOM layer for Alpine (`@click`, `x-show`, …).
+ * Default: outline + sm. No `ghost` (invisible on dark backgrounds).
+ */
 import type { VariantProps } from "class-variance-authority";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type Props = VariantProps<typeof buttonVariants> & {
+type DemoButtonVariant = "outline" | "default" | "destructive" | "secondary";
+
+type Props = Omit<VariantProps<typeof buttonVariants>, "variant"> & {
+  variant?: DemoButtonVariant;
   class?: string;
-  type?: "button" | "submit" | "reset";
   href?: string;
+  type?: "button" | "submit" | "reset";
 };
 
 const {

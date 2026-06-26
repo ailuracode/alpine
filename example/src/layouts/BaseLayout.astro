@@ -1,4 +1,5 @@
 ---
+import Button from "../components/astro/Button.astro";
 import SonnerToasts from "../components/SonnerToasts.astro";
 import "../styles/global.css";
 
@@ -37,32 +38,63 @@ const {
 		<title>{title}</title>
 	</head>
 	<body class="min-h-screen bg-background text-foreground" x-data="demoShell" x-cloak>
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground focus:outline-none"
+		>
+			Skip to content
+		</a>
+
 		<div class="min-h-screen">
 			<header
-				class="sticky top-0 z-30 border-b border-border bg-background transition-[margin] duration-300"
+				class="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 transition-[margin] duration-300 motion-reduce:transition-none"
 				x-bind:class="$store.device.type === 'desktop' ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''"
 			>
-				<div class="flex items-center gap-3 px-4 h-14">
-					<button
-						type="button"
-						class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-muted"
-						x-on:click="$store.device.type === 'desktop' ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
+				<div class="flex h-14 items-center gap-3 px-4">
+					<Button
+						variant="ghost"
+						size="icon"
 						aria-label="Toggle sidebar"
+						x-on:click="$store.device.type === 'desktop' ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="size-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+							aria-hidden="true"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
 						</svg>
-					</button>
-					<div class="min-w-0">
-						<h1 class="text-lg font-bold truncate">Alpine.js + @ailuracode</h1>
-						<p class="text-xs text-muted-foreground truncate leading-tight">Interactive demo of all plugins · Astro · shadcn/ui</p>
+					</Button>
+					<div class="min-w-0 flex-1">
+						<p class="truncate text-lg font-semibold text-balance">Alpine.js + @ailuracode</p>
+						<p class="truncate text-xs leading-tight text-muted-foreground">
+							Interactive plugin demos · Astro · shadcn/ui
+						</p>
 					</div>
+					<nav class="hidden items-center gap-1 sm:flex" aria-label="Site">
+						<a
+							href="/"
+							class="rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+						>
+							Docs
+						</a>
+						<a
+							href="/playground/"
+							class="rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+						>
+							Playground
+						</a>
+					</nav>
 				</div>
 			</header>
 
-			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-muted" aria-hidden="true">
+			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-muted motion-reduce:hidden" aria-hidden="true">
 				<div
-					class="h-full bg-primary transition-[width] duration-100 linear"
+					class="h-full bg-primary transition-[width] duration-100 linear motion-reduce:transition-none"
 					x-bind:style="'width: ' + $store.scroll.progress + '%'"
 				></div>
 			</div>

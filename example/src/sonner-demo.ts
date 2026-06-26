@@ -100,6 +100,70 @@ function toastStoreFromAlpine($store: Alpine.Stores): DemoToastStore {
   return $store.toast;
 }
 
+function swipeDeltaWithResistance(
+  delta: number,
+  allowedPositive: boolean,
+  allowedNegative: boolean
+): number {
+  if ((delta > 0 && allowedPositive) || (delta < 0 && allowedNegative)) {
+    return delta;
+  }
+
+  return delta * (1 / (1 + Math.abs(delta) / 20));
+}
+
+function resolvePrimarySwipeAxis(xDelta: number, yDelta: number): "x" | "y" {
+  return Math.abs(xDelta) > Math.abs(yDelta) ? "x" : "y";
+}
+
+function computeMoveSwipeOffsets(
+  swipeDirection: "x" | "y",
+  xDelta: number,
+  yDelta: number,
+  allowed: string[]
+): { swipeX: number; swipeY: number } {
+  if (swipeDirection === "x") {
+    return {
+      swipeX: swipeDeltaWithResistance(xDelta, allowed.includes("right"), allowed.includes("left")),
+      swipeY: 0,
+    };
+  }
+
+  return {
+    swipeX: 0,
+    swipeY: swipeDeltaWithResistance(yDelta, allowed.includes("bottom"), allowed.includes("top")),
+  };
+}
+
+function resolveSwipeDismissDirection(
+  swipeDirection: "x" | "y" | null,
+  xDelta: number,
+  yDelta: number,
+  threshold: number,
+  allowed: string[]
+): string | null {
+  if (swipeDirection === "x" && Math.abs(xDelta) >= threshold) {
+    const direction = xDelta > 0 ? "right" : "left";
+    return allowed.includes(direction) ? direction : null;
+  }
+
+  if (swipeDirection === "y" && Math.abs(yDelta) >= threshold) {
+    const direction = yDelta > 0 ? "bottom" : "top";
+    return allowed.includes(direction) ? direction : null;
+  }
+
+  return null;
+}
+
+function applySwipeAmount(element: HTMLElement, swipeX: number, swipeY: number): void {
+  element.style.setProperty("--swipe-amount-x", `${swipeX}px`);
+  element.style.setProperty("--swipe-amount-y", `${swipeY}px`);
+}
+
+function resetSwipeAmount(element: HTMLElement): void {
+  applySwipeAmount(element, 0, 0);
+}
+
 export function registerToastSonner(Alpine: Alpine): void {
   Alpine.data(
     "toastSonner",
@@ -533,35 +597,21 @@ export function registerToastSonner(Alpine: Alpine): void {
         const yDelta = event.clientY - this.pointerStart.y;
 
         if (!this.swipeDirection && (Math.abs(xDelta) > 1 || Math.abs(yDelta) > 1)) {
-          this.swipeDirection = Math.abs(xDelta) > Math.abs(yDelta) ? "x" : "y";
+          this.swipeDirection = resolvePrimarySwipeAxis(xDelta, yDelta);
         }
 
-        let swipeX = 0;
-        let swipeY = 0;
-
-        if (this.swipeDirection === "x") {
-          if (
-            (allowed.includes("right") && xDelta > 0) ||
-            (allowed.includes("left") && xDelta < 0)
-          ) {
-            swipeX = xDelta;
-          } else {
-            swipeX = xDelta * (1 / (1 + Math.abs(xDelta) / 20));
-          }
-        } else if (this.swipeDirection === "y") {
-          if (
-            (allowed.includes("bottom") && yDelta > 0) ||
-            (allowed.includes("top") && yDelta < 0)
-          ) {
-            swipeY = yDelta;
-          } else {
-            swipeY = yDelta * (1 / (1 + Math.abs(yDelta) / 20));
-          }
+        if (!this.swipeDirection) {
+          return;
         }
 
-        const element = event.currentTarget as HTMLElement;
-        element.style.setProperty("--swipe-amount-x", `${swipeX}px`);
-        element.style.setProperty("--swipe-amount-y", `${swipeY}px`);
+        const { swipeX, swipeY } = computeMoveSwipeOffsets(
+          this.swipeDirection,
+          xDelta,
+          yDelta,
+          allowed
+        );
+
+        applySwipeAmount(event.currentTarget as HTMLElement, swipeX, swipeY);
       },
 
       endSwipe(event: PointerEvent, toast: DemoToastItem, position: DemoToastPosition): void {
@@ -572,24 +622,19 @@ export function registerToastSonner(Alpine: Alpine): void {
         const allowed = this.swipeDirectionsFor(position);
         const xDelta = event.clientX - (this.pointerStart?.x ?? 0);
         const yDelta = event.clientY - (this.pointerStart?.y ?? 0);
-        const threshold = 45;
         const element = event.currentTarget as HTMLElement;
+        const dismissDirection = resolveSwipeDismissDirection(
+          this.swipeDirection,
+          xDelta,
+          yDelta,
+          45,
+          allowed
+        );
 
-        if (this.swipeDirection === "x" && Math.abs(xDelta) >= threshold) {
-          const direction = xDelta > 0 ? "right" : "left";
-
-          if (allowed.includes(direction)) {
-            this.dismiss(toast.id, { swipe: true, swipeDirection: direction });
-          }
-        } else if (this.swipeDirection === "y" && Math.abs(yDelta) >= threshold) {
-          const direction = yDelta > 0 ? "bottom" : "top";
-
-          if (allowed.includes(direction)) {
-            this.dismiss(toast.id, { swipe: true, swipeDirection: direction });
-          }
+        if (dismissDirection) {
+          this.dismiss(toast.id, { swipe: true, swipeDirection: dismissDirection });
         } else {
-          element.style.setProperty("--swipe-amount-x", "0px");
-          element.style.setProperty("--swipe-amount-y", "0px");
+          resetSwipeAmount(element);
         }
 
         this.swipingId = null;

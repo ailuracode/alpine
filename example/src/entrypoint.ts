@@ -117,6 +117,12 @@ export default (Alpine: Alpine) => {
   registerDemoShell(Alpine);
   registerToastDemoHandlers(Alpine);
   registerToastSonner(Alpine);
-  Alpine.plugin(queryDevtools({ position: "bottom", toggleCorner: "bottom-left", additionalStores: queryDemoStores }));
+  Alpine.plugin(
+    queryDevtools({
+      position: "bottom",
+      toggleCorner: "bottom-left",
+      additionalStores: queryDemoStores,
+    })
+  );
   Alpine.plugin(notify);
 };

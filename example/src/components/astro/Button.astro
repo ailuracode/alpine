@@ -1,19 +1,19 @@
 ---
+import type { VariantProps } from "class-variance-authority";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { VariantProps } from "class-variance-authority";
 
 type Props = VariantProps<typeof buttonVariants> & {
-	class?: string;
-	type?: "button" | "submit" | "reset";
+  class?: string;
+  type?: "button" | "submit" | "reset";
 };
 
 const {
-	variant = "outline",
-	size = "sm",
-	class: className,
-	type = "button",
-	...rest
+  variant = "outline",
+  size = "sm",
+  class: className,
+  type = "button",
+  ...rest
 } = Astro.props as Props;
 ---
 

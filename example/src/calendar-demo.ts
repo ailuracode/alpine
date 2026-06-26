@@ -11,14 +11,17 @@ type CalendarDemoComponent = CalendarDemoData & {
 };
 
 export function registerCalendarDemo(Alpine: Alpine): void {
-  Alpine.data("calendarDemo", (): CalendarDemoData => ({
-    cal: null,
-    init(this: CalendarDemoComponent) {
-      this.cal = this.$calendar({
-        weekStartsOn: 1,
-        mode: "single",
-        disabled: { dayOfWeek: [0, 6] },
-      });
-    },
-  }));
+  Alpine.data(
+    "calendarDemo",
+    (): CalendarDemoData => ({
+      cal: null,
+      init(this: CalendarDemoComponent) {
+        this.cal = this.$calendar({
+          weekStartsOn: 1,
+          mode: "single",
+          disabled: { dayOfWeek: [0, 6] },
+        });
+      },
+    })
+  );
 }

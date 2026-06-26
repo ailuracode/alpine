@@ -1,3 +1,4 @@
+import { PROMISE_LOADING_DURATION } from "./store.js";
 import type {
   ResolvedToastPluginConfig,
   ToastDuration,
@@ -10,7 +11,6 @@ import type {
   ToastStore,
   ToastVariant,
 } from "./types.js";
-import { PROMISE_LOADING_DURATION } from "./store.js";
 
 /** Variant names that cannot override core `$toast` methods. */
 export const RESERVED_TOAST_MAGIC_KEYS = new Set([

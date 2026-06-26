@@ -23,23 +23,29 @@ type ToggleTernaryDemoComponent = ToggleTernaryDemoData & {
 };
 
 export function registerToggleDemos(Alpine: Alpine): void {
-  Alpine.data("toggleBinaryDemo", (): ToggleBinaryDemoData => ({
-    power: null,
-    init(this: ToggleBinaryDemoComponent) {
-      this.power = this.$toggle({
-        states: { truly: "on", falsely: "off" },
-        initial: "off",
-      });
-    },
-  }));
+  Alpine.data(
+    "toggleBinaryDemo",
+    (): ToggleBinaryDemoData => ({
+      power: null,
+      init(this: ToggleBinaryDemoComponent) {
+        this.power = this.$toggle({
+          states: { truly: "on", falsely: "off" },
+          initial: "off",
+        });
+      },
+    })
+  );
 
-  Alpine.data("toggleTernaryDemo", (): ToggleTernaryDemoData => ({
-    answer: null,
-    init(this: ToggleTernaryDemoComponent) {
-      this.answer = this.$toggle({
-        states: { truly: "yes", falsely: "no", ternary: "unknown" },
-        initial: "unknown",
-      });
-    },
-  }));
+  Alpine.data(
+    "toggleTernaryDemo",
+    (): ToggleTernaryDemoData => ({
+      answer: null,
+      init(this: ToggleTernaryDemoComponent) {
+        this.answer = this.$toggle({
+          states: { truly: "yes", falsely: "no", ternary: "unknown" },
+          initial: "unknown",
+        });
+      },
+    })
+  );
 }

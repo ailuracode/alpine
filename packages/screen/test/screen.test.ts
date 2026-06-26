@@ -1,5 +1,5 @@
-import { afterEach, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import Alpine from "alpinejs";
+import { afterEach, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { setMatchMedia } from "../../../test/setup.js";
 import screenPlugin, {

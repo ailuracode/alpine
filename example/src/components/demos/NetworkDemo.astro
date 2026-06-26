@@ -1,0 +1,15 @@
+---
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Network" api="$network">
+	<p
+		class="font-semibold"
+		x-bind:class="$network.isOnline ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
+		x-text="$network.isOnline ? 'Online' : 'Offline'"
+	></p>
+	<div class="flex flex-wrap gap-2 mt-3">
+		<Button x-bind:disabled="!$network.isOnline">Save (requires connection)</Button>
+	</div>
+</DemoSection>

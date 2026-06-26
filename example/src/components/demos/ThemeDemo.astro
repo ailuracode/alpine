@@ -1,0 +1,38 @@
+---
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+
+const themeBtnActive =
+	"data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground data-[active=true]:hover:!bg-primary/80 data-[active=true]:!border-primary/20 dark:data-[active=true]:!bg-primary dark:data-[active=true]:!text-primary-foreground dark:data-[active=true]:hover:!bg-primary/80 dark:data-[active=true]:!border-primary/30";
+---
+
+<DemoSection title="Theme" api="$store.theme">
+	<p>
+		Mode: <strong x-text="$store.theme.mode"></strong> → resolved:
+		<strong x-text="$store.theme.resolved"></strong>
+	</p>
+	<div class="flex flex-wrap gap-2 mt-3">
+		<Button
+			class={themeBtnActive}
+			x-bind:data-active="$store.theme.isLight ? 'true' : null"
+			@click="$store.theme.set('light')"
+		>
+			Light
+		</Button>
+		<Button
+			class={themeBtnActive}
+			x-bind:data-active="$store.theme.isDark ? 'true' : null"
+			@click="$store.theme.set('dark')"
+		>
+			Dark
+		</Button>
+		<Button
+			class={themeBtnActive}
+			x-bind:data-active="$store.theme.isSystem ? 'true' : null"
+			@click="$store.theme.set('system')"
+		>
+			System
+		</Button>
+		<Button @click="$store.theme.cycle()">Cycle</Button>
+	</div>
+</DemoSection>

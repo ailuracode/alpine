@@ -1,0 +1,29 @@
+---
+import Alert from "../astro/Alert.astro";
+import Button from "../astro/Button.astro";
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Export" api="$export">
+	<p class="text-sm text-muted-foreground" x-show="!$export.isSupported" x-cloak>
+		Programmatic file exports are not available in this environment.
+	</p>
+	<template x-if="$export.isSupported">
+		<div>
+			<div class="flex flex-wrap gap-2 mt-1">
+				<Button @click="exportedText = await $export('Hello from Alpine!', 'hello.txt')">
+					Export text
+				</Button>
+				<Button @click="exportedJson = await $export(JSON.stringify({ plugin: 'export', savedAt: Date.now() }, null, 2), { filename: 'export.json', mimeType: 'application/json' })">
+					Export JSON
+				</Button>
+			</div>
+			<Alert variant="success" class="mt-3" x-show="exportedText === true" x-cloak>
+				<span>Text export started.</span>
+			</Alert>
+			<Alert variant="success" class="mt-3" x-show="exportedJson === true" x-cloak>
+				<span>JSON export started.</span>
+			</Alert>
+		</div>
+	</template>
+</DemoSection>

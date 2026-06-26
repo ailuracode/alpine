@@ -55,10 +55,11 @@ Also available on the store: `$store.toast.dismiss(id)`.
 | **Content** | `content` on each toast — any type your UI renders |
 | **Magic** | `$toast(title, options?)` → toast id (`default` variant, `bottom-right` position) |
 | **Close** | `$toast.dismiss(id)`, `$toast.dismissAt(position)`, `$toast.dismissAll()` |
+| **Dedupe** | `$toast.pushUnique(key, payload)` — one active toast per key (undo flows) |
 | **Promise** | `$toast.promise(factoryOrPromise, messages?)` |
 | **Variants** | `variants: toastVariants([...])` → `$toast.<name>()` |
 | **Positions** | `positions: toastPositions([...])` → one stack per position |
-| **Queue** | `maxToasts` and `maxVisible` per stack |
+| **Queue** | `maxToasts` / `maxVisible` per timed or persistent stack |
 | **UI** | Bring your own markup and CSS |
 
 ## License

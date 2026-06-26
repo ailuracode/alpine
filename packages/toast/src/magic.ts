@@ -1,5 +1,6 @@
 import type {
   ResolvedToastPluginConfig,
+  ToastDuration,
   ToastEventPayload,
   ToastMagic,
   ToastPayload,
@@ -9,6 +10,7 @@ import type {
   ToastStore,
   ToastVariant,
 } from "./types.js";
+import { PROMISE_LOADING_DURATION } from "./store.js";
 
 /** Variant names that cannot override core `$toast` methods. */
 export const RESERVED_TOAST_MAGIC_KEYS = new Set([
@@ -16,6 +18,7 @@ export const RESERVED_TOAST_MAGIC_KEYS = new Set([
   "update",
   "dismissAt",
   "dismissAll",
+  "pushUnique",
   "fromPayload",
   "promise",
 ]);
@@ -107,7 +110,7 @@ function buildPromiseSuccessPatch<T, TContent, TVariants extends readonly string
   data: T,
   messages: ToastPromiseMessages<T, ToastVariant<TVariants>, TContent>,
   successVariant: ToastVariant<TVariants>,
-  settledDuration: number
+  settledDuration: ToastDuration
 ): Partial<ToastPayload<TVariants, readonly [], TContent>> {
   const successTitle = resolveSuccessTitle(data, messages);
   const successContent = resolveSuccessContent(data, messages);
@@ -124,7 +127,7 @@ function buildPromiseErrorPatch<T, TContent, TVariants extends readonly string[]
   messages: ToastPromiseMessages<T, ToastVariant<TVariants>, TContent>,
   promiseConfig: ResolvedToastPluginConfig<TVariants>["promise"],
   errorVariant: ToastVariant<TVariants>,
-  settledDuration: number
+  settledDuration: ToastDuration
 ): Partial<ToastPayload<TVariants, readonly [], TContent>> {
   return {
     title: resolveErrorTitle(messages, promiseConfig.error),
@@ -156,6 +159,7 @@ export function createToastMagic<
   magic.update = (id, payload) => getStore().update(id, payload);
   magic.dismissAt = (position) => getStore().dismissAt(position);
   magic.dismissAll = () => getStore().dismissAll();
+  magic.pushUnique = (key, payload) => getStore().pushUnique(key, payload ?? {});
 
   magic.fromPayload = (payload: ToastEventPayload<TVariants, TPositions, TContent> = {}) => {
     const { title = null, content = null, variant = "default", ...options } = payload;
@@ -182,7 +186,7 @@ export function createToastMagic<
       title: messages.loading ?? promiseConfig.loading,
       content: messages.loadingContent ?? null,
       variant: loadingVariant,
-      duration: 0,
+      duration: PROMISE_LOADING_DURATION,
     });
 
     try {

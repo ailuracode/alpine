@@ -69,6 +69,7 @@ await $toast.promise(() => save(), {
 | `$toast.update(id, patch)` | Patch the same toast in place (variant, title, content, action, …). |
 | `$toast.dismissAt(position)` | Close every toast in one position stack. |
 | `$toast.dismissAll()` | Close every toast in every stack. |
+| `$toast.pushUnique(key, payload?)` | Dismiss active toasts with the same `key`, then push. |
 | `$toast.fromPayload(payload)` | Push from a plain payload (events, Laravel flash, etc.). |
 | `$toast.promise(factoryOrPromise, messages?)` | `loading` → `success` / `error` on the same toast. |
 
@@ -81,8 +82,9 @@ await $toast.promise(() => save(), {
 | `description` | `string \| null` | `null` |
 | `variant` | `default \| …your variants` | `default` |
 | `position` | `bottom-right \| …your positions` | `bottom-right` (or `defaultPosition`) |
-| `duration` | `number` (ms) | `4000` (`0` = no auto-dismiss) |
+| `duration` | `number` (ms) | `4000` (`false` or `0` = no auto-dismiss; stored as `false`) |
 | `action` | `{ label, onClick? }` | `null` |
+| `key` | `string \| null` | `null` — use with `pushUnique` for single-slot toasts |
 
 `title` / `description` are optional string shorthands. Use `content` for any shape your renderer understands (objects, arrays, HTML snippets, etc.). The plugin stores it as-is — rendering is up to your UI.
 
@@ -167,10 +169,16 @@ The plugin stores the position id on each toast. Render one stack per position i
 | Store API | Description |
 |-----------|-------------|
 | `stackPositions` | All stack keys (`defaultPosition` + `positions`) |
-| `itemsAt(position)` | Toasts in that stack, newest first |
-| `isVisibleAt(position, index)` | Per-stack visible limit |
+| `itemsAt(position)` | Toasts in that stack, newest first (includes exiting `removed` items) |
+| `timedItemsAt(position)` | Auto-dismiss stack — same order, includes exiting items |
+| `persistentItemsAt(position)` | Persistent stack (`duration: false`) — includes exiting items |
+| `activeTimedItemsAt(position)` | Timed stack without `removed` items — preferred for simple `x-for` |
+| `activePersistentItemsAt(position)` | Persistent stack without `removed` items |
+| `isVisibleAt(position, index)` | Timed stack only — peek/limit visibility (`maxVisible`) |
+| `pushUnique(key, payload?)` | Same as `$toast.pushUnique` |
+| `destroy()` | Clear timers — call when tearing down the plugin |
 | `dismiss(id)` | Close one toast (same as `$toast.dismiss`) |
-| `dismissAt(position)` | Close one entire stack |
+| `dismissAt(position)` | Close one entire position (timed + persistent) |
 | `dismissAll()` | Close all stacks |
 
 ## Promise flow
@@ -205,6 +213,8 @@ If a named variant is missing from `variants`, promise states fall back to `defa
 
 On failure, the toast updates to the error state and the returned promise **rejects** with the original error so callers can still use `try/catch` or `.catch()`.
 
+The **loading** state uses a long timed duration (`PROMISE_LOADING_DURATION`) so it stays in the **timed stack** (not perpetual). The timer is replaced when the promise settles to success or error.
+
 Reserved variant names (`dismiss`, `update`, `dismissAt`, `dismissAll`, `fromPayload`, `promise`) cannot override core `$toast` methods.
 
 In Alpine templates, wrap multi-argument calls in an arrow function:
@@ -219,10 +229,19 @@ In Alpine templates, wrap multi-argument calls in an arrow function:
 
 ## Queue limits
 
+Each **position** has two independent stacks:
+
+1. **Timed** — auto-dismiss toasts (`duration > 0`). `maxVisible` applies here (peek/stack UI).
+2. **Persistent** — `duration: false` (or `0` in payloads; normalized to `false`). Always fully visible in your UI.
+
+`maxToasts` applies **per stack per position** (not globally). Example: `maxToasts: 5` allows up to 5 timed + 5 persistent toasts at `bottom-right`.
+
 | Option | Default | Description |
 |--------|---------|-------------|
-| `maxToasts` | `5` | Maximum toasts kept **per position stack**. `0` = unlimited. |
-| `maxVisible` | `maxToasts` | Maximum toasts shown at once **per stack**. |
+| `maxToasts` | `5` | Maximum active toasts **per stack per position**. `0` = unlimited. |
+| `maxVisible` | `maxToasts` | Maximum timed toasts shown at once per position (`isVisibleAt`). |
+
+Use `activeTimedItemsAt` / `activePersistentItemsAt` when your renderer does not need exiting (`removed`) items. Keep `timedItemsAt` / `persistentItemsAt` when you animate dismiss (Sonner-style).
 
 ## Window events
 

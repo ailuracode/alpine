@@ -3,7 +3,9 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "baseUrl": ".",
     "paths": {
+      "@/*": ["./src/*"],
       "@ailuracode/alpine-attention": ["../packages/attention/src/index.ts"],
       "@ailuracode/alpine-battery": ["../packages/battery/src/index.ts"],
       "@ailuracode/alpine-calendar": ["../packages/calendar/src/index.ts"],

@@ -149,14 +149,13 @@ export default function sidebarPlugin(
     Alpine.store("sidebar", store);
     Alpine.magic("sidebar", () => Alpine.store("sidebar"));
 
+    const sidebar = Alpine.store("sidebar") as SidebarStore;
+
     // Escape key listener
     if (config.closeOnEscape) {
       escapeHandler = (event: KeyboardEvent) => {
-        if (event.key === "Escape") {
-          const s = Alpine.store("sidebar") as SidebarStore;
-          if (s.open) {
-            s.hide();
-          }
+        if (event.key === "Escape" && sidebar.open) {
+          sidebar.hide();
         }
       };
       window.addEventListener("keydown", escapeHandler);
@@ -165,16 +164,14 @@ export default function sidebarPlugin(
     // Breakpoint listener
     if (config.breakpoint) {
       breakpointQuery = window.matchMedia(config.breakpoint);
-      const s = Alpine.store("sidebar") as SidebarStore;
-      s.matchesBreakpoint = breakpointQuery.matches;
+      sidebar.matchesBreakpoint = breakpointQuery.matches;
 
       breakpointHandler = (event: MediaQueryListEvent) => {
-        const current = Alpine.store("sidebar") as SidebarStore;
-        current.matchesBreakpoint = event.matches;
+        sidebar.matchesBreakpoint = event.matches;
 
         // Auto-close when breakpoint no longer matches
-        if (!event.matches && current.open) {
-          current.hide();
+        if (!event.matches && sidebar.open) {
+          sidebar.hide();
         }
       };
 

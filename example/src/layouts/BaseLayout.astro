@@ -1,4 +1,5 @@
 ---
+import SonnerToasts from "../components/SonnerToasts.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -24,7 +25,7 @@ const {
 					saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
 				var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 				var resolved = mode === "system" ? (dark ? "dark" : "light") : mode;
-				document.documentElement.dataset.theme = resolved;
+				document.documentElement.classList.toggle("dark", resolved === "dark");
 				document.documentElement.style.colorScheme = resolved;
 			})();
 		</script>
@@ -35,18 +36,17 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="min-h-screen bg-base-200 text-base-content">
-		<div
-			class="min-h-screen"
-			x-data="{ copied: false, exportedText: null, exportedJson: null, shared: null }"
-			x-cloak
-		>
-			<header class="sticky top-0 z-30 bg-base-100 border-b border-base-300 transition-[margin] duration-300" x-bind:class="$store.device?.is('desktop') ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''">
+	<body class="min-h-screen bg-background text-foreground" x-data="demoShell" x-cloak>
+		<div class="min-h-screen">
+			<header
+				class="sticky top-0 z-30 border-b border-border bg-background transition-[margin] duration-300"
+				x-bind:class="$store.device.type === 'desktop' ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''"
+			>
 				<div class="flex items-center gap-3 px-4 h-14">
 					<button
 						type="button"
-						class="btn btn-sm btn-ghost btn-square shrink-0"
-						@click="$store.device?.is('desktop') ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
+						class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-muted"
+						x-on:click="$store.device.type === 'desktop' ? $store.sidebar.toggleCollapse() : $store.sidebar.toggle()"
 						aria-label="Toggle sidebar"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -55,12 +55,12 @@ const {
 					</button>
 					<div class="min-w-0">
 						<h1 class="text-lg font-bold truncate">Alpine.js + @ailuracode</h1>
-						<p class="text-xs text-base-content/70 truncate leading-tight">Interactive demo of all plugins · Astro · DaisyUI</p>
+						<p class="text-xs text-muted-foreground truncate leading-tight">Interactive demo of all plugins · Astro · shadcn/ui</p>
 					</div>
 				</div>
 			</header>
 
-			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-base-300" aria-hidden="true">
+			<div class="fixed top-0 left-0 right-0 z-50 h-1 bg-muted" aria-hidden="true">
 				<div
 					class="h-full bg-primary transition-[width] duration-100 linear"
 					x-bind:style="'width: ' + $store.scroll.progress + '%'"
@@ -69,103 +69,7 @@ const {
 
 			<slot />
 
-			<button
-				type="button"
-				class="btn btn-primary btn-circle fixed bottom-6 right-6 shadow-lg z-40"
-				x-show="$store.scroll.showToTop"
-				x-cloak
-				@click="$store.scroll.toTop()"
-				aria-label="Back to top"
-			>
-				↑
-			</button>
-
-			<template x-for="position in $store.toast.stackPositions" :key="position">
-				<div
-					class="toast toast-demo-stack z-[60]"
-					x-data
-					x-show="$store.toast.itemsAt(position).some((toast) => !toast.removed)"
-					x-bind:class="{
-						'toast-bottom toast-end': position === 'bottom-right',
-						'toast-top toast-center': position === 'top-center',
-					}"
-				>
-					<template x-for="(toast, index) in $store.toast.itemsAt(position)" :key="toast.id">
-						<div
-							class="toast-demo-item alert shadow-lg py-2 px-3 min-h-0 w-full !flex !items-center !gap-2 origin-center"
-							role="alert"
-							x-bind:data-position="toast.position"
-							x-bind:data-toast-motion="position === 'top-center' ? 'top' : 'bottom'"
-							x-bind:class="{
-								'alert-success': toast.variant === 'success',
-								'alert-info': toast.variant === 'info' || toast.variant === 'loading',
-								'alert-warning': toast.variant === 'warning',
-								'alert-error': toast.variant === 'error',
-							}"
-							x-show="!toast.removed && $store.toast.isVisibleAt(position, index)"
-							x-transition:leave="transition duration-300 ease-in"
-							x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-							x-transition:leave-end="position === 'top-center' ? 'opacity-0 -translate-y-full scale-[0.96]' : 'opacity-0 translate-y-full scale-[0.96]'"
-						>
-							<div
-								class="flex h-8 w-8 shrink-0 items-center justify-center"
-								x-show="toast.variant === 'loading'"
-								aria-hidden="true"
-							>
-								<span class="loading loading-spinner loading-sm"></span>
-							</div>
-							<div class="min-w-0 flex-1">
-								<span
-									x-show="toast.content?.kind === 'badge'"
-									class="badge badge-sm badge-outline"
-									x-text="toast.content?.label"
-								></span>
-								<span class="font-medium leading-snug" x-show="toast.title" x-text="toast.title"></span>
-								<p
-									class="text-sm opacity-80 leading-snug"
-									x-show="toast.description"
-									x-text="toast.description"
-								></p>
-							</div>
-							<div class="flex shrink-0 items-center justify-end gap-1 min-w-16">
-								<button
-									type="button"
-									class="btn btn-sm btn-ghost h-8 min-h-8 px-2 uppercase tracking-wide"
-									x-show="toast.content?.kind === 'undo-demo' && toast.action && toast.variant !== 'loading'"
-									x-text="toast.action.label"
-									@click="
-										$toast.update(toast.id, {
-											variant: 'loading',
-											title: 'Undoing…',
-											description: null,
-											action: null,
-											duration: 0,
-										});
-										setTimeout(() => {
-											$toast.update(toast.id, {
-												variant: 'success',
-												title: 'Change undone',
-												description: null,
-												action: null,
-												duration: 4000,
-											});
-										}, 1200);
-									"
-								></button>
-								<button
-									type="button"
-									class="btn btn-sm btn-ghost btn-square h-8 min-h-8 w-8"
-									x-show="toast.variant !== 'loading'"
-									@click="$toast.dismiss(toast.id)"
-									aria-label="Dismiss notification"
-								>
-									✕
-								</button>
-							</div>
-						</div>
-					</template>
-				</div>
-			</template>
+			<SonnerToasts />
 		</div>
 
 		<script>

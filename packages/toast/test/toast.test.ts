@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import toastPlugin, {
   createToastMagic,
   createToastStore,
+  PROMISE_LOADING_DURATION,
   resolveToastLimits,
   resolveToastPluginConfig,
   TOAST_STORE_KEY,
@@ -104,9 +105,10 @@ describe("@ailuracode/alpine-toast", () => {
     toast({
       content: { kind: "badge", label: "Pro plan", seats: 3 },
       variant: "default",
-      duration: 0,
+      duration: false,
     });
 
+    expect(store.items[0]?.duration).toBe(false);
     expect(store.items[0]?.content).toEqual({
       kind: "badge",
       label: "Pro plan",
@@ -181,7 +183,7 @@ describe("@ailuracode/alpine-toast", () => {
       description: "Changes stored",
       variant: "published",
       position: "top-center",
-      duration: 0,
+      duration: false,
     });
   });
 
@@ -211,6 +213,116 @@ describe("@ailuracode/alpine-toast", () => {
     vi.advanceTimersByTime(400);
     expect(store.items).toHaveLength(0);
     expect(id).toBeTruthy();
+  });
+
+  it("does not auto-dismiss when duration is false", () => {
+    const { toast, store } = createToastHarness({ variants: [], defaultDuration: 4000 });
+    toast("Persistent", { duration: false });
+
+    vi.advanceTimersByTime(10_000);
+
+    expect(store.items).toHaveLength(1);
+    expect(store.items[0]?.removed).toBe(false);
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("cancels auto-dismiss when update sets duration to false", () => {
+    const { toast, store } = createToastHarness({ variants: [], defaultDuration: 2000 });
+    const id = toast("Persistent", { duration: 1000 });
+
+    toast.update(id, { duration: false });
+    vi.advanceTimersByTime(5000);
+
+    expect(store.items).toHaveLength(1);
+    expect(store.items[0]?.removed).toBe(false);
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("keeps a perpetual toast when a sibling auto-dismisses", () => {
+    const { toast, store } = createToastHarness({
+      variants: ["success", "warning"] as const,
+      defaultDuration: 4000,
+    });
+    const undoId = toast.warning("File deleted", { duration: false });
+    const successId = toast.success("Saved", { duration: 1000 });
+
+    vi.advanceTimersByTime(1000);
+
+    expect(store.items.find((item) => item.id === successId)?.removed).toBe(true);
+    expect(store.items.find((item) => item.id === undoId)?.removed).toBe(false);
+
+    vi.advanceTimersByTime(400);
+
+    expect(store.items).toHaveLength(1);
+    expect(store.items[0]?.id).toBe(undoId);
+    expect(store.items[0]?.removed).toBe(false);
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("splits timed and persistent stacks at a position", () => {
+    const { toast, store } = createToastHarness({
+      variants: ["success", "warning"] as const,
+      defaultDuration: 4000,
+    });
+    toast.warning("Undo", { duration: false });
+    toast.success("Saved", { duration: 4000 });
+
+    expect(store.timedItemsAt("bottom-right")).toHaveLength(1);
+    expect(store.persistentItemsAt("bottom-right")).toHaveLength(1);
+    expect(store.timedItemsAt("bottom-right")[0]?.title).toBe("Saved");
+    expect(store.persistentItemsAt("bottom-right")[0]?.title).toBe("Undo");
+  });
+
+  it("maxToasts applies independently to timed and persistent stacks", () => {
+    const { toast, store } = createToastHarness({
+      variants: [],
+      maxToasts: 2,
+      defaultDuration: 4000,
+    });
+    toast("Persistent 1", { duration: false });
+    toast("Persistent 2", { duration: false });
+    toast("Persistent 3", { duration: false });
+    toast("Timed 1");
+    toast("Timed 2");
+    toast("Timed 3");
+
+    const activeTimed = store.timedItemsAt("bottom-right").filter((item) => !item.removed);
+    const activePersistent = store
+      .persistentItemsAt("bottom-right")
+      .filter((item) => !item.removed);
+
+    expect(activeTimed).toHaveLength(2);
+    expect(activePersistent).toHaveLength(2);
+    expect(activeTimed.map((item) => item.title)).toEqual(["Timed 3", "Timed 2"]);
+    expect(activePersistent.map((item) => item.title)).toEqual(["Persistent 3", "Persistent 2"]);
+  });
+
+  it("routes scheduled dismiss through getStore accessor", () => {
+    let dismissCalled = false;
+    let store!: ToastStore;
+
+    store = createToastStore({
+      defaultDuration: 500,
+      getStore: () =>
+        new Proxy(store, {
+          get(target, property, receiver) {
+            if (property === "dismiss") {
+              return (id: string) => {
+                dismissCalled = true;
+                return target.dismiss(id);
+              };
+            }
+
+            return Reflect.get(target, property, receiver);
+          },
+        }) as ToastStore,
+    });
+
+    store.push({ title: "Timed toast" });
+    vi.advanceTimersByTime(500);
+
+    expect(dismissCalled).toBe(true);
+    expect(store.items[0]?.removed).toBe(true);
   });
 
   it("dismisses manually", () => {
@@ -293,7 +405,7 @@ describe("@ailuracode/alpine-toast", () => {
     expect(store.items[0]).toMatchObject({
       title: "Saving...",
       variant: "loading",
-      duration: 0,
+      duration: PROMISE_LOADING_DURATION,
     });
 
     await promise;
@@ -302,6 +414,49 @@ describe("@ailuracode/alpine-toast", () => {
       variant: "success",
       duration: 4000,
     });
+  });
+
+  it("keeps promise loading in the timed stack", () => {
+    const { toast, store } = createToastHarness({
+      variants: demoVariants,
+      promise: { loadingVariant: "loading", successVariant: "success" },
+    });
+
+    let resolve!: (value: string) => void;
+    toast.promise(
+      () =>
+        new Promise<string>((resolvePromise) => {
+          resolve = resolvePromise;
+        }),
+      { loading: "Saving..." }
+    );
+
+    expect(store.timedItemsAt("bottom-right").some((item) => item.variant === "loading")).toBe(
+      true
+    );
+    expect(store.persistentItemsAt("bottom-right")).toHaveLength(0);
+
+    resolve("ok");
+  });
+
+  it("does not auto-dismiss promise loading before settlement", () => {
+    const { toast, store } = createToastHarness({
+      variants: demoVariants,
+      promise: { loadingVariant: "loading", successVariant: "success" },
+    });
+
+    toast.promise(
+      () =>
+        new Promise<string>(() => {
+          /* never settles */
+        }),
+      { loading: "Saving..." }
+    );
+
+    vi.advanceTimersByTime(PROMISE_LOADING_DURATION + 10_000);
+
+    expect(store.items[0]?.variant).toBe("loading");
+    expect(store.items[0]?.removed).toBe(false);
   });
 
   it("accepts an existing promise without a factory function", async () => {
@@ -403,6 +558,45 @@ describe("@ailuracode/alpine-toast", () => {
 
     vi.advanceTimersByTime(5000);
     expect(store.items[0]?.removed).toBe(false);
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("normalizes duration 0 to false on push", () => {
+    const { toast, store } = createToastHarness({ variants: [] });
+
+    toast("Stay open", { duration: 0 });
+
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("normalizes defaultDuration 0 to false on push", () => {
+    const { toast, store } = createToastHarness({ variants: [], defaultDuration: 0 });
+
+    toast("Default perpetual");
+
+    expect(store.items[0]?.duration).toBe(false);
+  });
+
+  it("pushUnique dismisses prior active toasts with the same key", () => {
+    const { toast, store } = createToastHarness({ variants: [], defaultDuration: 4000 });
+    const first = toast.pushUnique("undo", { title: "First", duration: false });
+    const second = toast.pushUnique("undo", { title: "Second", duration: false });
+
+    expect(store.items.find((item) => item.id === first)?.removed).toBe(true);
+    expect(store.activePersistentItemsAt("bottom-right")).toHaveLength(1);
+    expect(store.activePersistentItemsAt("bottom-right")[0]?.id).toBe(second);
+  });
+
+  it("activeTimedItemsAt excludes removed toasts", () => {
+    const { toast, store } = createToastHarness({ variants: [], defaultDuration: 4000 });
+    const id = toast("One");
+    toast("Two");
+
+    store.dismiss(id);
+
+    expect(store.timedItemsAt("bottom-right")).toHaveLength(2);
+    expect(store.activeTimedItemsAt("bottom-right")).toHaveLength(1);
+    expect(store.activeTimedItemsAt("bottom-right")[0]?.title).toBe("Two");
   });
 
   it("does not register variant shortcuts that collide with core methods", () => {
@@ -417,7 +611,11 @@ describe("@ailuracode/alpine-toast", () => {
   });
 
   it("marks trimmed toasts as removed instead of dropping them immediately", () => {
-    const { toast, store } = createToastHarness({ maxToasts: 3, defaultDuration: 0, variants: [] });
+    const { toast, store } = createToastHarness({
+      maxToasts: 3,
+      defaultDuration: 4000,
+      variants: [],
+    });
 
     toast("one");
     toast("two");
@@ -440,7 +638,7 @@ describe("@ailuracode/alpine-toast", () => {
     const { toast, store } = createToastHarness({
       maxToasts: 5,
       maxVisible: 2,
-      defaultDuration: 0,
+      defaultDuration: 4000,
       variants: [],
     });
 
@@ -521,7 +719,11 @@ describe("@ailuracode/alpine-toast", () => {
   });
 
   it("trims the oldest toasts when the queue exceeds maxToasts", () => {
-    const { toast, store } = createToastHarness({ maxToasts: 3, defaultDuration: 0, variants: [] });
+    const { toast, store } = createToastHarness({
+      maxToasts: 3,
+      defaultDuration: 4000,
+      variants: [],
+    });
 
     toast("one");
     toast("two");
@@ -565,7 +767,7 @@ describe("@ailuracode/alpine-toast", () => {
     const { toast, store } = createToastHarness({
       maxToasts: 5,
       maxVisible: 2,
-      defaultDuration: 0,
+      defaultDuration: 4000,
       variants: [],
     });
 
@@ -584,7 +786,7 @@ describe("@ailuracode/alpine-toast", () => {
   it("keeps independent stacks per position", () => {
     const { toast, store } = createToastHarness({
       maxToasts: 2,
-      defaultDuration: 0,
+      defaultDuration: 4000,
       variants: [],
     });
 

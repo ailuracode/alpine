@@ -172,10 +172,12 @@ export default function screenPlugin<
     Alpine.store("device", screenStore);
     Alpine.magic("device", () => Alpine.store("device"));
 
+    const device = Alpine.store("device") as ScreenStore<Name>;
+
     function bindListeners() {
       unbindListeners();
       typeHandler = () => {
-        screenStore.refresh();
+        device.refresh();
       };
       for (const q of queries) {
         q.media.addEventListener("change", typeHandler);
@@ -200,12 +202,12 @@ export default function screenPlugin<
       clearTimeout(widthTimer ?? undefined);
       widthTimer = setTimeout(() => {
         widthTimer = null;
-        screenStore.refreshWidth();
+        device.refreshWidth();
       }, WIDTH_DEBOUNCE_MS);
     }
 
     bindListeners();
-    screenStore.refresh();
+    device.refresh();
   };
 }
 

@@ -1,50 +1,49 @@
 ---
+import Badge from "./astro/Badge.astro";
+import Button from "./astro/Button.astro";
+
 interface Props {
   dataName: string;
   title: string;
   badgeClass?: string;
 }
 
-const { dataName, title, badgeClass = "badge-outline" } = Astro.props;
+const { dataName, title, badgeClass = "" } = Astro.props;
 ---
 
 <article
-	class="rounded-box border border-base-300 bg-base-200/50 p-4"
+	class="rounded-xl border border-border bg-muted/50 p-4"
 	x-data={dataName}
 	x-init="init()"
 	@destroy="destroy()"
 >
 	<h3 class="flex flex-wrap items-center gap-2 text-base font-semibold mb-2">
 		{title}
-		<span
-			class:list={["badge badge-sm", badgeClass]}
-			x-bind:class="{ 'badge-primary': query?.isSuccess }"
-			x-text="badge"
-		></span>
+		<Badge class={badgeClass} x-bind:class="{ 'bg-primary text-primary-foreground': query?.isSuccess }" x-text="badge" />
 	</h3>
 
-	<p class="text-sm text-error mt-2" x-show="query?.isError" x-text="query?.error?.message"></p>
+	<p class="text-sm text-destructive mt-2" x-show="query?.isError" x-text="query?.error?.message"></p>
 
 	<div class="mt-3">
 		<div
-			class="query-table-wrap relative min-h-90 overflow-auto rounded-box border border-base-300 bg-base-100"
+			class="query-table-wrap relative min-h-90 overflow-auto rounded-xl border border-border bg-card"
 			x-bind:class="{
 				'is-fetching': query?.isFetching && hasCachedPage,
 				'is-awaiting-data': isAwaitingData,
 			}"
 			x-bind:aria-busy="isAwaitingData || query?.isFetching"
 		>
-			<table class="table table-sm table-zebra">
-				<thead>
-					<tr>
-						<th scope="col">#</th>
-						<th scope="col">Name</th>
+			<table class="w-full caption-bottom text-sm">
+				<thead class="[&_tr]:border-b">
+					<tr class="border-b">
+						<th scope="col" class="h-10 px-2 text-left align-middle font-medium">#</th>
+						<th scope="col" class="h-10 px-2 text-left align-middle font-medium">Name</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody class="[&_tr:last-child]:border-0">
 					<template x-for="row in tableRows" :key="page + '-' + row.id">
-						<tr x-bind:class="{ 'is-loading': row.loading }">
-							<td class="w-14 tabular-nums text-base-content/60">
+						<tr class="border-b transition-colors hover:bg-muted/50" x-bind:class="{ 'is-loading': row.loading }">
+							<td class="w-14 p-2 align-middle tabular-nums text-muted-foreground">
 								<span
 									class="query-table-skeleton"
 									x-show="row.loading"
@@ -53,7 +52,7 @@ const { dataName, title, badgeClass = "badge-outline" } = Astro.props;
 								></span>
 								<span x-show="!row.loading" x-text="row.id"></span>
 							</td>
-							<td>
+							<td class="p-2 align-middle">
 								<span
 									class="query-table-skeleton"
 									x-show="row.loading"
@@ -70,29 +69,8 @@ const { dataName, title, badgeClass = "badge-outline" } = Astro.props;
 	</div>
 
 	<div class="flex flex-wrap gap-2 mt-3">
-		<button
-			type="button"
-			class="btn btn-sm btn-outline"
-			@click="prevPage()"
-			x-bind:disabled="page <= 1 || query?.isFetching"
-		>
-			Previous
-		</button>
-		<button
-			type="button"
-			class="btn btn-sm btn-outline"
-			@click="query?.refetch()"
-			x-bind:disabled="!query || query.isFetching"
-		>
-			Refresh
-		</button>
-		<button
-			type="button"
-			class="btn btn-sm btn-outline"
-			@click="nextPage()"
-			x-bind:disabled="!query?.data?.next || query?.isFetching"
-		>
-			Next
-		</button>
+		<Button @click="prevPage()" x-bind:disabled="page <= 1 || query?.isFetching">Previous</Button>
+		<Button @click="query?.refetch()" x-bind:disabled="!query || query.isFetching">Refresh</Button>
+		<Button @click="nextPage()" x-bind:disabled="!query?.data?.next || query?.isFetching">Next</Button>
 	</div>
 </article>

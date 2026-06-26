@@ -10,6 +10,9 @@ export type ToastPosition<TPositions extends readonly string[] = readonly []> =
 
 export type DefaultToastVariant = "default";
 
+/** Milliseconds before auto-dismiss, or `false` / `0` to keep the toast open. */
+export type ToastDuration = number | false;
+
 export type ToastVariant<TVariants extends readonly string[] = readonly []> =
   | DefaultToastVariant
   | TVariants[number];
@@ -29,8 +32,9 @@ export interface ToastPayload<
   description?: string | null;
   variant?: ToastVariant<TVariants>;
   position?: ToastPosition<TPositions>;
-  duration?: number;
+  duration?: ToastDuration;
   action?: ToastAction | null;
+  key?: string | null;
 }
 
 export interface ToastItem<
@@ -39,12 +43,13 @@ export interface ToastItem<
   TContent = unknown,
 > {
   id: string;
+  key: string | null;
   content: TContent | null;
   title: string | null;
   description: string | null;
   variant: ToastVariant<TVariants>;
   position: ToastPosition<TPositions>;
-  duration: number;
+  duration: ToastDuration;
   action: ToastAction | null;
   removed: boolean;
 }
@@ -58,7 +63,7 @@ export type ToastPayloadWithoutVariant<
 export interface ToastPromiseOptions<TVariants extends readonly string[] = readonly []> {
   loading?: string;
   error?: string;
-  duration?: number;
+  duration?: ToastDuration;
   loadingVariant?: ToastVariant<TVariants>;
   successVariant?: ToastVariant<TVariants>;
   errorVariant?: ToastVariant<TVariants>;
@@ -94,7 +99,7 @@ export interface ToastPromiseMessages<
   loadingVariant?: TVariant;
   successVariant?: TVariant;
   errorVariant?: TVariant;
-  duration?: number;
+  duration?: ToastDuration;
 }
 
 export type ToastPromiseInput<T> = (() => Promise<T> | T) | Promise<T>;
@@ -116,11 +121,23 @@ export interface ToastStore<
   maxVisible: number;
   items: ToastItem<TVariants, TPositions, TContent>[];
   push(payload?: ToastPayload<TVariants, TPositions, TContent>): string;
+  pushUnique(key: string, payload?: ToastPayload<TVariants, TPositions, TContent>): string;
   update(id: string, payload?: Partial<ToastPayload<TVariants, TPositions, TContent>>): void;
   dismiss(id: string): void;
   dismissAt(position: ToastPosition<TPositions>): void;
   dismissAll(): void;
+  destroy(): void;
   itemsAt(position: ToastPosition<TPositions>): ToastItem<TVariants, TPositions, TContent>[];
+  timedItemsAt(position: ToastPosition<TPositions>): ToastItem<TVariants, TPositions, TContent>[];
+  persistentItemsAt(
+    position: ToastPosition<TPositions>
+  ): ToastItem<TVariants, TPositions, TContent>[];
+  activeTimedItemsAt(
+    position: ToastPosition<TPositions>
+  ): ToastItem<TVariants, TPositions, TContent>[];
+  activePersistentItemsAt(
+    position: ToastPosition<TPositions>
+  ): ToastItem<TVariants, TPositions, TContent>[];
   isVisibleAt(position: ToastPosition<TPositions>, index: number): boolean;
 }
 
@@ -150,13 +167,14 @@ export type ToastMagic<
   update(id: string, payload?: Partial<ToastPayload<TVariants, TPositions, TContent>>): void;
   dismissAt(position: ToastPosition<TPositions>): void;
   dismissAll(): void;
+  pushUnique(key: string, payload?: ToastPayload<TVariants, TPositions, TContent>): string;
   fromPayload(payload?: ToastEventPayload<TVariants, TPositions, TContent>): string;
 } & ToastVariantMethods<TVariants, TPositions, TContent>;
 
 export type ResolvedPromiseConfig<TVariants extends readonly string[] = readonly []> = {
   loading: string;
   error: string;
-  duration: number;
+  duration: ToastDuration;
   loadingVariant: ToastVariant<TVariants>;
   successVariant: ToastVariant<TVariants>;
   errorVariant: ToastVariant<TVariants>;

@@ -1,0 +1,15 @@
+---
+import DemoSection from "../DemoSection.astro";
+---
+
+<DemoSection title="Visibility" api="$visibility">
+	<p
+		class="font-semibold"
+		x-bind:class="$visibility.isVisible ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
+		x-text="$visibility.isVisible ? 'Tab visible' : 'Tab hidden'"
+	></p>
+	<ul class="list-disc list-inside space-y-1">
+		<li>State: <strong x-text="$visibility.state"></strong></li>
+	</ul>
+	<p class="text-sm text-muted-foreground mt-2">Switch to another tab to see the state update.</p>
+</DemoSection>

@@ -1,4 +1,4 @@
-# Attention (Wake Lock & Idle)
+# Attention
 
 Package: `@ailuracode/alpine-attention`
 

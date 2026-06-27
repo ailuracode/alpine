@@ -1,4 +1,5 @@
 # Generated from ../docs/ by scripts/sync-docs.mjs — edit docs/ at repo root, then pnpm sync:docs
+src/content/docs/index.md
 src/content/docs/plugins/
 src/content/docs/getting-started.md
 src/content/docs/architecture.md
@@ -6,3 +7,5 @@ src/content/docs/contributing.md
 src/content/docs/core.md
 src/content/docs/query.md
 src/content/docs/query-devtools.md
+src/content/docs/es/
+src/content/docs/pt/

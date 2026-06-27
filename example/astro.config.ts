@@ -7,13 +7,88 @@ import { defineConfig } from "astro/config";
 const root = fileURLToPath(new URL(".", import.meta.url));
 const pkg = (name: string) => `${root}../packages/${name}/src/index.ts`;
 
+const sidebar = [
+  {
+    label: "Playground",
+    translations: { es: "Playground", pt: "Playground" },
+    link: "/playground/",
+  },
+  {
+    label: "Guides",
+    translations: { es: "Guías", pt: "Guias" },
+    items: [
+      {
+        label: "Getting started",
+        translations: { es: "Primeros pasos", pt: "Primeiros passos" },
+        link: "/getting-started/",
+      },
+      {
+        label: "Architecture",
+        translations: { es: "Arquitectura", pt: "Arquitetura" },
+        link: "/architecture/",
+      },
+      {
+        label: "Contributing",
+        translations: { es: "Contribuir", pt: "Contribuir" },
+        link: "/contributing/",
+      },
+      {
+        label: "Core",
+        translations: { es: "Core", pt: "Core" },
+        link: "/core/",
+      },
+    ],
+  },
+  {
+    label: "Query",
+    translations: { es: "Query", pt: "Query" },
+    items: [
+      {
+        label: "Query cache",
+        translations: { es: "Caché de consultas", pt: "Cache de consultas" },
+        link: "/query/",
+      },
+      {
+        label: "Query devtools",
+        translations: { es: "Query devtools", pt: "Query devtools" },
+        link: "/query-devtools/",
+      },
+    ],
+  },
+  {
+    label: "Plugins",
+    translations: { es: "Plugins", pt: "Plugins" },
+    items: [{ autogenerate: { directory: "plugins" } }],
+  },
+];
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
     starlight({
-      title: "Alpine.js + @ailuracode",
+      title: {
+        en: "Alpine.js + @ailuracode",
+        es: "Alpine.js + @ailuracode",
+        pt: "Alpine.js + @ailuracode",
+      },
       description: "Documentation and interactive demos for @ailuracode Alpine.js plugins",
+      defaultLocale: "root",
+      locales: {
+        root: {
+          label: "English",
+          lang: "en",
+        },
+        es: {
+          label: "Español",
+          lang: "es",
+        },
+        pt: {
+          label: "Português",
+          lang: "pt",
+        },
+      },
       logo: { src: "./public/logo.png", alt: "ailuracode" },
+      routeMiddleware: ["./src/route-data.ts"],
       social: [
         {
           icon: "github",
@@ -24,32 +99,7 @@ export default defineConfig({
       editLink: {
         baseUrl: "https://github.com/ailuracode/alpine/edit/master/docs/",
       },
-      sidebar: [
-        {
-          label: "Playground",
-          link: "/playground/",
-        },
-        {
-          label: "Guides",
-          items: [
-            { label: "Getting started", link: "/getting-started/" },
-            { label: "Architecture", link: "/architecture/" },
-            { label: "Contributing", link: "/contributing/" },
-            { label: "Core", link: "/core/" },
-          ],
-        },
-        {
-          label: "Query",
-          items: [
-            { label: "Query cache", link: "/query/" },
-            { label: "Query devtools", link: "/query-devtools/" },
-          ],
-        },
-        {
-          label: "Plugins",
-          items: [{ autogenerate: { directory: "plugins" } }],
-        },
-      ],
+      sidebar,
     }),
     react(),
   ],

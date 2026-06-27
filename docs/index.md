@@ -1,20 +1,4 @@
----
-title: "Alpine.js + @ailuracode"
-description: "Documentation and interactive demos for headless Alpine.js plugins by ailuracode."
-template: splash
-hero:
-  title: "Alpine.js plugins, documented"
-  tagline: "Headless stores and magics for theme, scroll, query cache, toasts, and more — framework-agnostic, npm-published, and ready for your markup."
-  actions:
-    - text: "Getting started"
-      link: "/getting-started/"
-      icon: "right-arrow"
-      variant: "primary"
-    - text: "Open playground"
-      link: "/playground/"
-      icon: "external"
-      variant: "minimal"
----
+# Alpine.js + @ailuracode
 
 Documentation and interactive demos for headless Alpine.js plugins by ailuracode.
 

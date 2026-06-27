@@ -1,4 +1,4 @@
-# Architecture: stores vs magics
+# Architecture
 
 This monorepo follows Alpine.js conventions and splits plugins into two categories.
 

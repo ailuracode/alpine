@@ -1,0 +1,131 @@
+{
+  "es": {
+    "attention": {
+      "title": "Attention",
+      "description": "Wake Lock e Idle Detection con los magics $wakelock y $idle."
+    },
+    "battery": {
+      "title": "Battery",
+      "description": "Estado de la batería del dispositivo con el magic $battery."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Cuadrículas de mes, navegación y selección de fechas con $calendar."
+    },
+    "clipboard": {
+      "title": "Clipboard",
+      "description": "Copiar al portapapeles con el magic $clipboard."
+    },
+    "export": {
+      "title": "Export",
+      "description": "Exportar datos a CSV, JSON y otros formatos con $export."
+    },
+    "geo": { "title": "Geo", "description": "Geolocalización y permisos con el store $store.geo." },
+    "json-api": {
+      "title": "JSON:API",
+      "description": "Cliente JSON:API tipado con el magic $jsonapi."
+    },
+    "network": {
+      "title": "Network",
+      "description": "Estado de conexión en línea/offline con el magic $network."
+    },
+    "notify": {
+      "title": "Notify",
+      "description": "Notificaciones del navegador y permisos push con $notify."
+    },
+    "platform": {
+      "title": "Platform",
+      "description": "Detección de SO, navegador y dispositivo con $platform."
+    },
+    "screen": {
+      "title": "Screen",
+      "description": "Breakpoints y dimensiones del viewport con $store.device."
+    },
+    "scroll": {
+      "title": "Scroll",
+      "description": "Posición, dirección, progreso y bloqueo de scroll con $store.scroll."
+    },
+    "share": { "title": "Share", "description": "Web Share API con el magic $share." },
+    "sidebar": {
+      "title": "Sidebar",
+      "description": "Estado de paneles laterales con $store.sidebar."
+    },
+    "theme": { "title": "Theme", "description": "Modos claro, oscuro y sistema con $store.theme." },
+    "toast": { "title": "Toast", "description": "Cola de toasts headless con el magic $toast." },
+    "toggle": {
+      "title": "Toggle",
+      "description": "Alternar valores booleanos con el magic $toggle."
+    },
+    "touch": {
+      "title": "Touch",
+      "description": "Detección de entrada táctil con el magic $touch."
+    },
+    "visibility": {
+      "title": "Visibility",
+      "description": "Visibilidad de pestaña y Page Visibility con $visibility."
+    }
+  },
+  "pt": {
+    "attention": {
+      "title": "Attention",
+      "description": "Wake Lock e Idle Detection com os magics $wakelock e $idle."
+    },
+    "battery": {
+      "title": "Battery",
+      "description": "Estado da bateria do dispositivo com o magic $battery."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Grades mensais, navegação e seleção de datas com $calendar."
+    },
+    "clipboard": {
+      "title": "Clipboard",
+      "description": "Copiar para a área de transferência com o magic $clipboard."
+    },
+    "export": {
+      "title": "Export",
+      "description": "Exportar dados para CSV, JSON e outros formatos com $export."
+    },
+    "geo": { "title": "Geo", "description": "Geolocalização e permissões com o store $store.geo." },
+    "json-api": {
+      "title": "JSON:API",
+      "description": "Cliente JSON:API tipado com o magic $jsonapi."
+    },
+    "network": {
+      "title": "Network",
+      "description": "Estado de ligação online/offline com o magic $network."
+    },
+    "notify": {
+      "title": "Notify",
+      "description": "Notificações do browser e permissões push com $notify."
+    },
+    "platform": {
+      "title": "Platform",
+      "description": "Deteção de SO, browser e dispositivo com $platform."
+    },
+    "screen": {
+      "title": "Screen",
+      "description": "Breakpoints e dimensões do viewport com $store.device."
+    },
+    "scroll": {
+      "title": "Scroll",
+      "description": "Posição, direção, progresso e bloqueio de scroll com $store.scroll."
+    },
+    "share": { "title": "Share", "description": "Web Share API com o magic $share." },
+    "sidebar": {
+      "title": "Sidebar",
+      "description": "Estado de painéis laterais com $store.sidebar."
+    },
+    "theme": { "title": "Theme", "description": "Modos claro, escuro e sistema com $store.theme." },
+    "toast": { "title": "Toast", "description": "Fila de toasts headless com o magic $toast." },
+    "toggle": {
+      "title": "Toggle",
+      "description": "Alternar valores booleanos com o magic $toggle."
+    },
+    "touch": { "title": "Touch", "description": "Deteção de entrada tátil com o magic $touch." },
+    "visibility": {
+      "title": "Visibility",
+      "description": "Visibilidade de separador e Page Visibility com $visibility."
+    }
+  }
+}

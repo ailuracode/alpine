@@ -27,7 +27,9 @@ Open [http://localhost:4321](http://localhost:4321) for documentation. Interacti
 | Path | Purpose |
 |------|---------|
 | `../docs/` | **Source of truth** for Markdown reference (edit here) |
-| `scripts/sync-docs.mjs` | Syncs `docs/` → `src/content/docs/` with Starlight frontmatter |
+| `../docs/es/`, `../docs/pt/` | Translated guides and plugin reference (Spanish, Portuguese) |
+| `../docs/i18n/` | Splash hero JSON + plugin sidebar labels per locale |
+| `scripts/sync-docs.mjs` | Syncs `docs/` → `src/content/docs/` (en root, es/, pt/) with Starlight frontmatter |
 | `src/content/docs/` | Starlight content (generated guides + `index.md`) |
 | `src/pages/playground/` | Overview + `[plugin].astro` subpages |
 | `src/playground-demos.ts` | Demo component registry |

@@ -1,4 +1,4 @@
-# Core plugin system
+# Core
 
 `@ailuracode/alpine-core` is the lazy plugin registry for the monorepo. Individual packages remain independently installable; the core coordinates registration and on-demand initialization.
 

@@ -1,16 +1,16 @@
 # JSON:API
 
-Strongly typed JSON:API client for Alpine.js.
+Cliente JSON:API fortemente tipado para Alpine.js.
 
-## Install
+## Instalação
 
 ```bash
 npm install @ailuracode/alpine-json-api @ailuracode/alpine-query alpinejs
 ```
 
-## Schema-driven types
+## Tipos orientados por schema
 
-`defineJsonApiSchema()` ingests your resource map and preserves literal `type` keys, attribute shapes, and relationship targets:
+`defineJsonApiSchema()` ingere seu mapa de recursos e preserva chaves literais de `type`, formas de atributos e destinos de relacionamentos:
 
 ```ts
 import { defineJsonApiSchema, createJsonApiClient } from "@ailuracode/alpine-json-api";
@@ -34,11 +34,11 @@ const schema = defineJsonApiSchema({
 const client = createJsonApiClient(schema, { baseUrl: "https://api.example.com" });
 ```
 
-`createJsonApiClient()` and `$jsonapi` infer:
+`createJsonApiClient()` e `$jsonapi` inferem:
 
-- `attributes` for each resource type
-- relationship names and target resource types
-- `include`, `fields`, `create`, and `update` payloads
+- `attributes` para cada tipo de recurso
+- nomes de relacionamentos e tipos de recurso de destino
+- payloads de `include`, `fields`, `create` e `update`
 
 ## Alpine plugin
 
@@ -48,19 +48,19 @@ import jsonApi from "@ailuracode/alpine-json-api";
 Alpine.plugin(jsonApi({ schema, baseUrl: "/api" }));
 ```
 
-Registers magic `$jsonapi` with the configured client.
+Registra o magic `$jsonapi` com o cliente configurado.
 
-## JSON:API features
+## Recursos JSON:API
 
-- `application/vnd.api+json` `Accept` / `Content-Type` headers
-- Compound documents (`included`)
+- Cabeçalhos `Accept` / `Content-Type` `application/vnd.api+json`
+- Documentos compostos (`included`)
 - Sparse fieldsets (`fields[type]=a,b`)
-- `include`, `sort`, `page`, and `filter` query params
-- JSON:API error documents via `JsonApiHttpError`
-- Automatic `relationships.*.resolved` hydration from compound `included` documents
-- Built on `typedFetch` from `@ailuracode/alpine-query`
+- Parâmetros de query `include`, `sort`, `page` e `filter`
+- Documentos de erro JSON:API via `JsonApiHttpError`
+- Hidratação automática de `relationships.*.resolved` a partir de documentos `included` compostos
+- Construído sobre `typedFetch` de `@ailuracode/alpine-query`
 
-## Query cache integration
+## Integração com cache de queries
 
 ```js
 import { jsonApiQueryOptions } from "@ailuracode/alpine-json-api";
@@ -75,7 +75,7 @@ const articles = jsonApiQueryOptions({
 
 $store.query.observe(articles);
 
-// Single resource
+// Recurso único
 const article = jsonApiFindOneQueryOptions({
   client: $jsonapi,
   resource: "articles",
@@ -84,9 +84,9 @@ const article = jsonApiFindOneQueryOptions({
 });
 ```
 
-Resolved relationships are available on `data[].relationships.author.resolved` after `include` fetches compound documents.
+Relacionamentos resolvidos ficam disponíveis em `data[].relationships.author.resolved` após `include` buscar documentos compostos.
 
-## See also
+## Veja também
 
-- [JSON:API specification](https://jsonapi.org/format/)
+- [Especificação JSON:API](https://jsonapi.org/format/)
 - [@ailuracode/alpine-query](./query.md)

@@ -62,7 +62,7 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         kind: "store",
         tier: "essential",
         description:
-          "Open, close, and collapse state for app shells. Compose with scroll lock on overlay open. This demo app uses the sidebar you are navigating right now.",
+          "Open, close, and toggle visibility for app shells. Visual width (rail, mini, expanded) is owned by the consumer via local Alpine state. Compose with scroll lock on overlay open. This demo app uses the sidebar you are navigating right now.",
       },
       {
         id: "toast",

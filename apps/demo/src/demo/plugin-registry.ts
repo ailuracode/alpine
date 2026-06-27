@@ -68,21 +68,15 @@ export function registerDemoPlugins(): void {
       magics: ["sidebar"],
       plugin: (Alpine) => {
         sidebar({
-          onOpen() {
+          onShow() {
             document.documentElement.setAttribute("data-sidebar", "");
             document.documentElement.style.scrollbarGutter = "stable";
             (Alpine.store("scroll") as { lock(): void }).lock();
           },
-          onClose() {
+          onHide() {
             document.documentElement.removeAttribute("data-sidebar");
             document.documentElement.style.scrollbarGutter = "";
             (Alpine.store("scroll") as { unlock(): void }).unlock();
-          },
-          onCollapse() {
-            document.documentElement.setAttribute("data-sidebar-collapsed", "");
-          },
-          onExpand() {
-            document.documentElement.removeAttribute("data-sidebar-collapsed");
           },
         })(Alpine);
       },

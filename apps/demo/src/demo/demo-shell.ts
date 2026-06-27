@@ -6,6 +6,12 @@ export type DemoShellData = {
   exportedJson: boolean | null;
   exportedUrl: boolean | null;
   shared: boolean | null;
+  /**
+   * Local visual state for the desktop sidebar width. Decoupled from
+   * `$store.sidebar` (which only owns visibility). Consumers choose how
+   * to render the panel — rail, mini, expanded, etc.
+   */
+  expanded: boolean;
 };
 
 export function registerDemoShell(Alpine: AlpineInstance): void {
@@ -17,6 +23,7 @@ export function registerDemoShell(Alpine: AlpineInstance): void {
       exportedJson: null,
       exportedUrl: null,
       shared: null,
+      expanded: true,
     })
   );
 }

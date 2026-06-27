@@ -8,8 +8,7 @@ const plugin = getPluginNavItem("sidebar")!;
 
 <DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
 	<ul class="list-disc list-inside space-y-1 text-sm">
-		<li>Open: <strong x-text="$store.sidebar.open"></strong></li>
-		<li>Collapsed: <strong x-text="$store.sidebar.collapsed"></strong></li>
+		<li>Visible: <strong x-text="$store.sidebar.visible"></strong></li>
 		<li>matchesBreakpoint: <strong x-text="$store.sidebar.matchesBreakpoint"></strong></li>
 		<li>hasOverlay: <strong x-text="$store.sidebar.hasOverlay"></strong></li>
 		<li>Device: <strong x-text="$store.device.type"></strong></li>
@@ -19,9 +18,6 @@ const plugin = getPluginNavItem("sidebar")!;
 		<DemoButton @click="$store.sidebar.show()">show()</DemoButton>
 		<DemoButton @click="$store.sidebar.hide()">hide()</DemoButton>
 		<DemoButton @click="$store.sidebar.toggle()">toggle()</DemoButton>
-		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.collapse()">collapse()</DemoButton>
-		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.expand()">expand()</DemoButton>
-		<DemoButton x-show="$store.device.type === 'desktop'" x-cloak @click="$store.sidebar.toggleCollapse()">toggleCollapse()</DemoButton>
 	</div>
 
 	<p class="text-sm text-muted-foreground mt-3">

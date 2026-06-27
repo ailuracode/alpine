@@ -1,7 +1,7 @@
 {
   "name": "@ailuracode/alpine-sidebar",
   "version": "0.1.1",
-  "description": "Alpine.js sidebar store for open/close state, scroll lock, overlay, and keyboard navigation",
+  "description": "Alpine.js sidebar store for visibility state, overlay, keyboard navigation, and responsive breakpoints",
   "type": "module",
   "license": "MIT",
   "author": "ailuracode",

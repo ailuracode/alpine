@@ -12,46 +12,32 @@ export interface SidebarPluginOptions {
    * Example: `'(min-width: 1024px)'` for desktop-only persistent sidebar.
    */
   breakpoint?: string;
-  /** Whether the sidebar starts collapsed. Default: `false`. */
-  collapsed?: boolean;
-  /** Called when sidebar opens. Use to apply CSS classes or attributes. */
-  onOpen?: () => void;
-  /** Called when sidebar closes. Use to remove CSS classes or attributes. */
-  onClose?: () => void;
-  /** Called when overlay is clicked. Useful for custom overlay logic. */
+  /** Called when the sidebar becomes visible. Use to apply CSS classes or attributes. */
+  onShow?: () => void;
+  /** Called when the sidebar becomes hidden. Use to remove CSS classes or attributes. */
+  onHide?: () => void;
+  /** Called when the overlay is clicked. Useful for custom overlay logic. */
   onOverlayClick?: () => void;
-  /** Called when sidebar collapses to compact mode. */
-  onCollapse?: () => void;
-  /** Called when sidebar expands from compact mode. */
-  onExpand?: () => void;
 }
 
 // ── Store ────────────────────────────────────────────────────────────
 
 export interface SidebarStore {
-  /** Whether the sidebar is currently open. */
-  open: boolean;
-  /** Whether the sidebar is in collapsed (compact) mode. */
-  collapsed: boolean;
+  /** Whether the sidebar is currently visible. */
+  visible: boolean;
   /** Whether the breakpoint media query currently matches. */
   matchesBreakpoint: boolean;
-  /** Whether an overlay is shown (open && closeOnOverlayClick). */
+  /** Whether an overlay should be shown (visible && closeOnOverlayClick). */
   readonly hasOverlay: boolean;
-  /** Whether the sidebar is open (alias for `open`). */
-  readonly isOpen: boolean;
+  /** Whether the sidebar is visible (alias for `visible`). */
+  readonly isVisible: boolean;
 
   /** Show the sidebar. */
   show(): void;
   /** Hide the sidebar. */
   hide(): void;
-  /** Toggle the sidebar open/closed. */
+  /** Toggle the sidebar visible/hidden. */
   toggle(): void;
-  /** Collapse the sidebar to compact mode. */
-  collapse(): void;
-  /** Expand the sidebar from compact mode. */
-  expand(): void;
-  /** Toggle between collapsed and expanded. */
-  toggleCollapse(): void;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -71,12 +57,9 @@ export default function sidebarPlugin(
     closeOnEscape: options.closeOnEscape ?? true,
     closeOnOverlayClick: options.closeOnOverlayClick ?? true,
     breakpoint: options.breakpoint,
-    collapsed: options.collapsed ?? false,
-    onOpen: options.onOpen as (() => void) | undefined,
-    onClose: options.onClose as (() => void) | undefined,
+    onShow: options.onShow as (() => void) | undefined,
+    onHide: options.onHide as (() => void) | undefined,
     onOverlayClick: options.onOverlayClick as (() => void) | undefined,
-    onCollapse: options.onCollapse as (() => void) | undefined,
-    onExpand: options.onExpand as (() => void) | undefined,
   };
 
   return function registerSidebar(Alpine) {
@@ -85,63 +68,38 @@ export default function sidebarPlugin(
     let breakpointHandler: ((event: MediaQueryListEvent) => void) | null = null;
 
     const store: SidebarStore = {
-      open: false,
-      collapsed: config.collapsed,
+      visible: false,
       matchesBreakpoint: false,
 
       get hasOverlay() {
-        return this.open && config.closeOnOverlayClick;
+        return this.visible && config.closeOnOverlayClick;
       },
 
-      get isOpen() {
-        return this.open;
+      get isVisible() {
+        return this.visible;
       },
 
       show() {
-        if (this.open) {
+        if (this.visible) {
           return;
         }
-        this.open = true;
-        config.onOpen?.();
+        this.visible = true;
+        config.onShow?.();
       },
 
       hide() {
-        if (!this.open) {
+        if (!this.visible) {
           return;
         }
-        this.open = false;
-        config.onClose?.();
+        this.visible = false;
+        config.onHide?.();
       },
 
       toggle() {
-        if (this.open) {
+        if (this.visible) {
           this.hide();
         } else {
           this.show();
-        }
-      },
-
-      collapse() {
-        if (this.collapsed) {
-          return;
-        }
-        this.collapsed = true;
-        config.onCollapse?.();
-      },
-
-      expand() {
-        if (!this.collapsed) {
-          return;
-        }
-        this.collapsed = false;
-        config.onExpand?.();
-      },
-
-      toggleCollapse() {
-        if (this.collapsed) {
-          this.expand();
-        } else {
-          this.collapse();
         }
       },
     };
@@ -154,7 +112,7 @@ export default function sidebarPlugin(
     // Escape key listener
     if (config.closeOnEscape) {
       escapeHandler = (event: KeyboardEvent) => {
-        if (event.key === "Escape" && sidebar.open) {
+        if (event.key === "Escape" && sidebar.visible) {
           sidebar.hide();
         }
       };
@@ -170,7 +128,7 @@ export default function sidebarPlugin(
         sidebar.matchesBreakpoint = event.matches;
 
         // Auto-close when breakpoint no longer matches
-        if (!event.matches && sidebar.open) {
+        if (!event.matches && sidebar.visible) {
           sidebar.hide();
         }
       };

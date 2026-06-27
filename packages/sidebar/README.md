@@ -1,8 +1,8 @@
 # @ailuracode/alpine-sidebar
 
-Alpine.js sidebar store for open/close state, overlay, keyboard navigation, and responsive breakpoints. Compose with `@ailuracode/alpine-scroll` for body scroll locking.
+Alpine.js sidebar store focused on **visibility** — open/close state, overlay, keyboard navigation, and responsive breakpoints. Compose with `@ailuracode/alpine-scroll` for body scroll locking.
 
-Three states: **open** (visible), **closed** (hidden), and **collapsed** (compact icon-only rail, optional).
+The plugin is intentionally **headless** and knows nothing about the width, mode, or appearance of your sidebar. The consumer owns the visual representation (drawer, rail, mini, expanded, floating, etc.) via local Alpine state.
 
 **[Full documentation →](../../docs/plugins/sidebar.md)**
 
@@ -32,41 +32,34 @@ Store name: `$store.sidebar`
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `open` | `boolean` | Whether the sidebar is open |
-| `collapsed` | `boolean` | Whether the sidebar is in collapsed (compact) mode |
+| `visible` | `boolean` | Whether the sidebar is currently visible |
 | `matchesBreakpoint` | `boolean` | Whether the breakpoint query matches |
 
 ### Getters
 
 | Getter | Description |
 |--------|-------------|
-| `isOpen` | Alias for `open` |
-| `hasOverlay` | `true` when open and `closeOnOverlayClick` is enabled |
+| `isVisible` | Alias for `visible` |
+| `hasOverlay` | `true` when visible and `closeOnOverlayClick` is enabled |
 
 ### Methods
 
 | Method | Description |
 |--------|-------------|
-| `show()` | Open the sidebar |
-| `hide()` | Close the sidebar |
-| `toggle()` | Toggle open/closed |
-| `collapse()` | Collapse to compact mode (icon-only) |
-| `expand()` | Expand from compact mode |
-| `toggleCollapse()` | Toggle between collapsed and expanded |
+| `show()` | Show the sidebar |
+| `hide()` | Hide the sidebar |
+| `toggle()` | Toggle visible/hidden |
 
 ### Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `closeOnEscape` | `boolean` | `true` | Close on Escape key |
-| `closeOnOverlayClick` | `boolean` | `true` | Close when overlay is clicked |
-| `collapsed` | `boolean` | `false` | Start in collapsed (compact) mode |
-| `breakpoint` | `string` | — | CSS media query for auto-close |
-| `onOpen` | `() => void` | — | Called when sidebar opens |
-| `onClose` | `() => void` | — | Called when sidebar closes |
-| `onOverlayClick` | `() => void` | — | Called when overlay is clicked |
-| `onCollapse` | `() => void` | — | Called when sidebar collapses to compact mode |
-| `onExpand` | `() => void` | — | Called when sidebar expands from compact mode |
+| `closeOnEscape` | `boolean` | `true` | Hide on Escape key |
+| `closeOnOverlayClick` | `boolean` | `true` | Hide when overlay is clicked |
+| `breakpoint` | `string` | — | CSS media query for auto-hide |
+| `onShow` | `() => void` | — | Called when the sidebar becomes visible |
+| `onHide` | `() => void` | — | Called when the sidebar becomes hidden |
+| `onOverlayClick` | `() => void` | — | Called when the overlay is clicked |
 
 ## HTML examples
 
@@ -75,10 +68,10 @@ Store name: `$store.sidebar`
 ```js
 Alpine.plugin(
   sidebar({
-    onOpen() {
+    onShow() {
       document.documentElement.setAttribute("data-sidebar", "");
     },
-    onClose() {
+    onHide() {
       document.documentElement.removeAttribute("data-sidebar");
     },
   }),
@@ -100,7 +93,7 @@ Alpine.plugin(
 
 <!-- Sidebar panel -->
 <aside
-  x-show="$store.sidebar.open"
+  x-show="$store.sidebar.visible"
   x-transition:enter="transition-slide-left"
   x-transition:leave="transition-slide-left-reverse"
 >
@@ -112,6 +105,23 @@ Alpine.plugin(
 </aside>
 ```
 
+### Manage visual width locally
+
+The plugin only controls visibility. Define your own width / mode in Alpine:
+
+```html
+<div
+  x-data="{ expanded: true }"
+  :class="expanded ? 'w-64' : 'w-16'"
+>
+  <button @click="expanded = !expanded">Toggle width</button>
+
+  <aside x-show="$store.sidebar.visible">
+    <!-- … -->
+  </aside>
+</div>
+```
+
 ### With scroll lock integration
 
 ```js
@@ -121,28 +131,30 @@ import sidebar from "@ailuracode/alpine-sidebar";
 Alpine.plugin(scroll());
 Alpine.plugin(
   sidebar({
-    onOpen() {
+    onShow() {
       Alpine.store("scroll").lock();
     },
-    onClose() {
+    onHide() {
       Alpine.store("scroll").unlock();
     },
   }),
 );
 ```
 
-### With breakpoint auto-close
+### With breakpoint auto-hide
 
 ```js
 Alpine.plugin(
   sidebar({
     breakpoint: "(min-width: 1024px)",
-    onOpen() {
+    onShow() {
       document.documentElement.setAttribute("data-sidebar", "");
     },
-    onClose() {
+    onHide() {
       document.documentElement.removeAttribute("data-sidebar");
     },
   }),
 );
 ```
+
+When the viewport no longer matches the breakpoint, the sidebar auto-hides.

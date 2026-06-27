@@ -24,7 +24,7 @@ const navLinkClass = (id: string) => {
 <!-- Sidebar overlay — mobile only (native button — not DemoButton; must cover full viewport) -->
 <button
 	type="button"
-	x-show="$store.device.type !== 'desktop' && $store.sidebar.open"
+	x-show="$store.device.type !== 'desktop' && $store.sidebar.visible"
 	x-transition.opacity
 	class="fixed inset-0 z-30 border-0 bg-black/50 p-0 motion-reduce:transition-none"
 	x-on:click="$store.sidebar.hide()"
@@ -32,9 +32,9 @@ const navLinkClass = (id: string) => {
 	style="display: none;"
 ></button>
 
-<!-- Left sidebar — persistent on desktop, drawer on mobile -->
+<!-- Left sidebar — persistent on desktop (width managed by local `expanded` state), drawer on mobile -->
 <aside
-	x-show="$store.device.type === 'desktop' || $store.sidebar.open"
+	x-show="$store.device.type === 'desktop' || $store.sidebar.visible"
 	x-transition:enter="transition ease-out duration-300 motion-reduce:transition-none"
 	x-transition:enter-start="-translate-x-full"
 	x-transition:enter-end="translate-x-0"
@@ -43,21 +43,21 @@ const navLinkClass = (id: string) => {
 	x-transition:leave-end="-translate-x-full"
 	class="fixed inset-y-0 left-0 z-40 flex flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl transition-[width] duration-300 ease-out motion-reduce:transition-none"
 	x-cloak
-	x-bind:class="$store.device.type === 'desktop' && $store.sidebar.collapsed ? 'w-16' : 'w-64'"
+	x-bind:class="$store.device.type === 'desktop' && !expanded ? 'w-16' : 'w-64'"
 	aria-label="Playground navigation"
 >
 	<!-- Logo -->
 	<a
 		href="/playground/"
 		class="flex h-14 shrink-0 items-center border-b border-sidebar-border transition-colors hover:bg-sidebar-accent/40"
-		x-bind:class="$store.sidebar.collapsed ? 'justify-center px-2' : 'px-4'"
+		x-bind:class="!expanded ? 'justify-center px-2' : 'px-4'"
 		x-on:click="$store.device.type !== 'desktop' && $store.sidebar.hide()"
 	>
 		<div class="flex items-center gap-3 overflow-hidden">
 			<img src="/logo.png" alt="" width="32" height="32" class="size-8 shrink-0 rounded-lg" />
 			<span
 				class="overflow-hidden whitespace-nowrap text-sm font-bold transition-[max-width,opacity] duration-300 motion-reduce:transition-none"
-				x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+				x-bind:class="!expanded ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
 			>
 				Alpine Plugins
 			</span>
@@ -76,7 +76,7 @@ const navLinkClass = (id: string) => {
 			<DemoNavIcon id="overview" />
 			<span
 				class="overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-300 motion-reduce:transition-none"
-				x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+				x-bind:class="!expanded ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
 			>
 				Overview
 			</span>
@@ -89,7 +89,7 @@ const navLinkClass = (id: string) => {
 				<>
 					<div
 						class="overflow-hidden px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider whitespace-nowrap text-sidebar-foreground/50 uppercase transition-[max-width,opacity] duration-300 motion-reduce:transition-none"
-						x-bind:class="$store.sidebar.collapsed ? 'max-h-0 max-w-0 py-0 opacity-0' : 'max-h-8 max-w-[180px] opacity-100'"
+						x-bind:class="!expanded ? 'max-h-0 max-w-0 py-0 opacity-0' : 'max-h-8 max-w-[180px] opacity-100'"
 					>
 						{group.label}
 					</div>
@@ -104,7 +104,7 @@ const navLinkClass = (id: string) => {
 							<DemoNavIcon id={item.id} />
 							<span
 								class="overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-300 motion-reduce:transition-none"
-								x-bind:class="$store.sidebar.collapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
+								x-bind:class="!expanded ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
 							>
 								{item.title}
 							</span>
@@ -117,7 +117,7 @@ const navLinkClass = (id: string) => {
 
 	<div
 		class="shrink-0 border-t border-sidebar-border p-3 text-[10px] leading-snug text-sidebar-foreground/60"
-		x-show="!$store.sidebar.collapsed"
+		x-show="expanded"
 		x-cloak
 	>
 		<p class="px-1">{PLUGIN_NAV_GROUPS.reduce((n, g) => n + g.items.length, 0)} modules · one demo per page</p>

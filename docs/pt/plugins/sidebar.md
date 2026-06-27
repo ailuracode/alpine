@@ -1,13 +1,13 @@
 ---
 title: "Sidebar"
-description: "Estado de painéis laterais com $store.sidebar."
+description: "Visibilidade do painel lateral com $store.sidebar."
 ---
 
 Package: `@ailuracode/alpine-sidebar`
 
-Controla o estado aberto/fechado da barra lateral com overlay, navegação por teclado e breakpoints responsivos. Agnóstico a framework CSS — todas as mudanças visuais são aplicadas via callbacks. Componha com `@ailuracode/alpine-scroll` para bloqueio de scroll do body.
+Controla a **visibilidade** do painel lateral (show / hide / toggle) com overlay, navegação por teclado e breakpoints responsivos. Agnóstico a framework CSS — todas as mudanças visuais são aplicadas via callbacks. Componha com `@ailuracode/alpine-scroll` para bloqueio de scroll do body.
 
-Três estados: **open** (visível), **closed** (oculta) e **collapsed** (trilho compacto somente com ícones, opcional).
+O plugin é **headless** por design e não conhece largura, modo nem aparência da sua sidebar. A representação visual (drawer, rail, mini, expandido, flutuante, etc.) fica a cargo do consumidor via estado local do Alpine.
 
 ## Instalação
 
@@ -27,15 +27,15 @@ Alpine.start();
 
 ### Com callbacks
 
-Aplique suas próprias classes CSS ou atributos quando o estado da barra lateral mudar:
+Aplique suas próprias classes CSS ou atributos quando a visibilidade da barra lateral mudar:
 
 ```js
 Alpine.plugin(
   sidebar({
-    onOpen() {
+    onShow() {
       document.documentElement.setAttribute("data-sidebar", "");
     },
-    onClose() {
+    onHide() {
       document.documentElement.removeAttribute("data-sidebar");
     },
   }),
@@ -44,7 +44,7 @@ Alpine.plugin(
 
 ### Com bloqueio de scroll
 
-Componha com `@ailuracode/alpine-scroll` via callbacks para bloquear o scroll do body quando a barra lateral estiver aberta:
+Componha com `@ailuracode/alpine-scroll` via callbacks para bloquear o scroll do body quando a barra lateral estiver visível:
 
 ```js
 import scroll from "@ailuracode/alpine-scroll";
@@ -53,11 +53,11 @@ import sidebar from "@ailuracode/alpine-sidebar";
 Alpine.plugin(scroll());
 Alpine.plugin(
   sidebar({
-    onOpen() {
+    onShow() {
       document.documentElement.setAttribute("data-sidebar", "");
       Alpine.store("scroll").lock();
     },
-    onClose() {
+    onHide() {
       document.documentElement.removeAttribute("data-sidebar");
       Alpine.store("scroll").unlock();
     },
@@ -79,41 +79,34 @@ Store name: `$store.sidebar`
 
 | Propriedade | Tipo | Descrição |
 |----------|------|-------------|
-| `open` | `boolean` | Se a barra lateral está aberta no momento |
-| `collapsed` | `boolean` | Se a barra lateral está em modo compacto (collapsed) |
+| `visible` | `boolean` | Se a barra lateral está visível no momento |
 | `matchesBreakpoint` | `boolean` | Se a media query do breakpoint corresponde no momento |
 
 ### Getters
 
 | Getter | Descrição |
 |--------|-------------|
-| `isOpen` | Alias para `open` |
-| `hasOverlay` | `true` quando aberta e `closeOnOverlayClick` está habilitado (padrão) |
+| `isVisible` | Alias para `visible` |
+| `hasOverlay` | `true` quando visível e `closeOnOverlayClick` está habilitado (padrão) |
 
 ### Métodos
 
 | Método | Descrição |
 |--------|-------------|
-| `show()` | Abre a barra lateral |
-| `hide()` | Fecha a barra lateral |
-| `toggle()` | Alterna aberto/fechado |
-| `collapse()` | Colapsa para modo compacto (somente ícones) |
-| `expand()` | Expande a partir do modo compacto |
-| `toggleCollapse()` | Alterna entre compacto e expandido |
+| `show()` | Mostra a barra lateral |
+| `hide()` | Oculta a barra lateral |
+| `toggle()` | Alterna entre visível e oculta |
 
 ### Opções
 
 | Opção | Tipo | Padrão | Descrição |
 |--------|------|---------|-------------|
-| `closeOnEscape` | `boolean` | `true` | Fecha a barra lateral ao pressionar Escape |
-| `closeOnOverlayClick` | `boolean` | `true` | Fecha a barra lateral ao clicar no overlay |
-| `collapsed` | `boolean` | `false` | Inicia em modo compacto (collapsed) |
-| `breakpoint` | `string` | — | Media query CSS — fecha automaticamente quando deixa de corresponder |
-| `onOpen` | `() => void` | — | Chamado quando a barra lateral abre |
-| `onClose` | `() => void` | — | Chamado quando a barra lateral fecha |
+| `closeOnEscape` | `boolean` | `true` | Oculta a barra lateral ao pressionar Escape |
+| `closeOnOverlayClick` | `boolean` | `true` | Oculta a barra lateral ao clicar no overlay |
+| `breakpoint` | `string` | — | Media query CSS — oculta automaticamente quando deixa de corresponder |
+| `onShow` | `() => void` | — | Chamado quando a barra lateral se torna visível |
+| `onHide` | `() => void` | — | Chamado quando a barra lateral é ocultada |
 | `onOverlayClick` | `() => void` | — | Chamado quando o overlay é clicado |
-| `onCollapse` | `() => void` | — | Chamado quando a barra lateral colapsa para modo compacto |
-| `onExpand` | `() => void` | — | Chamado quando a barra lateral expande a partir do modo compacto |
 
 ## Exemplos HTML
 
@@ -133,7 +126,7 @@ Store name: `$store.sidebar`
 
   <!-- Sidebar panel -->
   <aside
-    x-show="$store.sidebar.open"
+    x-show="$store.sidebar.visible"
     x-transition:enter="transition ease-out duration-300"
     x-transition:enter-start="-translate-x-full"
     x-transition:enter-end="translate-x-0"
@@ -157,53 +150,40 @@ Store name: `$store.sidebar`
 Alpine.plugin(
   sidebar({
     breakpoint: "(min-width: 1024px)",
-    onOpen() {
+    onShow() {
       document.documentElement.setAttribute("data-sidebar", "");
     },
-    onClose() {
+    onHide() {
       document.documentElement.removeAttribute("data-sidebar");
     },
   }),
 );
 ```
 
-Quando o viewport cruza o breakpoint, a barra lateral fecha automaticamente.
+Quando o viewport cruza o breakpoint, a barra lateral se oculta automaticamente.
 
-### Modo compacto (desktop)
+### A largura visual é responsabilidade do consumidor
 
-Colapse a barra lateral para um trilho somente com ícones no desktop, painel completo no mobile:
-
-```js
-Alpine.plugin(
-  sidebar({
-    collapsed: false,
-    onCollapse() {
-      document.documentElement.setAttribute("data-sidebar-collapsed", "");
-    },
-    onExpand() {
-      document.documentElement.removeAttribute("data-sidebar-collapsed");
-    },
-  }),
-);
-```
+O plugin não rastreia largura nem modo. Defina seu próprio estado visual no Alpine — por exemplo, um painel de 16rem contra um rail de 4rem:
 
 ```html
-<!-- Toggle compact mode -->
-<button @click="$store.sidebar.toggleCollapse()">
-  <span x-text="$store.sidebar.collapsed ? 'Expand' : 'Collapse'"></span>
-</button>
+<div x-data="{ expanded: true }">
+  <button @click="expanded = !expanded">
+    <span x-text="expanded ? 'Collapse' : 'Expand'"></span>
+  </button>
 
-<!-- Sidebar adapts via data attribute -->
-<aside
-  :class="$store.sidebar.collapsed ? 'w-16' : 'w-64'"
-  x-transition
->
-  <nav>
-    <a href="/" x-show="!$store.sidebar.collapsed">Home</a>
-    <a href="/about" x-show="!$store.sidebar.collapsed">About</a>
-  </nav>
-</aside>
+  <aside
+    x-show="$store.sidebar.visible"
+    x-transition
+    :class="expanded ? 'w-64' : 'w-16'"
+  >
+    <a href="/" x-show="expanded">Home</a>
+    <a href="/about" x-show="expanded">About</a>
+  </aside>
+</div>
 ```
+
+Você pode trocar isso por qualquer outra estratégia — um atributo `data-mode`, um `x-data` separado para o rail, uma implementação apenas com CSS, ou nada.
 
 ## Veja também
 

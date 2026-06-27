@@ -23,7 +23,10 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: [path.join(root, "test/setup.ts")],
-    include: [path.join(root, "packages/*/test/**/*.test.ts")],
+    include: [
+      path.join(root, "packages/*/test/**/*.test.ts"),
+      path.join(root, "apps/demo/test/**/*.test.ts"),
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],

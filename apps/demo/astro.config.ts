@@ -3,6 +3,7 @@ import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
+import { getLocaleDetectScript } from "./src/locale-detect.ts";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const pkg = (name: string) => `${root}../../packages/${name}/src/index.ts`;
@@ -90,6 +91,12 @@ export default defineConfig({
       editLink: {
         baseUrl: "https://github.com/ailuracode/alpine/edit/master/docs/",
       },
+      head: [
+        {
+          tag: "script",
+          content: getLocaleDetectScript(),
+        },
+      ],
       sidebar,
     }),
     react(),

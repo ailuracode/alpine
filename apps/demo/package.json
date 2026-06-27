@@ -1,7 +1,7 @@
 {
-  "name": "alpine-demo",
+  "name": "alpinejs-toolkit-demo",
   "private": true,
-  "description": "Interactive Astro demo for @ailuracode Alpine.js plugins",
+  "description": "Interactive Astro demo for @ailuracode/alpinejs-toolkit",
   "type": "module",
   "version": "0.0.0",
   "author": "ailuracode",
@@ -21,6 +21,7 @@
     "@ailuracode/alpine-battery": "workspace:*",
     "@ailuracode/alpine-calendar": "workspace:*",
     "@ailuracode/alpine-clipboard": "workspace:*",
+    "@ailuracode/alpine-core": "workspace:*",
     "@ailuracode/alpine-export": "workspace:*",
     "@ailuracode/alpine-geo": "workspace:*",
     "@ailuracode/alpine-json-api": "workspace:*",

@@ -1,59 +1,114 @@
-# @ailuracode/alpine
+# @ailuracode/alpinejs-toolkit
 
-Alpine.js plugin monorepo by **ailuracode**. Independent npm packages for common UI utilities — theme, viewport, connectivity, clipboard, scroll, touch detection, geolocation, and web notifications.
+Modular **Alpine.js toolkit** — lazy plugin init, headless stores and magics, TypeScript-first DX. Framework-agnostic: works with Vite, Astro, static HTML, or any ESM bundler.
 
-| Package | Type | Description |
-|---------|------|-------------|
-| [`@ailuracode/alpine-core`](./packages/core/README.md) | Core | Lazy plugin registry and initializer |
-| [`@ailuracode/alpine-theme`](./packages/theme/README.md) | Store | Light / dark / system theme preference |
-| [`@ailuracode/alpine-screen`](./packages/screen/README.md) | Store | Responsive device type and viewport width |
-| [`@ailuracode/alpine-network`](./packages/network/README.md) | Magic | Network online / offline state |
-| [`@ailuracode/alpine-visibility`](./packages/visibility/README.md) | Magic | Tab visibility state |
-| [`@ailuracode/alpine-battery`](./packages/battery/README.md) | Magic | Device battery level and charging state |
-| [`@ailuracode/alpine-clipboard`](./packages/clipboard/README.md) | Magic | Copy text to clipboard |
-| [`@ailuracode/alpine-toast`](./packages/toast/README.md) | Magic | In-app toast queue |
-| [`@ailuracode/alpine-export`](./packages/export/README.md) | Magic | Programmatic file exports (downloads) |
-| [`@ailuracode/alpine-calendar`](./packages/calendar/README.md) | Magic | Calendar date logic powered by date-fns |
-| [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | Store | Scroll position tracking and body lock |
-| [`@ailuracode/alpine-sidebar`](./packages/sidebar/README.md) | Store | Sidebar open/close state, scroll lock, and overlay |
-| [`@ailuracode/alpine-touch`](./packages/touch/README.md) | Magic | Touch and pointer capabilities |
-| [`@ailuracode/alpine-toggle`](./packages/toggle/README.md) | Magic | Binary and ternary toggle state |
-| [`@ailuracode/alpine-platform`](./packages/platform/README.md) | Magic | Client OS and platform detection |
-| [`@ailuracode/alpine-notify`](./packages/notify/README.md) | Magic | Web Notifications API |
-| [`@ailuracode/alpine-geo`](./packages/geo/README.md) | Store | Browser geolocation state and tracking |
-| [`@ailuracode/alpine-share`](./packages/share/README.md) | Magic | Web Share API wrapper |
-| [`@ailuracode/alpine-attention`](./packages/attention/README.md) | Magic | Screen Wake Lock and Idle Detection |
-| [`@ailuracode/alpine-query`](./packages/query/README.md) | Store | TanStack Query-style cache (store-agnostic core) |
-| [`@ailuracode/alpine-json-api`](./packages/json-api/README.md) | Magic | Strongly typed JSON:API client (`$jsonapi`) |
-| [`@ailuracode/alpine-query-adapter-nanostores`](./packages/query-adapter-nanostores/README.md) | Plugin | **Recommended** query adapter — Nanostores + `@nanostores/alpine` |
-| [`@ailuracode/alpine-query-adapter-alpine`](./packages/query-adapter-alpine/README.md) | Plugin | Query adapter — native `Alpine.reactive` |
-| [`@ailuracode/alpine-query-adapter-zustand`](./packages/query-adapter-zustand/README.md) | Plugin | Query adapter — Zustand vanilla |
-| [`@ailuracode/alpine-query-devtools`](./packages/query-devtools/README.md) | Plugin | Query cache inspector panel |
+Built by **ailuracode**. Twenty-one independent npm packages; install only what you need.
+
+## Why this exists
+
+Alpine gives you reactivity in HTML. This monorepo adds **headless, tree-shakeable modules** coordinated by a **lazy registry** (`@ailuracode/alpine-core`):
+
+- Register plugins without running them at import time
+- Load plugin code on demand with dynamic `import()`
+- Wire your own CSS — no Tailwind or `data-theme` baked in
+- Push server or event payloads into `$toast.fromPayload()` when you need them
 
 ## Quick start
 
 ```bash
-npm install @ailuracode/alpine-theme alpinejs
+npm install alpinejs @ailuracode/alpine-core @ailuracode/alpine-theme @ailuracode/alpine-toast
 ```
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@ailuracode/alpine-theme";
+import {
+  createAlpinePlugin,
+  defineStorePlugin,
+  lazyPlugin,
+  registerPlugin,
+} from "@ailuracode/alpine-core";
 
-Alpine.plugin(theme({
-  onChange({ resolved }) {
-    document.documentElement.classList.toggle("dark", resolved === "dark");
-  },
+function applyTheme({ resolved }) {
+  document.documentElement.classList.toggle("dark", resolved === "dark");
+}
+
+registerPlugin(
+  "theme",
+  defineStorePlugin(["theme"], async () => {
+    const { default: theme } = await import("@ailuracode/alpine-theme");
+    return theme({ onChange: applyTheme });
+  })
+);
+
+registerPlugin("toast", lazyPlugin({
+  kind: "magic",
+  magics: ["toast"],
+  import: () => import("@ailuracode/alpine-toast"),
 }));
 
+Alpine.plugin(createAlpinePlugin(["theme", "toast"]));
 Alpine.start();
 ```
 
-Install only the packages you need. Each one is a separate dependency.
+See [Getting started](./docs/getting-started.md) for essentials, lazy init, and HTML usage.
+
+## Packages
+
+### Core
+
+| Package | Description |
+|---------|-------------|
+| [`@ailuracode/alpine-core`](./packages/core/README.md) | Lazy plugin registry, deferred init, dynamic imports |
+
+### Essentials
+
+Start here for most Alpine apps.
+
+| Package | API | Description |
+|---------|-----|-------------|
+| [`@ailuracode/alpine-theme`](./packages/theme/README.md) | `$store.theme` | Light / dark / system preference |
+| [`@ailuracode/alpine-screen`](./packages/screen/README.md) | `$store.device` | Responsive breakpoints |
+| [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | `$store.scroll` | Scroll tracking and body lock |
+| [`@ailuracode/alpine-sidebar`](./packages/sidebar/README.md) | `$store.sidebar` | Sidebar / drawer shell state |
+| [`@ailuracode/alpine-toast`](./packages/toast/README.md) | `$toast` | Headless toast queue; `fromPayload` for plain objects |
+
+### Extended
+
+| Package | API | Description |
+|---------|-----|-------------|
+| [`@ailuracode/alpine-network`](./packages/network/README.md) | `$network` | Online / offline state |
+| [`@ailuracode/alpine-visibility`](./packages/visibility/README.md) | `$visibility` | Tab visibility |
+| [`@ailuracode/alpine-clipboard`](./packages/clipboard/README.md) | `$clipboard` | Copy to clipboard |
+| [`@ailuracode/alpine-platform`](./packages/platform/README.md) | `$platform` | OS and platform detection |
+| [`@ailuracode/alpine-touch`](./packages/touch/README.md) | `$touch` | Touch and pointer capabilities |
+| [`@ailuracode/alpine-toggle`](./packages/toggle/README.md) | `$toggle` | Binary and ternary toggle state |
+
+### Advanced
+
+| Package | API | Description |
+|---------|-----|-------------|
+| [`@ailuracode/alpine-battery`](./packages/battery/README.md) | `$battery` | Battery level and charging |
+| [`@ailuracode/alpine-geo`](./packages/geo/README.md) | `$store.geo` | Geolocation |
+| [`@ailuracode/alpine-export`](./packages/export/README.md) | `$export` | Programmatic file downloads |
+| [`@ailuracode/alpine-share`](./packages/share/README.md) | `$share` | Web Share API |
+| [`@ailuracode/alpine-attention`](./packages/attention/README.md) | `$wakelock`, `$idle` | Wake Lock and Idle Detection |
+| [`@ailuracode/alpine-notify`](./packages/notify/README.md) | `$notify` | Web Notifications |
+| [`@ailuracode/alpine-calendar`](./packages/calendar/README.md) | `$calendar` | Calendar date logic (date-fns) |
+| [`@ailuracode/alpine-json-api`](./packages/json-api/README.md) | `$jsonapi` | Typed JSON:API client |
+
+### Query
+
+| Package | Description |
+|---------|-------------|
+| [`@ailuracode/alpine-query`](./packages/query/README.md) | Store-agnostic query cache |
+| [`@ailuracode/alpine-query-adapter-nanostores`](./packages/query-adapter-nanostores/README.md) | **Recommended** — Nanostores + `@nanostores/alpine` |
+| [`@ailuracode/alpine-query-adapter-alpine`](./packages/query-adapter-alpine/README.md) | Native `Alpine.reactive` adapter |
+| [`@ailuracode/alpine-query-adapter-zustand`](./packages/query-adapter-zustand/README.md) | Zustand vanilla adapter |
+| [`@ailuracode/alpine-query-devtools`](./packages/query-devtools/README.md) | Query cache inspector |
 
 ## Demo app
 
-The [`apps/demo/`](./apps/demo/) directory is a **Starlight documentation site** plus an interactive **playground** for all plugins. It is part of the pnpm workspace and is **not** published to npm.
+The [`apps/demo/`](./apps/demo/) directory is a **Starlight documentation site** plus an interactive **playground**. It is part of the pnpm workspace and is **not** published to npm.
 
 ```bash
 pnpm install
@@ -61,42 +116,16 @@ pnpm run dev:demo
 ```
 
 - `/` — documentation (from [`docs/`](./docs/))
-- `/playground/` — live Alpine.js demos
+- `/playground/` — live Alpine.js demos (Essentials highlighted)
 
-When you add a new plugin package, update `docs/plugins/<name>.md` and wire the playground:
-
-| File | What to add |
-|------|-------------|
-| `docs/plugins/<name>.md` | API reference (source of truth) |
-| `apps/demo/package.json` | workspace dependency |
-| `apps/demo/astro.config.ts` | Vite alias |
-| `apps/demo/src/entrypoint.ts` | `Alpine.plugin(...)` registration |
-| `apps/demo/src/pages/playground/index.astro` | interactive demo section |
-
-See [AGENTS.md](./AGENTS.md) for the full checklist.
+See [AGENTS.md](./AGENTS.md) for the full checklist when adding a plugin.
 
 ## Documentation
 
-- [Getting started](./docs/getting-started.md)
-- [Core plugin system](./docs/core.md)
-- [Theme](./docs/plugins/theme.md)
-- [Screen](./docs/plugins/screen.md)
-- [Network](./docs/plugins/network.md)
-- [Visibility](./docs/plugins/visibility.md)
-- [Battery](./docs/plugins/battery.md)
-- [Clipboard](./docs/plugins/clipboard.md)
-- [Toast](./docs/plugins/toast.md)
-- [Export](./docs/plugins/export.md)
-- [Calendar](./docs/plugins/calendar.md)
-- [Scroll](./docs/plugins/scroll.md)
-- [Touch](./docs/plugins/touch.md)
-- [Platform](./docs/plugins/platform.md)
-- [Notify](./docs/plugins/notify.md)
-- [Geo](./docs/plugins/geo.md)
-- [Share](./docs/plugins/share.md)
-- [Attention](./docs/plugins/attention.md)
-- [Query](./docs/query.md)
-- [Query devtools](./docs/query-devtools.md)
+- [Getting started](./docs/getting-started.md) — lazy init, essentials, HTML usage
+- [Core](./docs/core.md) — plugin registry
+- **Essentials** — [theme](./docs/plugins/theme.md), [screen](./docs/plugins/screen.md), [scroll](./docs/plugins/scroll.md), [sidebar](./docs/plugins/sidebar.md), [toast](./docs/plugins/toast.md)
+- [Query](./docs/query.md) · [Query devtools](./docs/query-devtools.md)
 - [AGENTS.md](./AGENTS.md) — guide for AI agents and maintainers
 
 ## Development

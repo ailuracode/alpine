@@ -1,32 +1,61 @@
 ---
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PLUGIN_NAV_GROUPS, playgroundPath } from "../plugin-nav";
+import { getPluginsByTier, PLUGIN_NAV_GROUPS, playgroundPath } from "../plugin-nav";
 import Badge from "./astro/Badge.astro";
 import DemoSection from "./DemoSection.astro";
 
-const totalPlugins = PLUGIN_NAV_GROUPS.reduce((count, group) => count + group.items.length, 0);
+const essentialItems = getPluginsByTier("essential");
+const extendedGroups = PLUGIN_NAV_GROUPS.filter((group) => group.id !== "essentials");
+const extendedCount = extendedGroups.reduce((count, group) => count + group.items.length, 0);
 ---
 
-<DemoSection id="overview" title="Plugin Catalog" api="@ailuracode/alpine-*">
-	<p class="text-sm text-muted-foreground text-pretty">
-		Interactive reference for <strong>{totalPlugins}</strong> Alpine.js plugins published under
-		<code class="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">@ailuracode</code>.
-		Pick a plugin in the sidebar or browse by category below — each page shows the npm package, store or magic API,
-		and a live demo.
-	</p>
+<DemoSection id="overview" title="Alpine toolkit" api="@ailuracode/alpine-core">
+	<div class="flex flex-col gap-6">
+		<p class="text-sm leading-relaxed text-muted-foreground text-pretty">
+			Modular plugins for <strong>Alpine.js</strong> — lazy init via
+			<code class="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">@ailuracode/alpine-core</code>,
+			headless stores and magics, TypeScript globals. Start with <strong>{essentialItems.length} essentials</strong>,
+			then add from {extendedCount} extended and advanced modules.
+		</p>
 
-	<div class="grid gap-4 sm:grid-cols-2">
-		{
-			PLUGIN_NAV_GROUPS.map((group) => (
-				<Card size="sm">
-					<CardHeader>
-						<CardTitle>{group.label}</CardTitle>
-						<CardDescription>
-							{group.items.length} {group.items.length === 1 ? "plugin" : "plugins"}
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<ul class="space-y-1">
+		<Card size="sm" class="gap-4 border-primary/30 bg-primary/5">
+			<CardHeader className="gap-1.5 pb-0">
+				<CardTitle>Essentials</CardTitle>
+				<CardDescription>Recommended starting point for most apps</CardDescription>
+			</CardHeader>
+			<CardContent className="pt-3">
+				<ul class="space-y-1">
+				{
+					essentialItems.map((item) => (
+						<li>
+							<a
+								href={playgroundPath(item.id)}
+								class="group flex min-w-0 items-center justify-between gap-2 rounded-lg px-2 py-2 -mx-2 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+							>
+								<span class="truncate font-medium group-hover:text-primary">{item.title}</span>
+								<Badge variant="outline" class="shrink-0 font-mono text-[10px]">
+									{item.api}
+								</Badge>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			</CardContent>
+		</Card>
+
+		<div class="grid gap-4 sm:grid-cols-2">
+			{
+				extendedGroups.map((group) => (
+					<Card size="sm" class="gap-4">
+						<CardHeader className="gap-1.5 pb-0">
+							<CardTitle>{group.label}</CardTitle>
+							<CardDescription>
+								{group.items.length} {group.items.length === 1 ? "module" : "modules"}
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="pt-3">
+							<ul class="space-y-1">
 							{group.items.map((item) => (
 								<li>
 									<a
@@ -40,39 +69,33 @@ const totalPlugins = PLUGIN_NAV_GROUPS.reduce((count, group) => count + group.it
 									</a>
 								</li>
 							))}
-						</ul>
-					</CardContent>
-				</Card>
-			))
-		}
-	</div>
+							</ul>
+						</CardContent>
+					</Card>
+				))
+			}
+		</div>
 
-	<div class="flex flex-wrap gap-2">
-		<Badge variant="secondary">Stores</Badge>
-		<Badge variant="secondary">Magics</Badge>
-		<Badge variant="secondary">Query Core</Badge>
-		<Badge variant="outline">Astro + shadcn/ui</Badge>
-	</div>
+		<div class="flex flex-wrap gap-2 pt-1">
+			<Badge variant="secondary">Lazy init</Badge>
+			<Badge variant="secondary">fromPayload</Badge>
+			<Badge variant="secondary">Headless</Badge>
+			<Badge variant="outline">TypeScript</Badge>
+		</div>
 
-	<p class="text-xs text-muted-foreground">
-		<a href="/" class="font-medium text-primary underline-offset-4 hover:underline">Full documentation</a>
+		<p class="text-xs text-muted-foreground">
+		<a href="/getting-started/" class="font-medium text-primary underline-offset-4 hover:underline">Getting started</a>
+		<span aria-hidden="true"> · </span>
+		<a href="/core/" class="font-medium text-primary underline-offset-4 hover:underline">Core registry</a>
 		<span aria-hidden="true"> · </span>
 		<a
-			href="https://github.com/ailuracode/alpine"
+			href="https://github.com/ailuracode/alpinejs-toolkit"
 			target="_blank"
 			rel="noreferrer"
 			class="text-primary underline-offset-4 hover:underline"
 		>
 			GitHub
 		</a>
-		<span aria-hidden="true"> · </span>
-		<a
-			href="https://www.npmjs.com/~siddharthagf"
-			target="_blank"
-			rel="noreferrer"
-			class="text-primary underline-offset-4 hover:underline"
-		>
-			npm
-		</a>
-	</p>
+		</p>
+	</div>
 </DemoSection>

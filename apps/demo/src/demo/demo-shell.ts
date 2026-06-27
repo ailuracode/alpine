@@ -1,4 +1,4 @@
-import type { Alpine } from "alpinejs";
+import type { AlpineInstance } from "../types/alpine.js";
 
 export type DemoShellData = {
   copied: boolean;
@@ -8,7 +8,7 @@ export type DemoShellData = {
   shared: boolean | null;
 };
 
-export function registerDemoShell(Alpine: Alpine): void {
+export function registerDemoShell(Alpine: AlpineInstance): void {
   Alpine.data(
     "demoShell",
     (): DemoShellData => ({
@@ -40,7 +40,7 @@ declare global {
   }
 }
 
-export function registerToastDemoHandlers(Alpine: Alpine): void {
+export function registerToastDemoHandlers(Alpine: AlpineInstance): void {
   window.undoToastDemo = (id: string) => {
     const toast = Alpine.store("toast") as ToastStoreLike;
 

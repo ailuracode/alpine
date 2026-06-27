@@ -2,7 +2,7 @@ import type { MutationState, QueryState, QueryStore } from "@ailuracode/alpine-q
 import { createQueryClient, typedFetch } from "@ailuracode/alpine-query";
 import { createAlpineStoreAdapter } from "@ailuracode/alpine-query-adapter-alpine";
 import { createAlpineZustandAdapter } from "@ailuracode/alpine-query-adapter-zustand";
-import type { Alpine } from "alpinejs";
+import type { AlpineInstance } from "../types/alpine.js";
 
 const POKEAPI = "https://pokeapi.co/api/v2/pokemon";
 const PAGE_SIZE = 12;
@@ -182,7 +182,7 @@ function createPokeapiDemo(options: {
   });
 }
 
-export function registerQueryDemos(Alpine: Alpine): QueryStore[] {
+export function registerQueryDemos(Alpine: AlpineInstance): QueryStore[] {
   const alpineClient = createQueryClient({
     adapter: createAlpineStoreAdapter(Alpine),
   });
@@ -301,7 +301,7 @@ function createRetryObserver(store: QueryStore) {
   );
 }
 
-export function registerQueryAdvancedDemo(Alpine: Alpine): void {
+export function registerQueryAdvancedDemo(Alpine: AlpineInstance): void {
   Alpine.data(
     "queryAdvancedDemo",
     (): QueryAdvancedDemoData => ({

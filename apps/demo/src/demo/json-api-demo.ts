@@ -7,7 +7,7 @@ import {
   jsonApiQueryOptions,
 } from "@ailuracode/alpine-json-api";
 import type { QueryState, QueryStore } from "@ailuracode/alpine-query";
-import type { Alpine } from "alpinejs";
+import type { AlpineInstance } from "../types/alpine.js";
 import { createJsonApiMockFetcher } from "./json-api-mock.js";
 
 export const jsonApiSchema = defineJsonApiSchema({
@@ -68,7 +68,7 @@ function articlesListDefinition(sort: "title" | "-title") {
   });
 }
 
-export function registerJsonApiDemo(Alpine: Alpine): void {
+export function registerJsonApiDemo(Alpine: AlpineInstance): void {
   Alpine.data(
     "jsonApiDemo",
     (): JsonApiDemoData => ({

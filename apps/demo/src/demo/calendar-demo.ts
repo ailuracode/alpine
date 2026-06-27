@@ -1,7 +1,7 @@
 import type { CalendarInstance, CalendarMagic, CalendarMode } from "@ailuracode/alpine-calendar";
-import type { Alpine } from "alpinejs";
 import { addMonths } from "date-fns";
 import { enUS, es } from "date-fns/locale";
+import type { AlpineInstance } from "../types/alpine.js";
 
 type CalendarDemoData = {
   cal: CalendarInstance | null;
@@ -46,7 +46,7 @@ function formatSelectionLabel(cal: CalendarInstance): string {
   return "None";
 }
 
-export function registerCalendarDemo(Alpine: Alpine): void {
+export function registerCalendarDemo(Alpine: AlpineInstance): void {
   Alpine.data(
     "calendarDemo",
     (): CalendarDemoData => ({

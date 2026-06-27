@@ -37,7 +37,7 @@ const plugin = getPluginNavItem("toast")!;
 				<DemoButton @click="lastToastId = $toast.info('Will update…'); setTimeout(function () { $toast.update(lastToastId, { title: 'Updated in place', variant: 'success' }) }, 1200)">update()</DemoButton>
 				<DemoButton @click="$toast.dismissAt('top-center')">dismissAt top-center</DemoButton>
 				<DemoButton @click="$toast.dismissAll()">dismissAll</DemoButton>
-				<DemoButton @click="for (var i = 0; i < 5; i++) { $toast('Toast ' + (i + 1)) }">Flood Stack (5)</DemoButton>
+				<DemoButton @click="[1, 2, 3, 4, 5].forEach(function (i) { $toast('Toast ' + i) })">Flood Stack (5)</DemoButton>
 			</div>
 		</div>
 

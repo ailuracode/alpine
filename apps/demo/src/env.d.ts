@@ -69,8 +69,8 @@ declare module "alpinejs" {
   }
 }
 
-import { Alpine as AlpineType } from "alpinejs";
+import type { AlpineInstance } from "./types/alpine";
 
 declare global {
-  var Alpine: AlpineType;
+  var Alpine: AlpineInstance;
 }

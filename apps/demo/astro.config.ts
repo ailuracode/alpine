@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import { getLocaleDetectScript } from "./src/locale-detect.ts";
+import { pluginDocsSidebarItems } from "./src/plugin-nav.ts";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const pkg = (name: string) => `${root}../../packages/${name}/src/index.ts`;
@@ -31,6 +32,21 @@ const sidebar = [
     ],
   },
   {
+    label: "Essentials",
+    translations: { es: "Esenciales", pt: "Essenciais" },
+    items: pluginDocsSidebarItems("essential"),
+  },
+  {
+    label: "Extended",
+    translations: { es: "Extendidos", pt: "Estendidos" },
+    items: pluginDocsSidebarItems("extended"),
+  },
+  {
+    label: "Advanced",
+    translations: { es: "Avanzados", pt: "Avançados" },
+    items: pluginDocsSidebarItems("advanced"),
+  },
+  {
     label: "Query",
     translations: { es: "Query", pt: "Query" },
     items: [
@@ -46,11 +62,6 @@ const sidebar = [
       },
     ],
   },
-  {
-    label: "Plugins",
-    translations: { es: "Plugins", pt: "Plugins" },
-    items: [{ autogenerate: { directory: "plugins" } }],
-  },
 ];
 
 // https://astro.build/config
@@ -59,11 +70,11 @@ export default defineConfig({
   integrations: [
     starlight({
       title: {
-        en: "Alpine.js + @ailuracode",
-        es: "Alpine.js + @ailuracode",
-        pt: "Alpine.js + @ailuracode",
+        en: "Alpine.js Toolkit · @ailuracode",
+        es: "Alpine.js Toolkit · @ailuracode",
+        pt: "Alpine.js Toolkit · @ailuracode",
       },
-      description: "Documentation and interactive demos for @ailuracode Alpine.js plugins",
+      description: "Modular Alpine.js toolkit — lazy init, headless plugins, modern TypeScript DX.",
       defaultLocale: "root",
       locales: {
         root: {
@@ -85,11 +96,11 @@ export default defineConfig({
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/ailuracode/alpine",
+          href: "https://github.com/ailuracode/alpinejs-toolkit",
         },
       ],
       editLink: {
-        baseUrl: "https://github.com/ailuracode/alpine/edit/master/docs/",
+        baseUrl: "https://github.com/ailuracode/alpinejs-toolkit/edit/master/docs/",
       },
       head: [
         {
@@ -110,6 +121,7 @@ export default defineConfig({
         "@ailuracode/alpine-battery": pkg("battery"),
         "@ailuracode/alpine-calendar": pkg("calendar"),
         "@ailuracode/alpine-clipboard": pkg("clipboard"),
+        "@ailuracode/alpine-core": pkg("core"),
         "@ailuracode/alpine-toast": pkg("toast"),
         "@ailuracode/alpine-export": pkg("export"),
         "@ailuracode/alpine-geo": pkg("geo"),

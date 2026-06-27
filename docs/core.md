@@ -1,9 +1,9 @@
 ---
 title: "Core"
-description: "@ailuracode/alpine-core is the lazy plugin registry for the monorepo. Individual packages remain independently installable; the core coordinates registration…"
+description: "Lazy plugin registry for the Alpine toolkit — deferred init, dynamic imports, and framework-agnostic entrypoints."
 ---
 
-`@ailuracode/alpine-core` is the lazy plugin registry for the monorepo. Individual packages remain independently installable; the core coordinates registration and on-demand initialization.
+`@ailuracode/alpine-core` is the **lazy plugin registry** at the center of the toolkit. Individual packages remain independently installable; the core coordinates registration and on-demand initialization — ideal for app entries that should not load every plugin up front.
 
 ## Why a core?
 

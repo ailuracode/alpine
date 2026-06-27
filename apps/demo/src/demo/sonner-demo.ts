@@ -1,13 +1,18 @@
 import type { ToastItem, ToastPosition, ToastStore } from "@ailuracode/alpine-toast";
 import { isPersistentDuration } from "@ailuracode/alpine-toast";
-import type { Alpine } from "alpinejs";
-import type { ToastDemoContent, toastDemoPositions, toastDemoVariants } from "./entrypoint.js";
+import type { AlpineInstance } from "../types/alpine.js";
+import type { ToastDemoContent, toastDemoPositions, toastDemoVariants } from "./plugin-registry.js";
 
 type DemoVariants = typeof toastDemoVariants;
 type DemoPositions = typeof toastDemoPositions;
 type DemoToastItem = ToastItem<DemoVariants, DemoPositions, ToastDemoContent>;
 type DemoToastStore = ToastStore<DemoVariants, DemoPositions, ToastDemoContent>;
 type DemoToastPosition = ToastPosition<DemoPositions>;
+
+/** Demo toast plugin variants — overrides the generic default on `Alpine.Stores.toast`. */
+type DemoAlpineStores = Omit<Alpine.Stores, "toast"> & {
+  toast: DemoToastStore;
+};
 
 type SwipeMeta = {
   out: boolean;
@@ -92,11 +97,11 @@ type ToastSonnerData = {
 };
 
 type ToastSonnerComponent = ToastSonnerData & {
-  $store: Alpine.Stores;
+  $store: DemoAlpineStores;
   $watch<T>(getter: string | (() => T), callback: (value: T) => void): void;
 };
 
-function toastStoreFromAlpine($store: Alpine.Stores): DemoToastStore {
+function toastStoreFromAlpine($store: DemoAlpineStores): DemoToastStore {
   return $store.toast;
 }
 
@@ -164,7 +169,7 @@ function resetSwipeAmount(element: HTMLElement): void {
   applySwipeAmount(element, 0, 0);
 }
 
-export function registerToastSonner(Alpine: Alpine): void {
+export function registerToastSonner(Alpine: AlpineInstance): void {
   Alpine.data(
     "toastSonner",
     (config: ToastSonnerConfig = {}): ToastSonnerData => ({

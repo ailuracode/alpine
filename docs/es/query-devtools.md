@@ -1,4 +1,7 @@
-# Query devtools
+---
+title: "Query devtools"
+description: "Panel de devtools del navegador para inspeccionar entradas de caché, flags de estado y mutaciones de @ailuracode/alpine-query."
+---
 
 Panel de devtools del navegador para inspeccionar entradas de caché, flags de estado y mutaciones de `@ailuracode/alpine-query`.
 

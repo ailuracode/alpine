@@ -2,7 +2,7 @@
 
 Tab visibility magic for Alpine.js.
 
-**[Full documentation →](../../docs/visibility.md)**
+**[Full documentation →](../../docs/plugins/visibility.md)**
 
 ## Install
 

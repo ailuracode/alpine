@@ -2,7 +2,7 @@
 
 Responsive device type and viewport width store for Alpine.js.
 
-**[Full documentation →](../../docs/screen.md)**
+**[Full documentation →](../../docs/plugins/screen.md)**
 
 ## Install
 

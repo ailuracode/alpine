@@ -4,7 +4,7 @@ Headless in-app toast queue for Alpine.js via the `$toast` magic.
 
 **CSS-framework agnostic** — no markup, no styles. Only `default`, `bottom-right`, and `promise` are built into the API; you declare variants and positions your UI needs.
 
-**[Full documentation →](../../docs/toast.md)**
+**[Full documentation →](../../docs/plugins/toast.md)**
 
 ## Install
 

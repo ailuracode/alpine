@@ -2,7 +2,7 @@
 
 Screen Wake Lock and Idle Detection magics for Alpine.js.
 
-**[Full documentation →](../../docs/attention.md)**
+**[Full documentation →](../../docs/plugins/attention.md)**
 
 ## Install
 

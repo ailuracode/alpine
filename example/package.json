@@ -10,9 +10,6 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "sync:docs": "node scripts/sync-docs.mjs",
-    "predev": "pnpm run sync:docs",
-    "prebuild": "pnpm run sync:docs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

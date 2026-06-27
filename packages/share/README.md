@@ -2,7 +2,7 @@
 
 Web Share API magic for Alpine.js.
 
-**[Full documentation →](../../docs/share.md)**
+**[Full documentation →](../../docs/plugins/share.md)**
 
 ## Install
 

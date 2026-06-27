@@ -2,7 +2,7 @@
 
 Scroll position tracking and reference-counted body scroll lock for Alpine.js.
 
-**[Full documentation →](../../docs/scroll.md)**
+**[Full documentation →](../../docs/plugins/scroll.md)**
 
 ## Install
 

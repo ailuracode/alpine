@@ -1,4 +1,7 @@
-# Primeiros passos
+---
+title: "Primeiros passos"
+description: "- [Alpine.js](https://alpinejs.dev/) v3+"
+---
 
 ## Requisitos
 
@@ -161,4 +164,4 @@ O `global.d.ts` não tem instruções `import`, então resolve sem incluir o pac
 
 ## Próximos passos
 
-- Documentação por pacote: [theme](./theme.md), [screen](./screen.md), [network](./network.md), [visibility](./visibility.md), [battery](./battery.md), [clipboard](./clipboard.md), [export](./export.md), [scroll](./scroll.md), [touch](./touch.md), [platform](./platform.md), [notify](./notify.md), [geo](./geo.md), [share](./share.md)
+- Documentação por pacote: [theme](./plugins/theme.md), [screen](./plugins/screen.md), [network](./plugins/network.md), [visibility](./plugins/visibility.md), [battery](./plugins/battery.md), [clipboard](./plugins/clipboard.md), [export](./plugins/export.md), [scroll](./plugins/scroll.md), [touch](./plugins/touch.md), [platform](./plugins/platform.md), [notify](./plugins/notify.md), [geo](./plugins/geo.md), [share](./plugins/share.md)

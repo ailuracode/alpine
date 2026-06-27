@@ -1,4 +1,7 @@
-# Query
+---
+title: "Query"
+description: "Obtención asíncrona de datos al estilo TanStack Query para Alpine.js: caché, stale-while-revalidate, invalidación, reintentos, polling y mutaciones."
+---
 
 Obtención asíncrona de datos al estilo TanStack Query para Alpine.js: caché, stale-while-revalidate, invalidación, reintentos, polling y mutaciones.
 

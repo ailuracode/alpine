@@ -26,15 +26,14 @@ Open [http://localhost:4321](http://localhost:4321) for documentation. Interacti
 
 | Path | Purpose |
 |------|---------|
-| `../docs/` | **Source of truth** for Markdown reference (edit here) |
-| `../docs/es/`, `../docs/pt/` | Translated guides and plugin reference — edit these `.md` files directly (Spanish, Portuguese) |
-| `../docs/i18n/` | Splash hero JSON (`index-*.json`) + plugin sidebar labels (`plugin-labels.json`) |
-| `scripts/sync-docs.mjs` | Syncs `docs/` → `src/content/docs/` (en root, es/, pt/) with Starlight frontmatter |
-| `src/content/docs/` | Starlight content (generated guides + `index.md`) |
+| `../docs/` | **Source of truth** — Starlight Markdown (YAML frontmatter, no sync step) |
+| `../docs/plugins/` | Plugin API reference (English) |
+| `../docs/es/`, `../docs/pt/` | Translated guides + `plugins/` reference |
+| `src/content/docs/` | Symlink → `../../docs` (Starlight content collection) |
 | `src/pages/playground/` | Overview + `[plugin].astro` subpages |
 | `src/playground-demos.ts` | Demo component registry |
 
-`pnpm dev` and `pnpm build` run `sync:docs` automatically.
+Edit `docs/` directly; `pnpm dev` and `pnpm build` read it through the symlink.
 
 ## Build
 

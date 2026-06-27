@@ -1,4 +1,7 @@
-# Core
+---
+title: "Core"
+description: "@ailuracode/alpine-core é o registro lazy de plugins do monorepo. Os pacotes individuais continuam instaláveis de forma independente; o core coordena o regis…"
+---
 
 `@ailuracode/alpine-core` é o registro lazy de plugins do monorepo. Os pacotes individuais continuam instaláveis de forma independente; o core coordena o registro e a inicialização sob demanda.
 

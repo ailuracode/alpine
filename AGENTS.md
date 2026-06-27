@@ -179,14 +179,14 @@ All docs in **English**.
 
 `example/` is the Astro **documentation site** (Starlight) and **playground** in the pnpm workspace. It is **private** and excluded from publish and changesets. Run it with `pnpm run dev:example` from the repo root.
 
-- **Docs** — `docs/` at repo root is the Markdown source of truth; `example/scripts/sync-docs.mjs` syncs it into Starlight (`src/content/docs/`).
+- **Docs** — `docs/` at repo root is the Starlight source of truth (YAML frontmatter + Markdown, no sync step). Guides at the locale root (`getting-started.md`, `core.md`, `query.md`, …); plugin reference under `docs/plugins/` (and `docs/es/plugins/`, `docs/pt/plugins/`). Do not repeat the page `# title` in the body — Starlight renders `title` from frontmatter. `example/src/content/docs` is a symlink to `../../docs`.
 - **Playground** — interactive demos at `/playground/` (`src/pages/playground/`).
 
 **Every new plugin must be wired into the example app.** The playground is the canonical integration reference; plugin reference pages come from `docs/<name>.md`.
 
 When adding a new package, update:
 
-1. `docs/<name>.md` — API reference (synced to Starlight automatically)
+1. `docs/plugins/<name>.md` — API reference (Starlight page with YAML frontmatter)
 2. `example/package.json` — add `"@ailuracode/alpine-<name>": "workspace:*"` to `dependencies`
 3. `example/tsconfig.json` — add a `paths` entry pointing to `../packages/<name>/src/index.ts`
 4. `example/astro.config.ts` — add Vite alias for the package

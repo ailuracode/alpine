@@ -2,7 +2,7 @@
 
 Web Notifications API wrapper for Alpine.js via the `$notify` magic.
 
-**[Full documentation →](../../docs/notify.md)**
+**[Full documentation →](../../docs/plugins/notify.md)**
 
 ## Install
 
@@ -63,7 +63,7 @@ cp node_modules/@ailuracode/alpine-notify/dist/notify-sw.js public/notify-sw.js
 | Secure context (HTTPS) | Required |
 | Unsupported browsers | API returns `null` / `denied`; never throws |
 
-See [docs/notify.md](../../docs/notify.md) for details and usage patterns.
+See [docs/notify.md](../../docs/plugins/notify.md) for details and usage patterns.
 
 ## License
 

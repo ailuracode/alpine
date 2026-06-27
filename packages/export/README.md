@@ -2,7 +2,7 @@
 
 Programmatic file exports (browser downloads) for Alpine.js.
 
-**[Full documentation →](../../docs/export.md)**
+**[Full documentation →](../../docs/plugins/export.md)**
 
 ## Install
 

@@ -2,7 +2,7 @@
 
 Copy text to the clipboard via Alpine.js magic.
 
-**[Full documentation →](../../docs/clipboard.md)**
+**[Full documentation →](../../docs/plugins/clipboard.md)**
 
 ## Install
 

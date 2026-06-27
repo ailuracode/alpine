@@ -1,3 +1,21 @@
+---
+title: "Alpine.js + @ailuracode"
+description: "Documentación y demos interactivas de plugins Alpine.js headless por ailuracode."
+template: splash
+hero:
+  title: "Plugins Alpine.js, documentados"
+  tagline: "Stores y magics headless para tema, scroll, caché de consultas, toasts y más — agnósticos al framework, publicados en npm y listos para tu markup."
+  actions:
+    - text: "Primeros pasos"
+      link: "/getting-started/"
+      icon: "right-arrow"
+      variant: "primary"
+    - text: "Abrir playground"
+      link: "/playground/"
+      icon: "external"
+      variant: "minimal"
+---
+
 Documentación y demos interactivas de plugins headless de Alpine.js por ailuracode.
 
 ## ¿Qué es esto?
@@ -16,4 +34,4 @@ Los plugins nunca incluyen CSS ni markup específico de un framework: conectas l
 
 - [Primeros pasos](./getting-started.md) — instalar, registrar plugins, usar en HTML
 - [Playground](/playground/) — demos interactivas en vivo para cada plugin
-- [Plugins](./theme.md) — referencia de API por paquete (barra lateral)
+- [Plugins](./plugins/theme.md) — referencia de API por paquete (barra lateral)

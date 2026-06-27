@@ -1,4 +1,7 @@
-# Query
+---
+title: "Query"
+description: "TanStack Query-style async data fetching for Alpine.js: caching, stale-while-revalidate, invalidation, retries, polling, and mutations."
+---
 
 TanStack Query-style async data fetching for Alpine.js: caching, stale-while-revalidate, invalidation, retries, polling, and mutations.
 

@@ -2,7 +2,7 @@
 
 Light, dark, and system theme store for Alpine.js. CSS-framework agnostic.
 
-**[Full documentation →](../../docs/theme.md)**
+**[Full documentation →](../../docs/plugins/theme.md)**
 
 ## Install
 

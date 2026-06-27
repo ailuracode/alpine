@@ -2,7 +2,7 @@
 
 Battery status magic for Alpine.js.
 
-**[Full documentation →](../../docs/battery.md)**
+**[Full documentation →](../../docs/plugins/battery.md)**
 
 ## Install
 

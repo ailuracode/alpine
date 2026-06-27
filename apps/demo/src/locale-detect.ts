@@ -1,8 +1,12 @@
 export type DocsLocale = "en" | "es" | "pt";
 
 export function localeFromPathname(pathname: string): DocsLocale {
-  if (pathname === "/es" || pathname.startsWith("/es/")) return "es";
-  if (pathname === "/pt" || pathname.startsWith("/pt/")) return "pt";
+  if (pathname === "/es" || pathname.startsWith("/es/")) {
+    return "es";
+  }
+  if (pathname === "/pt" || pathname.startsWith("/pt/")) {
+    return "pt";
+  }
   return "en";
 }
 
@@ -18,14 +22,20 @@ export function shouldSkipLocaleDetect(pathname: string): boolean {
 export function preferredBrowserLocale(languages: readonly string[]): DocsLocale {
   for (const lang of languages) {
     const code = lang.split("-")[0]?.toLowerCase();
-    if (code === "es") return "es";
-    if (code === "pt") return "pt";
+    if (code === "es") {
+      return "es";
+    }
+    if (code === "pt") {
+      return "pt";
+    }
   }
   return "en";
 }
 
 export function localizedPath(pathname: string, locale: Exclude<DocsLocale, "en">): string {
-  if (pathname === "/") return `/${locale}/`;
+  if (pathname === "/") {
+    return `/${locale}/`;
+  }
   return `/${locale}${pathname}`;
 }
 

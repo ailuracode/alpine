@@ -10,20 +10,21 @@ const extendedCount = extendedGroups.reduce((count, group) => count + group.item
 ---
 
 <DemoSection id="overview" title="Alpine toolkit" api="@ailuracode/alpine-core">
-	<p class="text-sm text-muted-foreground text-pretty">
-		Modular plugins for <strong>Alpine.js</strong> — lazy init via
-		<code class="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">@ailuracode/alpine-core</code>,
-		headless stores and magics, TypeScript globals. Start with <strong>{essentialItems.length} essentials</strong>,
-		then add from {extendedCount} extended and advanced modules.
-	</p>
+	<div class="flex flex-col gap-6">
+		<p class="text-sm leading-relaxed text-muted-foreground text-pretty">
+			Modular plugins for <strong>Alpine.js</strong> — lazy init via
+			<code class="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">@ailuracode/alpine-core</code>,
+			headless stores and magics, TypeScript globals. Start with <strong>{essentialItems.length} essentials</strong>,
+			then add from {extendedCount} extended and advanced modules.
+		</p>
 
-	<Card size="sm" class="border-primary/30 bg-primary/5">
-		<CardHeader>
-			<CardTitle>Essentials</CardTitle>
-			<CardDescription>Recommended starting point for most apps</CardDescription>
-		</CardHeader>
-		<CardContent>
-			<ul class="space-y-1">
+		<Card size="sm" class="gap-4 border-primary/30 bg-primary/5">
+			<CardHeader className="gap-1.5 pb-0">
+				<CardTitle>Essentials</CardTitle>
+				<CardDescription>Recommended starting point for most apps</CardDescription>
+			</CardHeader>
+			<CardContent className="pt-3">
+				<ul class="space-y-1">
 				{
 					essentialItems.map((item) => (
 						<li>
@@ -40,21 +41,21 @@ const extendedCount = extendedGroups.reduce((count, group) => count + group.item
 					))
 				}
 			</ul>
-		</CardContent>
-	</Card>
+			</CardContent>
+		</Card>
 
-	<div class="grid gap-4 sm:grid-cols-2">
-		{
-			extendedGroups.map((group) => (
-				<Card size="sm">
-					<CardHeader>
-						<CardTitle>{group.label}</CardTitle>
-						<CardDescription>
-							{group.items.length} {group.items.length === 1 ? "module" : "modules"}
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<ul class="space-y-1">
+		<div class="grid gap-4 sm:grid-cols-2">
+			{
+				extendedGroups.map((group) => (
+					<Card size="sm" class="gap-4">
+						<CardHeader className="gap-1.5 pb-0">
+							<CardTitle>{group.label}</CardTitle>
+							<CardDescription>
+								{group.items.length} {group.items.length === 1 ? "module" : "modules"}
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="pt-3">
+							<ul class="space-y-1">
 							{group.items.map((item) => (
 								<li>
 									<a
@@ -68,21 +69,21 @@ const extendedCount = extendedGroups.reduce((count, group) => count + group.item
 									</a>
 								</li>
 							))}
-						</ul>
-					</CardContent>
-				</Card>
-			))
-		}
-	</div>
+							</ul>
+						</CardContent>
+					</Card>
+				))
+			}
+		</div>
 
-	<div class="flex flex-wrap gap-2">
-		<Badge variant="secondary">Lazy init</Badge>
-		<Badge variant="secondary">fromPayload</Badge>
-		<Badge variant="secondary">Headless</Badge>
-		<Badge variant="outline">TypeScript</Badge>
-	</div>
+		<div class="flex flex-wrap gap-2 pt-1">
+			<Badge variant="secondary">Lazy init</Badge>
+			<Badge variant="secondary">fromPayload</Badge>
+			<Badge variant="secondary">Headless</Badge>
+			<Badge variant="outline">TypeScript</Badge>
+		</div>
 
-	<p class="text-xs text-muted-foreground">
+		<p class="text-xs text-muted-foreground">
 		<a href="/getting-started/" class="font-medium text-primary underline-offset-4 hover:underline">Getting started</a>
 		<span aria-hidden="true"> · </span>
 		<a href="/core/" class="font-medium text-primary underline-offset-4 hover:underline">Core registry</a>
@@ -95,5 +96,6 @@ const extendedCount = extendedGroups.reduce((count, group) => count + group.item
 		>
 			GitHub
 		</a>
-	</p>
+		</p>
+	</div>
 </DemoSection>

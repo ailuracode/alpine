@@ -1,4 +1,5 @@
 ---
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import Button from "../components/astro/Button.astro";
 import SonnerToasts from "../components/SonnerToasts.astro";
 import "../styles/global.css";
@@ -36,6 +37,7 @@ const {
 		<meta name="description" content={description} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin="anonymous" />
 	</head>
 	<body class="min-h-screen bg-background text-foreground" x-data="demoShell" x-cloak>
 		<a
@@ -45,7 +47,7 @@ const {
 			Skip to content
 		</a>
 
-		<div class="min-h-screen">
+		<div class="flex min-h-screen flex-col">
 			<header
 				class="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 transition-[margin] duration-300 motion-reduce:transition-none"
 				x-bind:class="$store.device.type === 'desktop' ? ($store.sidebar.collapsed ? 'ml-16' : 'ml-64') : ''"

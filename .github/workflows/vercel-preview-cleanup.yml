@@ -1,13 +1,15 @@
-name: Vercel Preview Cleanup
+name: PR cleanup on merge
 
 on:
   pull_request:
     types: [closed]
-    paths:
-      - "apps/demo/**"
+
+permissions:
+  contents: write
 
 jobs:
-  cleanup:
+  vercel:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,14 +26,52 @@ jobs:
           BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
           echo "Cleaning up preview deployments for branch: $BRANCH_NAME"
 
-          # Pull project configuration (needed for vercel remove to know scope)
           vercel pull --yes --environment=preview \
             --token="$VERCEL_TOKEN" \
             --scope="$VERCEL_ORG_ID" \
             "$VERCEL_PROJECT_ID" 2>/dev/null || true
 
-          # Remove preview deployments whose name contains the branch name
           vercel remove --yes \
             --token="$VERCEL_TOKEN" \
             --scope="$VERCEL_ORG_ID" \
             "$BRANCH_NAME" 2>/dev/null || echo "No preview deployments found for branch $BRANCH_NAME"
+
+  delete-branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete merged branch
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = context.payload.pull_request.head.ref
+            const protectedBranches = new Set(["main", "master"])
+
+            if (protectedBranches.has(branch)) {
+              core.info(`Skipping protected branch: ${branch}`)
+              return
+            }
+
+            const headRepo = context.payload.pull_request.head.repo.full_name
+            const baseRepo = context.payload.pull_request.base.repo.full_name
+
+            if (headRepo !== baseRepo) {
+              core.info(`Skipping fork branch: ${headRepo}`)
+              return
+            }
+
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branch}`,
+              })
+              core.info(`Deleted branch: ${branch}`)
+            } catch (error) {
+              if (error.status !== 422) {
+                throw error
+              }
+
+              core.info(`Branch already deleted or not found: ${branch}`)
+            }

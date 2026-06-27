@@ -1,10 +1,10 @@
 ---
 title: "Alpine.js + @ailuracode"
-description: "Documentation and interactive demos for headless Alpine.js plugins by ailuracode."
+description: "Modular Alpine.js toolkit — lazy plugin init, headless stores and magics, modern TypeScript DX."
 template: splash
 hero:
-  title: "Alpine.js plugins, documented"
-  tagline: "Headless stores and magics for theme, scroll, query cache, toasts, and more — framework-agnostic, npm-published, and ready for your markup."
+  title: "Modular Alpine.js toolkit"
+  tagline: "Lazy-loaded, headless plugins for theme, layout, toasts, and more — install only what you need, wire your own markup and CSS."
   actions:
     - text: "Getting started"
       link: "/getting-started/"
@@ -16,22 +16,38 @@ hero:
       variant: "minimal"
 ---
 
-Documentation and interactive demos for headless Alpine.js plugins by ailuracode.
+Modular toolkit for **Alpine.js** by ailuracode — framework-agnostic, npm-published, TypeScript-ready.
 
 ## What is this?
 
-**@ailuracode/alpine** is a monorepo of independent Alpine.js plugins. Each package ships as `@ailuracode/alpine-<name>` on npm.
+**@ailuracode/alpine** is not a grab-bag of unrelated plugins — it is a **modular Alpine toolkit** built around three ideas:
 
-| Type | Examples | Use when |
-|------|----------|----------|
-| **Store** | `$store.theme`, `$store.scroll` | Shared mutable state and actions across components |
-| **Magic** | `$network`, `$toast`, `$clipboard` | Environment data or one-off utilities |
-| **Core** | `createQueryClient`, `query({ adapter })` | Store-agnostic infrastructure |
+| Pillar | What you get |
+|--------|--------------|
+| **Lazy init** | [`@ailuracode/alpine-core`](./core.md) registers plugins without running them at import time; load code on demand with dynamic `import()`. |
+| **Headless** | Stores and magics only — no CSS, no UI components, no Tailwind assumptions. You apply styles via callbacks. |
+| **Modern DX** | TypeScript globals (`$store.theme`, `$toast`), tree-shakeable npm packages, SSR-safe loaders. |
 
-Plugins never ship CSS or framework-specific markup — you wire styles through callbacks and your own components.
+Start with **Essentials** — the modules most apps need first. Add **Extended** and **Advanced** packages only when you need them.
+
+## Essentials
+
+| Package | API | Use when |
+|---------|-----|----------|
+| [Theme](./plugins/theme.md) | `$store.theme` | Light / dark / system preference |
+| [Screen](./plugins/screen.md) | `$store.device` | Responsive breakpoints in templates |
+| [Scroll](./plugins/scroll.md) | `$store.scroll` | Scroll progress, body lock for overlays |
+| [Sidebar](./plugins/sidebar.md) | `$store.sidebar` | Drawer / nav shell state |
+| [Toast](./plugins/toast.md) | `$toast` | In-app messages; [`fromPayload`](./plugins/toast.md) for plain objects |
+
+## Extended & advanced
+
+- **Extended** — [network](./plugins/network.md), [visibility](./plugins/visibility.md), [clipboard](./plugins/clipboard.md), [platform](./plugins/platform.md), [touch](./plugins/touch.md), [toggle](./plugins/toggle.md)
+- **Advanced** — [geo](./plugins/geo.md), [battery](./plugins/battery.md), [export](./plugins/export.md), [share](./plugins/share.md), [attention](./plugins/attention.md), [notify](./plugins/notify.md), [calendar](./plugins/calendar.md), [JSON:API](./plugins/json-api.md)
+- **Query** — [store-agnostic cache](./query.md) with pluggable adapters and optional [devtools](./query-devtools.md)
 
 ## Explore
 
-- [Getting started](./getting-started.md) — install, register plugins, use in HTML
-- [Playground](/playground/) — live interactive demos for every plugin
-- [Plugins](./plugins/theme.md) — per-package API reference (sidebar)
+- [Getting started](./getting-started.md) — install, lazy init, use in HTML
+- [Core](./core.md) — registry, deferred initialization, dynamic imports
+- [Playground](/playground/) — live demos (Essentials highlighted)

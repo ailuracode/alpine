@@ -73,7 +73,7 @@ await $toast.promise(() => save(), {
 | `$toast.dismissAt(position)` | Close every toast in one position stack. |
 | `$toast.dismissAll()` | Close every toast in every stack. |
 | `$toast.pushUnique(key, payload?)` | Dismiss active toasts with the same `key`, then push. |
-| `$toast.fromPayload(payload)` | Push from a plain payload (events, Laravel flash, etc.). |
+| `$toast.fromPayload(payload)` | Push from a plain payload (events, session flash, etc.). |
 | `$toast.promise(factoryOrPromise, messages?)` | `loading` → `success` / `error` on the same toast. |
 
 ### Payload options

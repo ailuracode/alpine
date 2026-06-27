@@ -73,7 +73,7 @@ await $toast.promise(() => save(), {
 | `$toast.dismissAt(position)` | Dispensa todos los toasts de una pila de posición. |
 | `$toast.dismissAll()` | Dispensa todos los toasts de todas las pilas. |
 | `$toast.pushUnique(key, payload?)` | Dispensa toasts activos con la misma `key`, luego encola. |
-| `$toast.fromPayload(payload)` | Encola desde un payload plano (eventos, flash de Laravel, etc.). |
+| `$toast.fromPayload(payload)` | Encola desde un payload plano (eventos, flash de sesión, etc.). |
 | `$toast.promise(factoryOrPromise, messages?)` | `loading` → `success` / `error` en el mismo toast. |
 
 ### Opciones del payload

@@ -54,6 +54,9 @@ importers:
       '@ailuracode/alpine-clipboard':
         specifier: workspace:*
         version: link:../../packages/clipboard
+      '@ailuracode/alpine-core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@ailuracode/alpine-export':
         specifier: workspace:*
         version: link:../../packages/export

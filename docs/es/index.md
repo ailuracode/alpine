@@ -1,10 +1,10 @@
 ---
 title: "Alpine.js + @ailuracode"
-description: "Documentación y demos interactivas de plugins Alpine.js headless por ailuracode."
+description: "Toolkit modular para Alpine.js — init lazy, plugins headless y DX TypeScript moderna."
 template: splash
 hero:
-  title: "Plugins Alpine.js, documentados"
-  tagline: "Stores y magics headless para tema, scroll, caché de consultas, toasts y más — agnósticos al framework, publicados en npm y listos para tu markup."
+  title: "Toolkit modular para Alpine.js"
+  tagline: "Plugins headless con carga lazy para tema, layout, toasts y más — instala solo lo que necesitas, conecta tu propio markup y CSS."
   actions:
     - text: "Primeros pasos"
       link: "/getting-started/"
@@ -16,22 +16,38 @@ hero:
       variant: "minimal"
 ---
 
-Documentación y demos interactivas de plugins headless de Alpine.js por ailuracode.
+Toolkit modular para **Alpine.js** por ailuracode — agnóstico al framework, publicado en npm, listo para TypeScript.
 
 ## ¿Qué es esto?
 
-**@ailuracode/alpine** es un monorepo de plugins independientes de Alpine.js. Cada paquete se publica en npm como `@ailuracode/alpine-<name>`.
+**@ailuracode/alpine** no es una colección aleatoria de plugins — es un **toolkit Alpine modular** basado en tres ideas:
 
-| Tipo | Ejemplos | Úsalo cuando |
-|------|----------|--------------|
-| **Store** | `$store.theme`, `$store.scroll` | Estado mutable compartido y acciones entre componentes |
-| **Magic** | `$network`, `$toast`, `$clipboard` | Datos del entorno o utilidades puntuales |
-| **Core** | `createQueryClient`, `query({ adapter })` | Infraestructura agnóstica al store |
+| Pilar | Qué obtienes |
+|-------|--------------|
+| **Init lazy** | [`@ailuracode/alpine-core`](./core.md) registra plugins sin ejecutarlos al importar; carga bajo demanda con `import()` dinámico. |
+| **Headless** | Solo stores y magics — sin CSS, sin componentes UI, sin suposiciones de Tailwind. Aplicas estilos con callbacks. |
+| **DX moderna** | Globals TypeScript (`$store.theme`, `$toast`), paquetes npm tree-shakeables, loaders seguros para SSR. |
 
-Los plugins nunca incluyen CSS ni markup específico de un framework: conectas los estilos mediante callbacks y tus propios componentes.
+Empieza con **Esenciales** — los módulos que la mayoría de apps necesitan primero. Añade paquetes **Extendidos** y **Avanzados** solo cuando los requieras.
+
+## Esenciales
+
+| Paquete | API | Úsalo cuando |
+|---------|-----|--------------|
+| [Theme](./plugins/theme.md) | `$store.theme` | Preferencia claro / oscuro / sistema |
+| [Screen](./plugins/screen.md) | `$store.device` | Breakpoints responsive en plantillas |
+| [Scroll](./plugins/scroll.md) | `$store.scroll` | Progreso de scroll, body lock para overlays |
+| [Sidebar](./plugins/sidebar.md) | `$store.sidebar` | Estado de drawer / nav shell |
+| [Toast](./plugins/toast.md) | `$toast` | Mensajes in-app; [`fromPayload`](./plugins/toast.md) para objetos planos |
+
+## Extendidos y avanzados
+
+- **Extendidos** — [network](./plugins/network.md), [visibility](./plugins/visibility.md), [clipboard](./plugins/clipboard.md), [platform](./plugins/platform.md), [touch](./plugins/touch.md), [toggle](./plugins/toggle.md)
+- **Avanzados** — [geo](./plugins/geo.md), [battery](./plugins/battery.md), [export](./plugins/export.md), [share](./plugins/share.md), [attention](./plugins/attention.md), [notify](./plugins/notify.md), [calendar](./plugins/calendar.md), [JSON:API](./plugins/json-api.md)
+- **Query** — [caché agnóstica al store](./query.md) con adaptadores opcionales y [devtools](./query-devtools.md)
 
 ## Explorar
 
-- [Primeros pasos](./getting-started.md) — instalar, registrar plugins, usar en HTML
-- [Playground](/playground/) — demos interactivas en vivo para cada plugin
-- [Plugins](./plugins/theme.md) — referencia de API por paquete (barra lateral)
+- [Primeros pasos](./getting-started.md) — instalar, init lazy, uso en HTML
+- [Core](./core.md) — registro, init diferido, imports dinámicos
+- [Playground](/playground/) — demos en vivo (Esenciales destacados)

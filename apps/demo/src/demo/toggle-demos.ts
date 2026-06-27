@@ -1,5 +1,5 @@
 import type { ToggleInstance, ToggleMagic } from "@ailuracode/alpine-toggle";
-import type { Alpine } from "alpinejs";
+import type { AlpineInstance } from "../types/alpine.js";
 
 type BinaryPower = ToggleInstance<"on", "off", undefined, "on" | "off">;
 type TernaryAnswer = ToggleInstance<"yes", "no", "unknown", "yes" | "no" | "unknown">;
@@ -22,7 +22,7 @@ type ToggleTernaryDemoComponent = ToggleTernaryDemoData & {
   $toggle: ToggleMagic;
 };
 
-export function registerToggleDemos(Alpine: Alpine): void {
+export function registerToggleDemos(Alpine: AlpineInstance): void {
   Alpine.data(
     "toggleBinaryDemo",
     (): ToggleBinaryDemoData => ({

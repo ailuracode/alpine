@@ -1,50 +1,118 @@
 ---
 title: "Getting started"
-description: "- [Alpine.js](https://alpinejs.dev/) v3+"
+description: "Install the modular Alpine toolkit — lazy init, essentials, and TypeScript."
 ---
 
 ## Requirements
 
 - [Alpine.js](https://alpinejs.dev/) v3+
-- A bundler with ESM support (Vite, Webpack, etc.) or native ES modules in the browser
+- A bundler with ESM support ([Vite](https://vite.dev/), Webpack, etc.) or native ES modules
 
-## Installation
+## Install essentials
 
-Install Alpine.js and one or more packages:
+Start with the core registry and the five essential modules:
 
 ```bash
-npm install alpinejs @ailuracode/alpine-theme @ailuracode/alpine-screen
+npm install alpinejs \
+  @ailuracode/alpine-core \
+  @ailuracode/alpine-theme \
+  @ailuracode/alpine-screen \
+  @ailuracode/alpine-scroll \
+  @ailuracode/alpine-sidebar \
+  @ailuracode/alpine-toast
 ```
 
-## Registration
+Add more packages later — each one is an independent npm dependency.
 
-Register plugins **before** `Alpine.start()`:
+## Lazy init (recommended)
+
+Register plugins in your app entry (`main.js`, `app.ts`, etc.). Only the plugins you initialize are loaded along the import paths you use:
+
+```js
+import Alpine from "alpinejs";
+import {
+  createAlpinePlugin,
+  defineStorePlugin,
+  lazyPlugin,
+  registerPlugin,
+} from "@ailuracode/alpine-core";
+
+function applyTheme({ resolved }) {
+  document.documentElement.classList.toggle("dark", resolved === "dark");
+}
+
+registerPlugin(
+  "theme",
+  defineStorePlugin(["theme"], async () => {
+    const { default: theme } = await import("@ailuracode/alpine-theme");
+    return theme({ onChange: applyTheme });
+  })
+);
+
+registerPlugin(
+  "toast",
+  lazyPlugin({
+    kind: "magic",
+    magics: ["toast"],
+    import: () => import("@ailuracode/alpine-toast"),
+  })
+);
+
+registerPlugin("screen", lazyPlugin({
+  kind: "store",
+  stores: ["device"],
+  import: () => import("@ailuracode/alpine-screen"),
+}));
+
+Alpine.plugin(createAlpinePlugin(["theme", "toast", "screen"]));
+Alpine.start();
+```
+
+## Lazy initialization
+
+[`@ailuracode/alpine-core`](./core.md) separates **registration** (no side effects) from **initialization** (runs Alpine plugin callbacks):
+
+```js
+import Alpine from "alpinejs";
+import { initPlugins, lazyPlugin, registerPlugin } from "@ailuracode/alpine-core";
+
+registerPlugin(
+  "scroll",
+  lazyPlugin({
+    kind: "store",
+    stores: ["scroll"],
+    import: () => import("@ailuracode/alpine-scroll"),
+  })
+);
+
+await initPlugins(Alpine, "scroll");
+Alpine.start();
+```
+
+Use `createAlpinePlugin()` when you prefer the standard `Alpine.plugin()` bridge. Use `initPlugins()` directly in async entrypoints (SSR hydration, route-based loading).
+
+See [Core](./core.md) for sync init, plugin kinds, and factory plugins like `theme({ onChange })`.
+
+## Direct registration (simple apps)
+
+If you do not need lazy loading yet, register plugins directly — still **before** `Alpine.start()`:
 
 ```js
 import Alpine from "alpinejs";
 import theme from "@ailuracode/alpine-theme";
 import screen from "@ailuracode/alpine-screen";
-import network from "@ailuracode/alpine-network";
 
 Alpine.plugin(theme({ onChange: applyTheme }));
 Alpine.plugin(screen);
-Alpine.plugin(network);
 
 Alpine.start();
 ```
 
-Some plugins accept options (e.g. `theme`). Others are plain functions:
-
-```js
-Alpine.plugin(screen);
-Alpine.plugin(network);
-```
+Migrate to the core registry when you want code-splitting or a single init pipeline.
 
 ## Using in HTML
 
 ### Stores
-
-Access global reactive state with `$store`:
 
 ```html
 <button :class="{ active: $store.theme.isDark }" @click="$store.theme.set('dark')">
@@ -52,116 +120,67 @@ Access global reactive state with `$store`:
 </button>
 
 <div x-show="$store.device.isMobile">Mobile layout</div>
-```
-
-### Magics
-
-Read environment state or call utilities directly:
-
-```html
-<div x-show="!$network.isOnline">You are offline</div>
-
-<div x-show="!$visibility.isVisible">Tab is in the background</div>
-
-<div x-show="$battery.isAvailable">
-  Battery: <span x-text="Math.round($battery.level * 100)"></span>%
-</div>
-
-<button @click="await $clipboard('Hello')">Copy</button>
-
-<p x-show="$touch.isTouch">Touch-optimized UI</p>
-
-<button @click="$notify.sendIfPermitted('Task complete')">Notify</button>
-```
-
-## Combining packages
-
-```js
-import Alpine from "alpinejs";
-import theme from "@ailuracode/alpine-theme";
-import scroll from "@ailuracode/alpine-scroll";
-
-function applyTheme({ resolved }) {
-  document.documentElement.dataset.theme = resolved;
-}
-
-Alpine.plugin(theme({ onChange: applyTheme }));
-Alpine.plugin(scroll());
-
-Alpine.start();
-```
-
-```html
-<div
-  class="progress"
-  :style="`width: ${$store.scroll.progress}%`"
-></div>
 
 <button x-show="$store.scroll.showToTop" @click="$store.scroll.toTop()">
   Back to top
 </button>
 ```
 
-## CDN
+### Magics
 
-Load plugins from a CDN (e.g. [esm.sh](https://esm.sh)) with native ES modules:
+```html
+<button @click="$toast('Changes saved', { variant: 'success' })">Notify</button>
+```
+
+Push a plain payload from server-rendered data or events:
+
+```html
+<div
+  x-data
+  x-init="$toast.fromPayload({ title: 'Saved', variant: 'success' })"
+></div>
+```
+
+See [`$toast.fromPayload`](./plugins/toast.md) for the full payload shape.
+
+## Package tiers
+
+| Tier | Packages | When to add |
+|------|----------|-------------|
+| **Essentials** | theme, screen, scroll, sidebar, toast | Most Alpine apps |
+| **Extended** | network, visibility, clipboard, platform, touch, toggle | Connectivity, clipboard, device hints |
+| **Advanced** | geo, battery, export, share, attention, notify, calendar, json-api | Specialized browser APIs |
+| **Query** | query + adapter + devtools | Client-side data cache (see [Query](./query.md)) |
+
+## CDN
 
 ```html
 <script type="module">
   import Alpine from "https://esm.sh/alpinejs";
-  import clipboard from "https://esm.sh/@ailuracode/alpine-clipboard";
+  import theme from "https://esm.sh/@ailuracode/alpine-theme";
 
-  Alpine.plugin(clipboard);
+  Alpine.plugin(theme({ onChange: ({ resolved }) => {
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+  }}));
   Alpine.start();
 </script>
 ```
 
-[esm.sh](https://esm.sh) serves the `X-TypeScript-Types` header for editor support when you import from it.
-
 ## TypeScript
 
-Install `@types/alpinejs` (or add it as a dev dependency). Each package ships two declaration files:
-
-| File | Purpose |
-|------|---------|
-| `dist/index.d.ts` | Module import (`import clipboard from "…"`) |
-| `dist/global.d.ts` | Ambient augmentations for `$clipboard`, `$store.theme`, etc. |
-
-### npm projects
-
-Reference plugin types in your app entry (e.g. `src/env.d.ts`):
+Each package ships `dist/index.d.ts` (imports) and `dist/global.d.ts` (Alpine augmentations):
 
 ```ts
 /// <reference types="@types/alpinejs" />
-/// <reference types="@ailuracode/alpine-clipboard" />
+/// <reference types="@ailuracode/alpine-core" />
 /// <reference types="@ailuracode/alpine-theme" />
+/// <reference types="@ailuracode/alpine-toast" />
 ```
 
-Or import the plugin module — the generated `index.d.ts` also augments Alpine globals:
-
-```ts
-import clipboard from "@ailuracode/alpine-clipboard";
-```
-
-### CDN projects (no runtime npm install)
-
-**Option A — esm.sh (recommended):** import from [esm.sh](https://esm.sh). VS Code reads the `X-TypeScript-Types` response header automatically.
-
-**Option B — types as dev dependencies** (CDN for runtime, npm only for the editor):
-
-```bash
-npm install -D @types/alpinejs @ailuracode/alpine-clipboard
-```
-
-```ts
-/// <reference types="@types/alpinejs" />
-/// <reference types="@ailuracode/alpine-clipboard" />
-```
-
-**Option C — copy `global.d.ts`** from unpkg into your project (e.g. `src/types/alpine-clipboard.d.ts`) and reference it with `/// <reference path="./types/alpine-clipboard.d.ts" />`.
-
-`global.d.ts` has no `import` statements, so it resolves without pulling the full package into `node_modules` at runtime.
+Or import the plugin module — generated types augment globals automatically.
 
 ## Next steps
 
-- Individual package docs: [theme](./plugins/theme.md), [screen](./plugins/screen.md), [network](./plugins/network.md), [visibility](./plugins/visibility.md), [battery](./plugins/battery.md), [clipboard](./plugins/clipboard.md), [export](./plugins/export.md), [scroll](./plugins/scroll.md), [touch](./plugins/touch.md), [platform](./plugins/platform.md), [notify](./plugins/notify.md), [geo](./plugins/geo.md), [share](./plugins/share.md)
+- [Core](./core.md) — lazy registry and dynamic imports
+- Essentials — [theme](./plugins/theme.md), [screen](./plugins/screen.md), [scroll](./plugins/scroll.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
+- [Playground](/playground/) — interactive demos

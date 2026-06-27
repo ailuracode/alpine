@@ -1,167 +1,113 @@
 ---
 title: "Primeros pasos"
-description: "- [Alpine.js](https://alpinejs.dev/) v3+"
+description: "Instala el toolkit Alpine modular — init lazy, esenciales y TypeScript."
 ---
 
 ## Requisitos
 
 - [Alpine.js](https://alpinejs.dev/) v3+
-- Un bundler con soporte ESM (Vite, Webpack, etc.) o módulos ES nativos en el navegador
+- Un bundler con soporte ESM (Vite, Webpack, etc.) o módulos ES nativos
 
-## Instalación
+## Instalar esenciales
 
-Instala Alpine.js y uno o más paquetes:
+Empieza con el registro core y los cinco módulos esenciales:
 
 ```bash
-npm install alpinejs @ailuracode/alpine-theme @ailuracode/alpine-screen
+npm install alpinejs \
+  @ailuracode/alpine-core \
+  @ailuracode/alpine-theme \
+  @ailuracode/alpine-screen \
+  @ailuracode/alpine-scroll \
+  @ailuracode/alpine-sidebar \
+  @ailuracode/alpine-toast
 ```
 
-## Registro
+Añade más paquetes después — cada uno es una dependencia npm independiente.
 
-Registra los plugins **antes** de `Alpine.start()`:
+## Init lazy (recomendado)
+
+Registra plugins en tu entry (`main.js`, `app.ts`, etc.):
+
+```js
+import Alpine from "alpinejs";
+import {
+  createAlpinePlugin,
+  defineStorePlugin,
+  lazyPlugin,
+  registerPlugin,
+} from "@ailuracode/alpine-core";
+
+function applyTheme({ resolved }) {
+  document.documentElement.classList.toggle("dark", resolved === "dark");
+}
+
+registerPlugin(
+  "theme",
+  defineStorePlugin(["theme"], async () => {
+    const { default: theme } = await import("@ailuracode/alpine-theme");
+    return theme({ onChange: applyTheme });
+  })
+);
+
+registerPlugin(
+  "toast",
+  lazyPlugin({
+    kind: "magic",
+    magics: ["toast"],
+    import: () => import("@ailuracode/alpine-toast"),
+  })
+);
+
+Alpine.plugin(createAlpinePlugin(["theme", "toast"]));
+Alpine.start();
+```
+
+Consulta [Core](./core.md) para init sync, tipos de plugin y factories como `theme({ onChange })`.
+
+## Registro directo (apps simples)
+
+Si aún no necesitas lazy loading, registra plugins directamente — siempre **antes** de `Alpine.start()`:
 
 ```js
 import Alpine from "alpinejs";
 import theme from "@ailuracode/alpine-theme";
 import screen from "@ailuracode/alpine-screen";
-import network from "@ailuracode/alpine-network";
 
 Alpine.plugin(theme({ onChange: applyTheme }));
 Alpine.plugin(screen);
-Alpine.plugin(network);
 
 Alpine.start();
-```
-
-Algunos plugins aceptan opciones (p. ej. `theme`). Otros son plugins sin opciones (funciones de registro directas):
-
-```js
-Alpine.plugin(screen);
-Alpine.plugin(network);
 ```
 
 ## Uso en HTML
 
 ### Stores
 
-Accede al estado reactivo global con `$store`:
-
 ```html
 <button :class="{ active: $store.theme.isDark }" @click="$store.theme.set('dark')">
-  Dark
+  Oscuro
 </button>
 
-<div x-show="$store.device.isMobile">Mobile layout</div>
+<div x-show="$store.device.isMobile">Layout móvil</div>
 ```
 
 ### Magics
 
-Lee el estado del entorno o invoca utilidades directamente:
-
 ```html
-<div x-show="!$network.isOnline">You are offline</div>
-
-<div x-show="!$visibility.isVisible">Tab is in the background</div>
-
-<div x-show="$battery.isAvailable">
-  Battery: <span x-text="Math.round($battery.level * 100)"></span>%
-</div>
-
-<button @click="await $clipboard('Hello')">Copy</button>
-
-<p x-show="$touch.isTouch">Touch-optimized UI</p>
-
-<button @click="$notify.sendIfPermitted('Task complete')">Notify</button>
+<button @click="$toast('Cambios guardados', { variant: 'success' })">Notificar</button>
 ```
 
-## Combinar paquetes
+## Niveles de paquetes
 
-```js
-import Alpine from "alpinejs";
-import theme from "@ailuracode/alpine-theme";
-import scroll from "@ailuracode/alpine-scroll";
+| Nivel | Paquetes | Cuándo añadir |
+|-------|----------|---------------|
+| **Esenciales** | theme, screen, scroll, sidebar, toast | La mayoría de apps Alpine |
+| **Extendidos** | network, visibility, clipboard, platform, touch, toggle | Conectividad, portapapeles, hints de dispositivo |
+| **Avanzados** | geo, battery, export, share, attention, notify, calendar, json-api | APIs de navegador especializadas |
+| **Query** | query + adapter + devtools | Caché de datos en cliente (ver [Query](./query.md)) |
 
-function applyTheme({ resolved }) {
-  document.documentElement.dataset.theme = resolved;
-}
+## Siguientes pasos
 
-Alpine.plugin(theme({ onChange: applyTheme }));
-Alpine.plugin(scroll());
-
-Alpine.start();
-```
-
-```html
-<div
-  class="progress"
-  :style="`width: ${$store.scroll.progress}%`"
-></div>
-
-<button x-show="$store.scroll.showToTop" @click="$store.scroll.toTop()">
-  Back to top
-</button>
-```
-
-## CDN
-
-Carga plugins desde un CDN (p. ej. [esm.sh](https://esm.sh)) con módulos ES nativos:
-
-```html
-<script type="module">
-  import Alpine from "https://esm.sh/alpinejs";
-  import clipboard from "https://esm.sh/@ailuracode/alpine-clipboard";
-
-  Alpine.plugin(clipboard);
-  Alpine.start();
-</script>
-```
-
-[esm.sh](https://esm.sh) sirve el encabezado `X-TypeScript-Types` para soporte en el editor cuando importas desde allí.
-
-## TypeScript
-
-Instala `@types/alpinejs` (o agrégalo como dependencia de desarrollo). Cada paquete incluye dos archivos de declaración:
-
-| Archivo | Propósito |
-|------|---------|
-| `dist/index.d.ts` | Importación de módulo (`import clipboard from "…"`) |
-| `dist/global.d.ts` | Ampliaciones ambientales para `$clipboard`, `$store.theme`, etc. |
-
-### Proyectos npm
-
-Referencia los tipos de los plugins en el entry de tu app (p. ej. `src/env.d.ts`):
-
-```ts
-/// <reference types="@types/alpinejs" />
-/// <reference types="@ailuracode/alpine-clipboard" />
-/// <reference types="@ailuracode/alpine-theme" />
-```
-
-O importa el módulo del plugin — el `index.d.ts` generado también amplía los globals de Alpine:
-
-```ts
-import clipboard from "@ailuracode/alpine-clipboard";
-```
-
-### Proyectos CDN (sin instalación npm en runtime)
-
-**Opción A — esm.sh (recomendada):** importa desde [esm.sh](https://esm.sh). VS Code lee automáticamente el encabezado de respuesta `X-TypeScript-Types`.
-
-**Opción B — tipos como dependencias de desarrollo** (CDN en runtime, npm solo para el editor):
-
-```bash
-npm install -D @types/alpinejs @ailuracode/alpine-clipboard
-```
-
-```ts
-/// <reference types="@types/alpinejs" />
-/// <reference types="@ailuracode/alpine-clipboard" />
-```
-
-**Opción C — copia `global.d.ts`** desde unpkg a tu proyecto (p. ej. `src/types/alpine-clipboard.d.ts`) y referéncialo con `/// <reference path="./types/alpine-clipboard.d.ts" />`.
-
-`global.d.ts` no tiene sentencias `import`, así que se resuelve sin incluir el paquete completo en `node_modules` en runtime.
-
-## Próximos pasos
-
-- Documentación por paquete: [theme](./plugins/theme.md), [screen](./plugins/screen.md), [network](./plugins/network.md), [visibility](./plugins/visibility.md), [battery](./plugins/battery.md), [clipboard](./plugins/clipboard.md), [export](./plugins/export.md), [scroll](./plugins/scroll.md), [touch](./plugins/touch.md), [platform](./plugins/platform.md), [notify](./plugins/notify.md), [geo](./plugins/geo.md), [share](./plugins/share.md)
+- [Core](./core.md) — registro lazy e imports dinámicos
+- Esenciales — [theme](./plugins/theme.md), [screen](./plugins/screen.md), [scroll](./plugins/scroll.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
+- [Playground](/playground/) — demos interactivas

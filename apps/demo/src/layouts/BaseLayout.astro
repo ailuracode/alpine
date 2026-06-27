@@ -105,12 +105,9 @@ const {
 		</div>
 
 		<script>
-			import Alpine from "alpinejs";
-			import register from "../entrypoint";
+			import { startAlpineDemo } from "../alpine-boot";
 
-			register(Alpine);
-			window.Alpine = Alpine;
-			Alpine.start();
+			await startAlpineDemo();
 		</script>
 	</body>
 </html>

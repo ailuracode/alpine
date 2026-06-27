@@ -3,21 +3,21 @@ title: "Share"
 description: "Web Share API com o magic $share."
 ---
 
-Package: `@ailuracode/alpinejs.share`
+Package: `@ailuracode/alpinejs-share`
 
 Wrapper leve em torno da [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share). Registra o magic chamável `$share`.
 
 ## Instalação
 
 ```bash
-npm install @ailuracode/alpinejs.share alpinejs
+npm install @ailuracode/alpinejs-share alpinejs
 ```
 
 ## Configuração
 
 ```js
 import Alpine from "alpinejs";
-import share from "@ailuracode/alpinejs.share";
+import share from "@ailuracode/alpinejs-share";
 
 Alpine.plugin(share);
 Alpine.start();
@@ -26,7 +26,7 @@ Alpine.start();
 Consumidores TypeScript podem adicionar:
 
 ```ts
-/// <reference types="@ailuracode/alpinejs.share/global" />
+/// <reference types="@ailuracode/alpinejs-share/global" />
 ```
 
 ## Magic API

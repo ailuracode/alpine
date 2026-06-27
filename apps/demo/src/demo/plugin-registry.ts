@@ -4,13 +4,13 @@ import {
   defineStorePlugin,
   lazyPlugin,
   registerPlugin,
-} from "@ailuracode/alpinejs.core";
-import queryDevtools from "@ailuracode/alpinejs.query-devtools";
-import screen from "@ailuracode/alpinejs.screen";
-import scroll from "@ailuracode/alpinejs.scroll";
-import sidebar from "@ailuracode/alpinejs.sidebar";
-import theme from "@ailuracode/alpinejs.theme";
-import toast, { toastPositions, toastVariants } from "@ailuracode/alpinejs.toast";
+} from "@ailuracode/alpinejs-core";
+import queryDevtools from "@ailuracode/alpinejs-query-devtools";
+import screen from "@ailuracode/alpinejs-screen";
+import scroll from "@ailuracode/alpinejs-scroll";
+import sidebar from "@ailuracode/alpinejs-sidebar";
+import theme from "@ailuracode/alpinejs-theme";
+import toast, { toastPositions, toastVariants } from "@ailuracode/alpinejs-toast";
 import type { AlpineInstance } from "../types/alpine.js";
 import { registerCalendarDemo } from "./calendar-demo.js";
 import { registerDemoShell, registerToastDemoHandlers } from "./demo-shell.js";
@@ -46,7 +46,7 @@ function applyTheme({ resolved }: { resolved: "light" | "dark" }) {
 
 let pluginsRegistered = false;
 
-/** Register all demo plugins with @ailuracode/alpinejs.core (no Alpine side effects yet). */
+/** Register all demo plugins with @ailuracode/alpinejs-core (no Alpine side effects yet). */
 export function registerDemoPlugins(): void {
   if (pluginsRegistered) {
     return;
@@ -118,7 +118,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["network"],
-      import: () => import("@ailuracode/alpinejs.network"),
+      import: () => import("@ailuracode/alpinejs-network"),
     })
   );
 
@@ -127,7 +127,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["visibility"],
-      import: () => import("@ailuracode/alpinejs.visibility"),
+      import: () => import("@ailuracode/alpinejs-visibility"),
     })
   );
 
@@ -136,7 +136,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["clipboard"],
-      import: () => import("@ailuracode/alpinejs.clipboard"),
+      import: () => import("@ailuracode/alpinejs-clipboard"),
     })
   );
 
@@ -145,7 +145,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["platform"],
-      import: () => import("@ailuracode/alpinejs.platform"),
+      import: () => import("@ailuracode/alpinejs-platform"),
     })
   );
 
@@ -154,7 +154,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["touch"],
-      import: () => import("@ailuracode/alpinejs.touch"),
+      import: () => import("@ailuracode/alpinejs-touch"),
     })
   );
 
@@ -163,7 +163,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["toggle"],
-      import: () => import("@ailuracode/alpinejs.toggle"),
+      import: () => import("@ailuracode/alpinejs-toggle"),
     })
   );
 
@@ -173,7 +173,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["share"],
-      import: () => import("@ailuracode/alpinejs.share"),
+      import: () => import("@ailuracode/alpinejs-share"),
     })
   );
 
@@ -182,7 +182,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["battery"],
-      import: () => import("@ailuracode/alpinejs.battery"),
+      import: () => import("@ailuracode/alpinejs-battery"),
     })
   );
 
@@ -191,7 +191,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["calendar"],
-      import: () => import("@ailuracode/alpinejs.calendar"),
+      import: () => import("@ailuracode/alpinejs-calendar"),
     })
   );
 
@@ -200,7 +200,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "both",
       magics: ["wakelock", "idle"],
-      import: () => import("@ailuracode/alpinejs.attention"),
+      import: () => import("@ailuracode/alpinejs-attention"),
     })
   );
 
@@ -209,7 +209,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["export"],
-      import: () => import("@ailuracode/alpinejs.export"),
+      import: () => import("@ailuracode/alpinejs-export"),
     })
   );
 
@@ -219,7 +219,7 @@ export function registerDemoPlugins(): void {
       kind: "both",
       stores: ["geo"],
       magics: ["geo"],
-      import: () => import("@ailuracode/alpinejs.geo"),
+      import: () => import("@ailuracode/alpinejs-geo"),
     })
   );
 
@@ -228,7 +228,7 @@ export function registerDemoPlugins(): void {
     lazyPlugin({
       kind: "magic",
       magics: ["notify"],
-      import: () => import("@ailuracode/alpinejs.notify"),
+      import: () => import("@ailuracode/alpinejs-notify"),
     })
   );
 
@@ -238,7 +238,7 @@ export function registerDemoPlugins(): void {
       kind: "magic",
       magics: ["nano"],
       import: async () => {
-        const { NanoStores } = await import("@ailuracode/alpinejs.query-adapter-nanostores");
+        const { NanoStores } = await import("@ailuracode/alpinejs-query-adapter-nanostores");
         return { default: NanoStores };
       },
     })
@@ -248,8 +248,8 @@ export function registerDemoPlugins(): void {
     "query",
     defineStorePlugin(["query"], async () => {
       const [{ default: query }, { createAlpineNanostoresAdapter }] = await Promise.all([
-        import("@ailuracode/alpinejs.query"),
-        import("@ailuracode/alpinejs.query-adapter-nanostores"),
+        import("@ailuracode/alpinejs-query"),
+        import("@ailuracode/alpinejs-query-adapter-nanostores"),
       ]);
 
       return query({ adapter: createAlpineNanostoresAdapter });
@@ -259,7 +259,7 @@ export function registerDemoPlugins(): void {
   registerPlugin(
     "json-api",
     defineMagicPlugin(["jsonapi"], async () => {
-      const { default: jsonApi } = await import("@ailuracode/alpinejs.json-api");
+      const { default: jsonApi } = await import("@ailuracode/alpinejs-json-api");
       return jsonApi(jsonApiDemoOptions);
     })
   );

@@ -3,8 +3,8 @@ import {
   defineJsonApiSchema,
   jsonApiFindOneQueryOptions,
   jsonApiQueryOptions,
-} from "@ailuracode/alpinejs.json-api";
-import { createQueryClient } from "@ailuracode/alpinejs.query";
+} from "@ailuracode/alpinejs-json-api";
+import { createQueryClient } from "@ailuracode/alpinejs-query";
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 const schema = defineJsonApiSchema({

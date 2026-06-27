@@ -1,23 +1,23 @@
 ---
 title: "Network"
-description: "Package: @ailuracode/alpinejs.network"
+description: "Package: @ailuracode/alpinejs-network"
 ---
 
-Package: `@ailuracode/alpinejs.network`
+Package: `@ailuracode/alpinejs-network`
 
 Reactive network connectivity via the `$network` magic. Wraps `navigator.onLine` and browser `online` / `offline` events.
 
 ## Install
 
 ```bash
-npm install @ailuracode/alpinejs.network alpinejs
+npm install @ailuracode/alpinejs-network alpinejs
 ```
 
 ## Setup
 
 ```js
 import Alpine from "alpinejs";
-import network from "@ailuracode/alpinejs.network";
+import network from "@ailuracode/alpinejs-network";
 
 Alpine.plugin(network);
 Alpine.start();

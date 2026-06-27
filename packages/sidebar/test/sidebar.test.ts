@@ -8,7 +8,7 @@ import sidebarPlugin, {
 
 // ── Type inference ───────────────────────────────────────────────────
 
-describe("@ailuracode/alpinejs.sidebar type inference", () => {
+describe("@ailuracode/alpinejs-sidebar type inference", () => {
   it("sidebarOptions() preserves literal types via const generic", () => {
     const options = sidebarOptions({
       closeOnEscape: false,
@@ -94,7 +94,7 @@ describe("@ailuracode/alpinejs.sidebar type inference", () => {
 
 // ── Runtime behavior ─────────────────────────────────────────────────
 
-describe("@ailuracode/alpinejs.sidebar", () => {
+describe("@ailuracode/alpinejs-sidebar", () => {
   let store: SidebarStore;
 
   beforeEach(() => {

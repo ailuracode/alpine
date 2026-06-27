@@ -1,4 +1,4 @@
-# @ailuracode/alpinejs.battery
+# @ailuracode/alpinejs-battery
 
 Battery status magic for Alpine.js.
 
@@ -7,14 +7,14 @@ Battery status magic for Alpine.js.
 ## Install
 
 ```bash
-npm install @ailuracode/alpinejs.battery alpinejs
+npm install @ailuracode/alpinejs-battery alpinejs
 ```
 
 ## Quick example
 
 ```js
 import Alpine from "alpinejs";
-import battery from "@ailuracode/alpinejs.battery";
+import battery from "@ailuracode/alpinejs-battery";
 
 Alpine.plugin(battery);
 Alpine.start();

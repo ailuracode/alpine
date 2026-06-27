@@ -3,21 +3,21 @@ title: "Clipboard"
 description: "Copiar para a área de transferência com o magic $clipboard."
 ---
 
-Package: `@ailuracode/alpinejs.clipboard`
+Package: `@ailuracode/alpinejs-clipboard`
 
 Copia texto para a área de transferência do sistema via magic `$clipboard`. Usa a Clipboard API com fallback para `execCommand`.
 
 ## Instalação
 
 ```bash
-npm install @ailuracode/alpinejs.clipboard alpinejs
+npm install @ailuracode/alpinejs-clipboard alpinejs
 ```
 
 ## Configuração
 
 ```js
 import Alpine from "alpinejs";
-import clipboard from "@ailuracode/alpinejs.clipboard";
+import clipboard from "@ailuracode/alpinejs-clipboard";
 
 Alpine.plugin(clipboard);
 Alpine.start();

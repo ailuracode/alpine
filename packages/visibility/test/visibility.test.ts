@@ -20,7 +20,7 @@ function setDocumentVisibility(hidden: boolean, visibilityState: VisibilityState
   });
 }
 
-describe("@ailuracode/alpinejs.visibility type inference", () => {
+describe("@ailuracode/alpinejs-visibility type inference", () => {
   it("exports literal visibility states", () => {
     expectTypeOf(VISIBILITY_STATES).toEqualTypeOf<readonly ["visible", "hidden", "prerender"]>();
   });
@@ -64,7 +64,7 @@ describe("@ailuracode/alpinejs.visibility type inference", () => {
   });
 });
 
-describe("@ailuracode/alpinejs.visibility", () => {
+describe("@ailuracode/alpinejs-visibility", () => {
   it("registers $visibility with initial visible state", () => {
     setDocumentVisibility(false, "visible");
 

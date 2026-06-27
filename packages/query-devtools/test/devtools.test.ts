@@ -1,8 +1,8 @@
-import type { QueryStore } from "@ailuracode/alpinejs.query";
-import query, { createQueryClient } from "@ailuracode/alpinejs.query";
-import { createAlpineStoreAdapter } from "@ailuracode/alpinejs.query-adapter-alpine";
-import { createAlpineNanostoresAdapter } from "@ailuracode/alpinejs.query-adapter-nanostores";
-import queryDevtoolsPlugin from "@ailuracode/alpinejs.query-devtools";
+import type { QueryStore } from "@ailuracode/alpinejs-query";
+import query, { createQueryClient } from "@ailuracode/alpinejs-query";
+import { createAlpineStoreAdapter } from "@ailuracode/alpinejs-query-adapter-alpine";
+import { createAlpineNanostoresAdapter } from "@ailuracode/alpinejs-query-adapter-nanostores";
+import queryDevtoolsPlugin from "@ailuracode/alpinejs-query-devtools";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 import { resetMatchMedia, setMatchMedia } from "../../../test/setup.js";
@@ -14,7 +14,7 @@ import { DEFAULT_TOGGLE_CORNER_STORAGE_KEY } from "../src/toggle-corner.js";
 
 const nanostoresQuery = () => query({ adapter: createAlpineNanostoresAdapter });
 
-describe("@ailuracode/alpinejs.query-devtools", () => {
+describe("@ailuracode/alpinejs-query-devtools", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
     localStorage.clear();
@@ -679,14 +679,14 @@ describe("@ailuracode/alpinejs.query-devtools", () => {
 
   it("getQueryStore() throws when query store is missing", () => {
     expect(() => getQueryStore({ store: () => undefined })).toThrow(
-      "@ailuracode/alpinejs.query-devtools could not find"
+      "@ailuracode/alpinejs-query-devtools could not find"
     );
   });
 
   it("getQueryStore() accepts a createQueryClient() instance", async () => {
     vi.useFakeTimers();
 
-    const { createQueryClient } = await import("@ailuracode/alpinejs.query");
+    const { createQueryClient } = await import("@ailuracode/alpinejs-query");
     const store = getQueryStore(createQueryClient());
 
     const controller = mountQueryDevtools({ store, initialOpen: true });

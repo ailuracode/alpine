@@ -1,10 +1,10 @@
-import type { MutationState, QueryStateAdapter } from "@ailuracode/alpinejs.query";
+import type { MutationState, QueryStateAdapter } from "@ailuracode/alpinejs-query";
 import {
   createMutationStateView,
   createQueryStateView,
   type MutationStateRecord,
   type QueryStateRecord,
-} from "@ailuracode/alpinejs.query";
+} from "@ailuracode/alpinejs-query";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 function patchZustandStore<TRecord extends Record<string, unknown>>(
@@ -28,7 +28,7 @@ function patchZustandStore<TRecord extends Record<string, unknown>>(
   }
 }
 
-/** Zustand vanilla store adapter for `@ailuracode/alpinejs.query`. No official zustand-alpine integration exists. */
+/** Zustand vanilla store adapter for `@ailuracode/alpinejs-query`. No official zustand-alpine integration exists. */
 export const zustandQueryAdapter: QueryStateAdapter = {
   name: "Zustand",
 

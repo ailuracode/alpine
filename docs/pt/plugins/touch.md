@@ -3,21 +3,21 @@ title: "Touch"
 description: "Deteção de entrada tátil com o magic $touch."
 ---
 
-Package: `@ailuracode/alpinejs.touch`
+Package: `@ailuracode/alpinejs-touch`
 
 Detecta dispositivos touch e capacidades de ponteiro via magic `$touch`. Atualiza em mudanças de `matchMedia`.
 
 ## Instalação
 
 ```bash
-npm install @ailuracode/alpinejs.touch alpinejs
+npm install @ailuracode/alpinejs-touch alpinejs
 ```
 
 ## Configuração
 
 ```js
 import Alpine from "alpinejs";
-import touch from "@ailuracode/alpinejs.touch";
+import touch from "@ailuracode/alpinejs-touch";
 
 Alpine.plugin(touch);
 Alpine.start();
@@ -55,7 +55,7 @@ Alpine.start();
 
 - Exibir alvos de toque maiores em dispositivos touch
 - Desabilitar UI exclusiva de hover quando `!$touch.canHover`
-- Ramificar lógica de layout junto com `@ailuracode/alpinejs.screen` para tamanho do viewport
+- Ramificar lógica de layout junto com `@ailuracode/alpinejs-screen` para tamanho do viewport
 
 ## Notas
 

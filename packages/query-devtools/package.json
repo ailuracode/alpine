@@ -1,7 +1,7 @@
 {
-  "name": "@ailuracode/alpinejs.query-devtools",
+  "name": "@ailuracode/alpinejs-query-devtools",
   "version": "0.2.4",
-  "description": "TanStack Query-style devtools panel for @ailuracode/alpinejs.query",
+  "description": "TanStack Query-style devtools panel for @ailuracode/alpinejs-query",
   "type": "module",
   "license": "MIT",
   "author": "ailuracode",
@@ -36,7 +36,7 @@
     "@types/alpinejs": "^3.13.11"
   },
   "dependencies": {
-    "@ailuracode/alpinejs.query": "workspace:*"
+    "@ailuracode/alpinejs-query": "workspace:*"
   },
   "peerDependenciesMeta": {
     "@types/alpinejs": {

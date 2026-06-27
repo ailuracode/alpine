@@ -1,4 +1,4 @@
-# @ailuracode/alpinejs.scroll
+# @ailuracode/alpinejs-scroll
 
 Scroll position tracking and reference-counted body scroll lock for Alpine.js.
 
@@ -7,14 +7,14 @@ Scroll position tracking and reference-counted body scroll lock for Alpine.js.
 ## Install
 
 ```bash
-npm install @ailuracode/alpinejs.scroll alpinejs
+npm install @ailuracode/alpinejs-scroll alpinejs
 ```
 
 ## Quick example
 
 ```js
 import Alpine from "alpinejs";
-import scroll from "@ailuracode/alpinejs.scroll";
+import scroll from "@ailuracode/alpinejs-scroll";
 
 Alpine.plugin(scroll());
 Alpine.start();
@@ -36,7 +36,7 @@ import {
   computeScrollMetrics,
   readScrollSnapshot,
   scrollOptions,
-} from "@ailuracode/alpinejs.scroll";
+} from "@ailuracode/alpinejs-scroll";
 ```
 
 ## API summary

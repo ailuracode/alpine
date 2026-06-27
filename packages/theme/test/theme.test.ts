@@ -9,7 +9,7 @@ import themePlugin, {
   type ThemeStoreOf,
 } from "../src/index.js";
 
-describe("@ailuracode/alpinejs.theme", () => {
+describe("@ailuracode/alpinejs-theme", () => {
   const onChange = vi.fn();
   let store: ThemeStore;
 
@@ -90,7 +90,7 @@ describe("@ailuracode/alpinejs.theme", () => {
   });
 });
 
-describe("@ailuracode/alpinejs.theme type inference", () => {
+describe("@ailuracode/alpinejs-theme type inference", () => {
   it("infers default mode literals on the store", () => {
     localStorage.setItem("typed-theme", "light");
     const Alpine = startAlpine(themePlugin({ storageKey: "typed-theme" }));
@@ -117,7 +117,7 @@ describe("@ailuracode/alpinejs.theme type inference", () => {
   });
 });
 
-describe("@ailuracode/alpinejs.theme system mode", () => {
+describe("@ailuracode/alpinejs-theme system mode", () => {
   it("resolves system preference from matchMedia", () => {
     localStorage.setItem("system-theme", "system");
     setMatchMedia("(prefers-color-scheme: dark)", true);

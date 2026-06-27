@@ -3,21 +3,21 @@ title: "Theme"
 description: "Modos claro, escuro e sistema com $store.theme."
 ---
 
-Package: `@ailuracode/alpinejs.theme`
+Package: `@ailuracode/alpinejs-theme`
 
 Gerencia a preferência de tema claro, escuro e do sistema com persistência em `localStorage`. Agnóstico a framework CSS — você controla como o tema é aplicado ao DOM.
 
 ## Instalação
 
 ```bash
-npm install @ailuracode/alpinejs.theme alpinejs
+npm install @ailuracode/alpinejs-theme alpinejs
 ```
 
 ## Configuração
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@ailuracode/alpinejs.theme";
+import theme from "@ailuracode/alpinejs-theme";
 
 Alpine.plugin(theme({
   storageKey: "theme", // opcional, padrão: "theme"

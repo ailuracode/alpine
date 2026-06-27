@@ -1,23 +1,23 @@
 ---
 title: "Theme"
-description: "Package: @ailuracode/alpinejs.theme"
+description: "Package: @ailuracode/alpinejs-theme"
 ---
 
-Package: `@ailuracode/alpinejs.theme`
+Package: `@ailuracode/alpinejs-theme`
 
 Manages light, dark, and system theme preference with `localStorage` persistence. CSS-framework agnostic — you control how the theme is applied to the DOM.
 
 ## Install
 
 ```bash
-npm install @ailuracode/alpinejs.theme alpinejs
+npm install @ailuracode/alpinejs-theme alpinejs
 ```
 
 ## Setup
 
 ```js
 import Alpine from "alpinejs";
-import theme from "@ailuracode/alpinejs.theme";
+import theme from "@ailuracode/alpinejs-theme";
 
 Alpine.plugin(theme({
   storageKey: "theme", // optional, default: "theme"

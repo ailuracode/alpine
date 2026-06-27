@@ -1,7 +1,7 @@
-import { isAndroidDevice, isIosDevice } from "@ailuracode/alpinejs.platform";
+import { isAndroidDevice, isIosDevice } from "@ailuracode/alpinejs-platform";
 import type AlpineType from "alpinejs";
 
-export { isIosDevice } from "@ailuracode/alpinejs.platform";
+export { isIosDevice } from "@ailuracode/alpinejs-platform";
 
 export interface NotifyPluginOptions {
   /** URL of the minimal service worker script (must be same-origin). */

@@ -5,8 +5,8 @@ import {
   type JsonApiSingleDocument,
   jsonApiFindOneQueryOptions,
   jsonApiQueryOptions,
-} from "@ailuracode/alpinejs.json-api";
-import type { QueryState, QueryStore } from "@ailuracode/alpinejs.query";
+} from "@ailuracode/alpinejs-json-api";
+import type { QueryState, QueryStore } from "@ailuracode/alpinejs-query";
 import type { AlpineInstance } from "../types/alpine.js";
 import { createJsonApiMockFetcher } from "./json-api-mock.js";
 

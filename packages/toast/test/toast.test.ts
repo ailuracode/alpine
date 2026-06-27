@@ -64,7 +64,7 @@ function createToastHarness<
   };
 }
 
-describe("@ailuracode/alpinejs.toast", () => {
+describe("@ailuracode/alpinejs-toast", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

@@ -3,21 +3,21 @@ title: "Visibility"
 description: "Visibilidad de pestaña y Page Visibility con $visibility."
 ---
 
-Package: `@ailuracode/alpinejs.visibility`
+Package: `@ailuracode/alpinejs-visibility`
 
 Visibilidad de pestaña reactiva mediante el magic `$visibility`. Envuelve la [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) (`document.visibilityState`, `visibilitychange`).
 
 ## Instalación
 
 ```bash
-npm install @ailuracode/alpinejs.visibility alpinejs
+npm install @ailuracode/alpinejs-visibility alpinejs
 ```
 
 ## Configuración
 
 ```js
 import Alpine from "alpinejs";
-import visibility from "@ailuracode/alpinejs.visibility";
+import visibility from "@ailuracode/alpinejs-visibility";
 
 Alpine.plugin(visibility);
 Alpine.start();
@@ -39,7 +39,7 @@ import {
   VISIBILITY_STATES,
   createVisibilityState,
   readVisibilityState,
-} from "@ailuracode/alpinejs.visibility";
+} from "@ailuracode/alpinejs-visibility";
 ```
 
 ## Ejemplos HTML

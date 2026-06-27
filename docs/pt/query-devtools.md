@@ -1,25 +1,25 @@
 ---
 title: "Query devtools"
-description: "Painel de devtools do navegador para inspecionar entradas de cache, flags de status e mutações do @ailuracode/alpinejs.query."
+description: "Painel de devtools do navegador para inspecionar entradas de cache, flags de status e mutações do @ailuracode/alpinejs-query."
 ---
 
-Painel de devtools do navegador para inspecionar entradas de cache, flags de status e mutações do `@ailuracode/alpinejs.query`.
+Painel de devtools do navegador para inspecionar entradas de cache, flags de status e mutações do `@ailuracode/alpinejs-query`.
 
 ## Instalação
 
 ```bash
-npm install @ailuracode/alpinejs.query-devtools @ailuracode/alpinejs.query @ailuracode/alpinejs.query-adapter-nanostores alpinejs nanostores @nanostores/alpine
+npm install @ailuracode/alpinejs-query-devtools @ailuracode/alpinejs-query @ailuracode/alpinejs-query-adapter-nanostores alpinejs nanostores @nanostores/alpine
 ```
 
 ```js
 import Alpine from "alpinejs";
-import query from "@ailuracode/alpinejs.query";
+import query from "@ailuracode/alpinejs-query";
 import {
   createAlpineNanostoresAdapter,
   NanoStores,
-} from "@ailuracode/alpinejs.query-adapter-nanostores";
+} from "@ailuracode/alpinejs-query-adapter-nanostores";
 
-import queryDevtools from "@ailuracode/alpinejs.query-devtools";
+import queryDevtools from "@ailuracode/alpinejs-query-devtools";
 
 Alpine.plugin(NanoStores);
 Alpine.plugin(query({ adapter: createAlpineNanostoresAdapter }));
@@ -51,12 +51,12 @@ Carregue as devtools apenas em desenvolvimento:
 
 ```js
 if (import.meta.env.DEV) {
-  const { default: queryDevtools } = await import("@ailuracode/alpinejs.query-devtools");
+  const { default: queryDevtools } = await import("@ailuracode/alpinejs-query-devtools");
   Alpine.plugin(queryDevtools());
 }
 ```
 
 ## Veja também
 
-- [@ailuracode/alpinejs.query](./query.md)
+- [@ailuracode/alpinejs-query](./query.md)
 - [TanStack Query Devtools](https://tanstack.com/query/latest/docs/framework/react/devtools)

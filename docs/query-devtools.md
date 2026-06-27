@@ -1,4 +1,7 @@
-# @ailuracode/alpine-query-devtools
+---
+title: "Query devtools"
+description: "Browser devtools panel for inspecting @ailuracode/alpine-query cache entries, status flags, and mutations."
+---
 
 Browser devtools panel for inspecting `@ailuracode/alpine-query` cache entries, status flags, and mutations.
 

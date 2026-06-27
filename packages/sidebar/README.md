@@ -4,7 +4,7 @@ Alpine.js sidebar store for open/close state, overlay, keyboard navigation, and 
 
 Three states: **open** (visible), **closed** (hidden), and **collapsed** (compact icon-only rail, optional).
 
-**[Full documentation →](../../docs/sidebar.md)**
+**[Full documentation →](../../docs/plugins/sidebar.md)**
 
 ## Install
 

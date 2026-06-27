@@ -2,7 +2,7 @@
 
 Network connectivity magic for Alpine.js.
 
-**[Full documentation →](../../docs/network.md)**
+**[Full documentation →](../../docs/plugins/network.md)**
 
 ## Install
 

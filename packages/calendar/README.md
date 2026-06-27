@@ -2,7 +2,7 @@
 
 Lightweight calendar date logic for Alpine.js, powered by [date-fns](https://date-fns.org/).
 
-**[Full documentation →](../../docs/calendar.md)**
+**[Full documentation →](../../docs/plugins/calendar.md)**
 
 ## Install
 

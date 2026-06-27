@@ -2,7 +2,7 @@
 
 Touch and pointer capability detection for Alpine.js.
 
-**[Full documentation →](../../docs/touch.md)**
+**[Full documentation →](../../docs/plugins/touch.md)**
 
 ## Install
 

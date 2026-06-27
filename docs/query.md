@@ -1,4 +1,7 @@
-# @ailuracode/alpine-query
+---
+title: "Query"
+description: "TanStack Query-style async data fetching for Alpine.js: caching, stale-while-revalidate, invalidation, retries, polling, and mutations."
+---
 
 TanStack Query-style async data fetching for Alpine.js: caching, stale-while-revalidate, invalidation, retries, polling, and mutations.
 
@@ -294,5 +297,5 @@ const todos = query.observe(["todos"], () => typedFetch<Todo[]>("/api/todos"));
 
 ## See also
 
-- [Architecture](./architecture.md)
+- [Core](./core.md)
 - [TanStack Query docs](https://tanstack.com/query/latest/docs/framework/react/overview)

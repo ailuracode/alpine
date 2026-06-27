@@ -2,7 +2,7 @@
 
 Geolocation store for Alpine.js.
 
-**[Full documentation →](../../docs/geo.md)**
+**[Full documentation →](../../docs/plugins/geo.md)**
 
 ## Install
 

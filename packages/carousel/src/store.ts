@@ -106,7 +106,7 @@ function createAutoplayPlugin(options: CarouselOptions): AutoplayType | null {
 
   const autoplayOptions = options.autoplayOptions ?? {};
   const stopOnMouseEnter = autoplayOptions.stopOnMouseEnter ?? false;
-  const stopOnInteraction = autoplayOptions.stopOnInteraction ?? (stopOnMouseEnter ? false : true);
+  const stopOnInteraction = autoplayOptions.stopOnInteraction ?? !stopOnMouseEnter;
 
   return Autoplay({
     delay: autoplayOptions.delay ?? 4000,

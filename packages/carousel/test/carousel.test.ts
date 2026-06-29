@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { startAlpine } from "../../../test/helpers.js";
 
 const { EmblaCarouselMock, AutoplayMock, autoplayApi } = vi.hoisted(() => {
@@ -34,9 +34,9 @@ type EmblaMockApi = {
   canScrollNext: ReturnType<typeof vi.fn>;
   canScrollPrev: ReturnType<typeof vi.fn>;
   slidesInView: ReturnType<typeof vi.fn>;
-  scrollNext: ReturnType<typeof vi.fn>;
-  scrollPrev: ReturnType<typeof vi.fn>;
-  scrollTo: ReturnType<typeof vi.fn>;
+  scrollNext: Mock<() => void>;
+  scrollPrev: Mock<() => void>;
+  scrollTo: Mock<(nextIndex: number) => void>;
   reInit: ReturnType<typeof vi.fn>;
 };
 

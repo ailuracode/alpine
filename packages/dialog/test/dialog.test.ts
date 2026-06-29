@@ -101,7 +101,7 @@ describe("@ailuracode/alpine-dialog", () => {
 
   it("cleans up on destroy", () => {
     const onLockChange = vi.fn();
-    store = createDialogStore({ onLockChange, scrollLock: true });
+    store = createDialogStore({ onLockChange, defaultScrollLock: true });
     store.register("settings", { scrollLock: true });
     store.open("settings");
     store.destroy();

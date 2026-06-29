@@ -4,7 +4,7 @@ Guidance for AI agents and contributors working on **@ailuracode/alpinejs-toolki
 
 ## Project
 
-Alpine.js plugin monorepo by **ailuracode**. Nineteen independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpinejs-toolkit` is **private** and never published.
+Alpine.js plugin monorepo by **ailuracode**. Twenty-six independent npm packages under `packages/`, plus shared tests and docs. The root package `@ailuracode/alpinejs-toolkit` is **private** and never published.
 
 | Package | Type | Store / Magic |
 |---------|------|---------------|
@@ -14,6 +14,13 @@ Alpine.js plugin monorepo by **ailuracode**. Nineteen independent npm packages u
 | `@ailuracode/alpine-scroll` | Store | `$store.scroll` |
 | `@ailuracode/alpine-sidebar` | Store | `$store.sidebar` |
 | `@ailuracode/alpine-lang` | Store | `$store.lang` |
+| `@ailuracode/alpine-dialog` | Store | `$store.dialog` |
+| `@ailuracode/alpine-menu` | Store | `$store.menu` |
+| `@ailuracode/alpine-tooltip` | Store | `$store.tooltip` |
+| `@ailuracode/alpine-tabs` | Store | `$store.tabs` |
+| `@ailuracode/alpine-accordion` | Store | `$store.accordion` |
+| `@ailuracode/alpine-command` | Store | `$store.command` |
+| `@ailuracode/alpine-carousel` | Store | `$store.carousel` |
 | `@ailuracode/alpine-env` | Magic | `$network`, `$visibility`, `$battery`, `$platform` |
 | `@ailuracode/alpine-transfer` | Magic | `$clipboard`, `$share`, `$export` |
 | `@ailuracode/alpine-toast` | Magic | `$toast` — headless queue (no markup/CSS) |

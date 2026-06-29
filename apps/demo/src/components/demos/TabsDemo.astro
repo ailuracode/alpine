@@ -1,0 +1,65 @@
+---
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("tabs")!;
+const tabClasses =
+  "rounded-md px-3 py-2 text-sm font-medium data-[active]:bg-primary data-[active]:text-primary-foreground hover:bg-accent";
+---
+
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div
+		class="grid gap-6"
+		x-data="{ tabs: ['profile', 'billing', 'security'] }"
+		x-init="
+			$store.tabs.register('settings-tabs', { defaultTab: 'profile', urlParam: 'tab' });
+			tabs.forEach(id => $store.tabs.registerTab('settings-tabs', id));
+		"
+	>
+		<div>
+			<h3 class="text-sm font-medium mb-2">Controlled tabs</h3>
+			<p class="text-xs text-muted-foreground mb-3">
+				Active: <strong x-text="$store.tabs.active('settings-tabs')"></strong> · URL sync via
+				<code>?tab=</code>
+			</p>
+
+			<div
+				class="inline-flex gap-1 rounded-lg border p-1"
+				x-bind="$store.tabs.tablistProps('settings-tabs')"
+				@keydown="$store.tabs.handleKeydown('settings-tabs', $event)"
+			>
+				<template x-for="id in tabs" :key="id">
+					<button
+						type="button"
+						class={tabClasses}
+						:data-active="$store.tabs.isActive('settings-tabs', id) ? '' : null"
+						x-bind="$store.tabs.tabProps('settings-tabs', id)"
+						@click="$store.tabs.select('settings-tabs', id)"
+						x-text="id"
+					></button>
+				</template>
+			</div>
+
+			<template x-for="id in tabs" :key="id">
+				<div class="mt-4 rounded-md border p-4 text-sm" x-bind="$store.tabs.panelProps('settings-tabs', id)">
+					Panel: <strong x-text="id"></strong>
+				</div>
+			</template>
+		</div>
+
+		<div class="flex gap-2">
+			<button
+				type="button"
+				class="text-xs rounded-md border px-3 py-1.5"
+				@click="$store.tabs.previous('settings-tabs')"
+			>
+				previous()
+			</button>
+			<button type="button" class="text-xs rounded-md border px-3 py-1.5" @click="$store.tabs.next('settings-tabs')">
+				next()
+			</button>
+		</div>
+	</div>
+
+	<p class="text-xs text-muted-foreground mt-6">Package: <code>{plugin.package}</code></p>
+</DemoSection>

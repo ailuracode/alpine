@@ -1,6 +1,6 @@
 export type PluginKind = "store" | "magic" | "directive" | "core";
 
-export type PluginTier = "essential" | "extended" | "advanced";
+export type PluginTier = "essential" | "extended" | "advanced" | "headless";
 
 export type PluginNavItem = {
   id: string;
@@ -144,6 +144,82 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         tier: "extended",
         description:
           "asChild-style directive that merges wrapper attributes onto the first child and removes the wrapper.",
+      },
+    ],
+  },
+  {
+    id: "headless-ui",
+    label: "Headless UI",
+    items: [
+      {
+        id: "dialog",
+        title: "Dialog",
+        package: "@ailuracode/alpine-dialog",
+        api: "$store.dialog",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Accessible modal state — focus trap, scroll-lock hooks, Escape/outside dismiss, and ARIA helpers.",
+      },
+      {
+        id: "menu",
+        title: "Menu",
+        package: "@ailuracode/alpine-menu",
+        api: "$store.menu",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Dropdown and context menu state with keyboard navigation, roving tabindex, and ARIA helpers.",
+      },
+      {
+        id: "tooltip",
+        title: "Tooltip",
+        package: "@ailuracode/alpine-tooltip",
+        api: "$store.tooltip",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Tooltip and popover positioning with hover/focus delays. Optional Floating UI for advanced placement.",
+      },
+      {
+        id: "tabs",
+        title: "Tabs",
+        package: "@ailuracode/alpine-tabs",
+        api: "$store.tabs",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Accessible tabs with keyboard navigation, ARIA props, and optional URL query sync.",
+      },
+      {
+        id: "accordion",
+        title: "Accordion",
+        package: "@ailuracode/alpine-accordion",
+        api: "$store.accordion",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Single or multi-open accordion state with keyboard focus and ARIA expanded/controls helpers.",
+      },
+      {
+        id: "command",
+        title: "Command",
+        package: "@ailuracode/alpine-command",
+        api: "$store.command",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Spotlight-style command palette — searchable actions, groups, shortcuts, and keyboard selection.",
+      },
+      {
+        id: "carousel",
+        title: "Carousel",
+        package: "@ailuracode/alpine-carousel",
+        api: "$store.carousel",
+        kind: "store",
+        tier: "headless",
+        description:
+          "Accessible carousel store powered by Embla — navigation, autoplay, loop, keyboard, and ARIA helpers.",
       },
     ],
   },

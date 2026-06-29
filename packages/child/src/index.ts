@@ -19,6 +19,7 @@ export {
 const processedWrappers = new WeakSet<Element>();
 
 type AlpineElement = Element & {
+  _x_ignore?: boolean;
   _x_ignoreSelf?: boolean;
 };
 
@@ -67,31 +68,41 @@ export default function childPlugin(Alpine: AlpineType.Alpine): void {
       return;
     }
 
-    transferAttributes(el, target, config.mode);
-
-    let promoted: Element | null = null;
-
-    Alpine.mutateDom(() => {
-      morph(el, target.outerHTML, {
-        added(node) {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            promoted = node as Element;
-          }
-        },
-      });
-    });
-
-    const result = promoted ?? (el.isConnected ? el : null);
-    if (result) {
-      Alpine.nextTick(() => {
-        Alpine.initTree(result as HTMLElement);
-      });
-    }
-
-    clearTransferredAttributes(el);
+    // Defer unwrap until after the current initTree pass so DOM mutations from
+    // morph do not corrupt scope for siblings initialized later (e.g. sidebar).
     processedWrappers.add(el);
     (el as AlpineElement)._x_ignoreSelf = true;
+    (target as AlpineElement)._x_ignore = true;
     skip();
+
+    Alpine.nextTick(() => {
+      if (!(el.isConnected || target.isConnected)) {
+        return;
+      }
+
+      transferAttributes(el, target, config.mode);
+
+      let promoted: Element | null = null;
+
+      Alpine.mutateDom(() => {
+        morph(el, target.outerHTML, {
+          added(node) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              promoted = node as Element;
+            }
+          },
+        });
+      });
+
+      const result = promoted ?? (el.isConnected ? el : null);
+      if (result) {
+        processedWrappers.add(result);
+        (result as AlpineElement)._x_ignore = undefined;
+        Alpine.initTree(result as HTMLElement);
+      }
+
+      clearTransferredAttributes(el);
+    });
   });
 
   Alpine.directive("child", () => {

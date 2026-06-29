@@ -80,10 +80,10 @@ Use `x-child` when building **headless Alpine primitives** or **Blade components
 
 ## How it works
 
-1. During `Alpine.initTree()`, the plugin intercepts elements with `x-child`.
+1. During `Alpine.initTree()`, the plugin intercepts elements with `x-child` and skips the wrapper.
 2. It locates the **first element child** (skips text and comments).
-3. Attributes are merged onto the child following the active mode.
-4. [`Alpine.morph()`](https://alpinejs.dev/plugins/morph) replaces the wrapper with the merged child, preserving Alpine bindings and scope.
+3. After the current init pass completes, attributes are merged onto the child following the active mode.
+4. [`Alpine.morph()`](https://alpinejs.dev/plugins/morph) replaces the wrapper with the merged child, then `Alpine.initTree()` runs on the promoted node.
 
 ## Modifiers
 

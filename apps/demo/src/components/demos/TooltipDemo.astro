@@ -1,0 +1,100 @@
+---
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("tooltip")!;
+const buttonClasses =
+  "inline-flex min-w-28 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+---
+
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div
+		class="grid gap-8"
+		x-data="{
+			demos: [
+				{ id: 'tip-top', placement: 'top', label: 'Top', text: 'Top placement' },
+				{ id: 'tip-top-start', placement: 'top-start', label: 'Top start', text: 'Top start' },
+				{ id: 'tip-top-end', placement: 'top-end', label: 'Top end', text: 'Top end' },
+				{ id: 'tip-bottom', placement: 'bottom', label: 'Bottom', text: 'Bottom placement' },
+				{ id: 'tip-bottom-start', placement: 'bottom-start', label: 'Bottom start', text: 'Bottom start' },
+				{ id: 'tip-bottom-end', placement: 'bottom-end', label: 'Bottom end', text: 'Bottom end' },
+				{ id: 'tip-left', placement: 'left', label: 'Left', text: 'Left placement' },
+				{ id: 'tip-right', placement: 'right', label: 'Right', text: 'Right placement' },
+			],
+			bindDemoTooltips() {
+				this.demos.forEach((demo) => {
+					$store.tooltip.register(demo.id, {
+						placement: demo.placement,
+						openDelay: 80,
+						closeDelay: 80,
+					});
+				});
+				$nextTick(() => {
+					this.demos.forEach((demo) => {
+						const anchor = $el.querySelector(`[data-tooltip-anchor='${demo.id}']`);
+						const floating = document.querySelector(`[data-tooltip-floating='${demo.id}']`);
+						$store.tooltip.bindElements(demo.id, anchor, floating);
+					});
+				});
+			},
+		}"
+		x-init="bindDemoTooltips()"
+	>
+		<div>
+			<h3 class="text-sm font-medium mb-2">Placement variants</h3>
+			<p class="text-xs text-muted-foreground mb-4">
+				Hover or focus each trigger. Active position:
+				<strong
+					x-text="demos.find(d => $store.tooltip.isOpen(d.id))?.placement ?? '—'"
+				></strong>
+			</p>
+
+			<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+				<template x-for="demo in demos" :key="demo.id">
+					<div class="flex flex-col items-center gap-2 rounded-lg border border-dashed p-4">
+						<button
+							type="button"
+							class={buttonClasses}
+							x-bind:data-tooltip-anchor="demo.id"
+							x-bind:aria-describedby="demo.id + '-tooltip'"
+							@mouseenter="$store.tooltip.showOnHover(demo.id)"
+							@mouseleave="$store.tooltip.hideOnHover(demo.id)"
+							@focus="$store.tooltip.showOnFocus(demo.id)"
+							@blur="$store.tooltip.hideOnFocus(demo.id)"
+							@keydown.escape="$store.tooltip.handleKeydown(demo.id, $event)"
+							x-text="demo.label"
+						></button>
+						<code class="text-[10px] text-muted-foreground" x-text="demo.placement"></code>
+					</div>
+				</template>
+			</div>
+		</div>
+
+		<template x-teleport="body">
+			<template x-for="demo in demos" :key="demo.id">
+				<div
+					x-bind:id="demo.id + '-tooltip'"
+					x-bind:data-tooltip-floating="demo.id"
+					x-show="$store.tooltip.isOpen(demo.id)"
+					x-effect="$store.tooltip.isOpen(demo.id) && $store.tooltip.refreshPosition(demo.id)"
+					role="tooltip"
+					x-bind:style="$store.tooltip.tooltipStyle(demo.id)"
+					class="pointer-events-none z-[60] whitespace-nowrap rounded-md border bg-popover px-3 py-1.5 text-xs text-popover-foreground shadow-md"
+					x-text="demo.text"
+				></div>
+			</template>
+		</template>
+
+		<div>
+			<h3 class="text-sm font-medium mb-2">Notes</h3>
+			<ul class="text-xs text-muted-foreground list-disc pl-5 space-y-1">
+				<li>Call <code>bindElements()</code> on each anchor + floating pair</li>
+				<li><code>tooltipStyle()</code> applies fixed coordinates from <code>getPosition()</code></li>
+				<li>Built-in placements: top, bottom, left, right, and *-start / *-end variants</li>
+				<li>Optional <code>@floating-ui/dom</code> for collision detection in production UIs</li>
+			</ul>
+		</div>
+	</div>
+
+	<p class="text-xs text-muted-foreground mt-6">Package: <code>{plugin.package}</code></p>
+</DemoSection>

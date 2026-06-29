@@ -1,0 +1,274 @@
+---
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("carousel")!;
+const navButton =
+  "inline-flex items-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent disabled:opacity-40";
+const viewportClass = "min-w-0 w-full max-w-full overflow-hidden rounded-lg border";
+const containerH = "flex touch-pan-y pinch-zoom";
+const containerV = "flex h-full touch-pan-x pinch-zoom flex-col";
+const slideCard =
+  "flex min-h-32 items-center justify-center rounded-lg border bg-muted/40 text-sm font-medium";
+const slideH = `${slideCard} min-w-0 shrink-0 grow-0 [flex:0_0_var(--slide-size,100%)]`;
+const slideV = `${slideCard} min-h-0 min-w-0 shrink-0 grow-0 [flex:0_0_var(--slide-size,100%)]`;
+---
+
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div
+		class="grid min-w-0 gap-10"
+		x-data="{
+			imageSlides: [
+				{ id: 1, title: 'Mountain lake', color: 'bg-sky-200 dark:bg-sky-900' },
+				{ id: 2, title: 'Desert dunes', color: 'bg-amber-200 dark:bg-amber-900' },
+				{ id: 3, title: 'Forest trail', color: 'bg-emerald-200 dark:bg-emerald-900' },
+			],
+			cardSlides: [
+				{ id: 1, title: 'Starter', price: '$9', detail: 'For side projects' },
+				{ id: 2, title: 'Pro', price: '$29', detail: 'For growing teams' },
+				{ id: 3, title: 'Enterprise', price: 'Custom', detail: 'For large orgs' },
+			],
+			bindCarousel(root, id, options) {
+				if (options) {
+					$store.carousel.create(id, options);
+				} else {
+					$store.carousel.create(id);
+				}
+				const mount = () => {
+					const viewport = root.querySelector(`[data-carousel-viewport='${id}']`);
+					if (viewport) {
+						$store.carousel.bindViewport(id, viewport);
+					}
+				};
+				$nextTick(() => $nextTick(mount));
+			},
+			stateLine(id) {
+				const s = $store.carousel.instances[id];
+				if (!s) return '—';
+				return `index ${s.currentIndex + 1}/${s.totalSlides} · progress ${(s.progress * 100).toFixed(0)}% · playing ${s.isPlaying}`;
+			},
+		}"
+	>
+		<!-- Basic -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'basic')">
+			<h3 class="text-sm font-medium mb-2">Basic</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('basic')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('basic', { label: 'Basic carousel' })">
+				<div
+					data-carousel-viewport="basic"
+					x-bind="$store.carousel.viewportProps('basic')"
+					class={viewportClass}
+					@keydown="$store.carousel.handleKeydown('basic', $event)"
+				>
+					<div class={containerH}>
+						<div x-bind="$store.carousel.slideProps('basic', 0)" class={slideH}>Slide 1</div>
+						<div x-bind="$store.carousel.slideProps('basic', 1)" class={slideH}>Slide 2</div>
+						<div x-bind="$store.carousel.slideProps('basic', 2)" class={slideH}>Slide 3</div>
+					</div>
+				</div>
+				<div class="mt-3 flex gap-2">
+					<button type="button" class={navButton} :disabled="!$store.carousel.canPrevious('basic')" @click="$store.carousel.previous('basic')">Previous</button>
+					<button type="button" class={navButton} :disabled="!$store.carousel.canNext('basic')" @click="$store.carousel.next('basic')">Next</button>
+				</div>
+			</section>
+		</div>
+
+		<!-- Loop -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'loop', { loop: true })">
+			<h3 class="text-sm font-medium mb-2">Loop</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('loop')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('loop', { label: 'Loop carousel' })">
+				<div data-carousel-viewport="loop" x-bind="$store.carousel.viewportProps('loop')" class={viewportClass} @keydown="$store.carousel.handleKeydown('loop', $event)">
+					<div class={containerH}>
+						<template x-for="n in 4" :key="n">
+							<div x-bind="$store.carousel.slideProps('loop', n - 1)" class={slideH} x-text="'Loop slide ' + n"></div>
+						</template>
+					</div>
+				</div>
+				<div class="mt-3 flex gap-2">
+					<button type="button" class={navButton} @click="$store.carousel.previous('loop')">Previous</button>
+					<button type="button" class={navButton} @click="$store.carousel.next('loop')">Next</button>
+				</div>
+			</section>
+		</div>
+
+		<!-- Autoplay -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'autoplay', { autoplay: true, autoplayOptions: { delay: 2500, stopOnMouseEnter: false } })">
+			<h3 class="text-sm font-medium mb-2">Autoplay</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('autoplay')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('autoplay', { label: 'Autoplay carousel' })">
+				<div data-carousel-viewport="autoplay" x-bind="$store.carousel.viewportProps('autoplay')" class={viewportClass}>
+					<div class={containerH}>
+						<template x-for="n in 3" :key="n">
+							<div x-bind="$store.carousel.slideProps('autoplay', n - 1)" class={`${slideH} bg-primary/10`} x-text="'Auto ' + n"></div>
+						</template>
+					</div>
+				</div>
+				<div class="mt-3 flex gap-2">
+					<button type="button" class={navButton} @click="$store.carousel.play('autoplay')">Play</button>
+					<button type="button" class={navButton} @click="$store.carousel.pause('autoplay')">Pause</button>
+				</div>
+			</section>
+		</div>
+
+		<!-- Autoplay + hover pause -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'autoplay-hover', { autoplay: true, autoplayOptions: { delay: 2000, stopOnMouseEnter: true } })">
+			<h3 class="text-sm font-medium mb-2">Autoplay with hover pause</h3>
+			<p class="text-xs text-muted-foreground mb-3">Hover the viewport to pause. <span x-text="stateLine('autoplay-hover')"></span></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('autoplay-hover', { label: 'Autoplay hover pause' })">
+				<div data-carousel-viewport="autoplay-hover" x-bind="$store.carousel.viewportProps('autoplay-hover')" class={viewportClass}>
+					<div class={containerH}>
+						<template x-for="n in 3" :key="n">
+							<div x-bind="$store.carousel.slideProps('autoplay-hover', n - 1)" class={slideH} x-text="'Hover ' + n"></div>
+						</template>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Indicators -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'indicators')">
+			<h3 class="text-sm font-medium mb-2">Indicators</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('indicators')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('indicators', { label: 'Carousel with indicators' })">
+				<div data-carousel-viewport="indicators" x-bind="$store.carousel.viewportProps('indicators')" class={viewportClass} @keydown="$store.carousel.handleKeydown('indicators', $event)">
+					<div class={containerH}>
+						<template x-for="n in 5" :key="n">
+							<div x-bind="$store.carousel.slideProps('indicators', n - 1)" class={slideH} x-text="'Dot ' + n"></div>
+						</template>
+					</div>
+				</div>
+				<div class="mt-3 flex flex-wrap items-center gap-2" role="tablist" aria-label="Slide indicators">
+					<template x-for="n in $store.carousel.count('indicators')" :key="n">
+						<button
+							type="button"
+							x-bind="$store.carousel.indicatorProps('indicators', n - 1)"
+							class="size-2.5 rounded-full border transition-colors"
+							x-bind:class="$store.carousel.current('indicators') === n - 1 ? 'bg-primary border-primary' : 'bg-muted border-input'"
+							@click="$store.carousel.goTo('indicators', n - 1)"
+						></button>
+					</template>
+				</div>
+			</section>
+		</div>
+
+		<!-- Thumbnails -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'thumbnails')">
+			<h3 class="text-sm font-medium mb-2">Thumbnails</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('thumbnails')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('thumbnails', { label: 'Carousel with thumbnails' })">
+				<div data-carousel-viewport="thumbnails" x-bind="$store.carousel.viewportProps('thumbnails')" class={viewportClass}>
+					<div class={containerH}>
+						<template x-for="slide in imageSlides" :key="slide.id">
+							<div
+								x-bind="$store.carousel.slideProps('thumbnails', slide.id - 1)"
+								class={`${slideH} min-h-40 text-sm font-semibold`}
+								x-bind:class="slide.color"
+								x-text="slide.title"
+							></div>
+						</template>
+					</div>
+				</div>
+				<div class="mt-3 flex gap-2" role="tablist" aria-label="Thumbnail navigation">
+					<template x-for="slide in imageSlides" :key="'thumb-' + slide.id">
+						<button
+							type="button"
+							x-bind="$store.carousel.indicatorProps('thumbnails', slide.id - 1)"
+							class="h-12 flex-1 rounded border text-[10px] font-medium transition-colors"
+							x-bind:class="[
+								slide.color,
+								$store.carousel.current('thumbnails') === slide.id - 1 ? 'ring-2 ring-primary ring-offset-2' : 'opacity-70 hover:opacity-100',
+							]"
+							@click="$store.carousel.goTo('thumbnails', slide.id - 1)"
+							x-text="slide.title"
+						></button>
+					</template>
+				</div>
+			</section>
+		</div>
+
+		<!-- Vertical -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'vertical', { axis: 'y' })">
+			<h3 class="text-sm font-medium mb-2">Vertical orientation</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('vertical')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('vertical', { label: 'Vertical carousel' })">
+				<div data-carousel-viewport="vertical" x-bind="$store.carousel.viewportProps('vertical')" class={`${viewportClass} h-40`} @keydown="$store.carousel.handleKeydown('vertical', $event)">
+					<div class={containerV}>
+						<template x-for="n in 4" :key="n">
+							<div x-bind="$store.carousel.slideProps('vertical', n - 1)" class={slideV} x-text="'Vertical ' + n"></div>
+						</template>
+					</div>
+				</div>
+				<div class="mt-3 flex gap-2">
+					<button type="button" class={navButton} @click="$store.carousel.previous('vertical')">Up</button>
+					<button type="button" class={navButton} @click="$store.carousel.next('vertical')">Down</button>
+				</div>
+			</section>
+		</div>
+
+		<!-- Images -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'images', { loop: true })">
+			<h3 class="text-sm font-medium mb-2">Images</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('images')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('images', { label: 'Image gallery' })">
+				<div data-carousel-viewport="images" x-bind="$store.carousel.viewportProps('images')" class={viewportClass}>
+					<div class={containerH}>
+						<template x-for="slide in imageSlides" :key="'img-' + slide.id">
+							<div x-bind="$store.carousel.slideProps('images', slide.id - 1)" class={`${slideH} relative aspect-video overflow-hidden`}>
+								<div class="absolute inset-0 flex items-center justify-center text-lg font-semibold" x-bind:class="slide.color" x-text="slide.title"></div>
+							</div>
+						</template>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Cards -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'cards', { align: 'start' })">
+			<h3 class="text-sm font-medium mb-2">Cards</h3>
+			<p class="text-xs text-muted-foreground mb-3" x-text="stateLine('cards')"></p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('cards', { label: 'Pricing cards carousel' })">
+				<div data-carousel-viewport="cards" x-bind="$store.carousel.viewportProps('cards', { slideSize: false })" class="min-w-0 w-full max-w-full overflow-hidden rounded-lg [--slide-size:85%] sm:[--slide-size:45%]">
+					<div class="flex gap-3 touch-pan-y pinch-zoom">
+						<template x-for="slide in cardSlides" :key="'card-' + slide.id">
+							<div x-bind="$store.carousel.slideProps('cards', slide.id - 1)" class="min-w-0 shrink-0 grow-0 [flex:0_0_var(--slide-size)]">
+								<div class="rounded-lg border bg-card p-4 shadow-sm">
+									<h4 class="font-semibold" x-text="slide.title"></h4>
+									<p class="text-2xl font-bold mt-1" x-text="slide.price"></p>
+									<p class="text-xs text-muted-foreground mt-2" x-text="slide.detail"></p>
+								</div>
+							</div>
+						</template>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Keyboard -->
+		<div class="min-w-0" x-init="bindCarousel($el, 'keyboard')">
+			<h3 class="text-sm font-medium mb-2">Keyboard navigation</h3>
+			<p class="text-xs text-muted-foreground mb-3">
+				Focus the viewport and use arrow keys, Home, or End. <span x-text="stateLine('keyboard')"></span>
+			</p>
+			<section class="min-w-0 w-full" x-bind="$store.carousel.carouselProps('keyboard', { label: 'Keyboard carousel' })">
+				<div
+					data-carousel-viewport="keyboard"
+					x-bind="$store.carousel.viewportProps('keyboard')"
+					class={`${viewportClass} ring-offset-2 focus-visible:ring-2 focus-visible:ring-ring`}
+					@keydown="$store.carousel.handleKeydown('keyboard', $event)"
+				>
+					<div class={containerH}>
+						<template x-for="n in 6" :key="n">
+							<div x-bind="$store.carousel.slideProps('keyboard', n - 1)" class={slideH} x-text="'Key slide ' + n"></div>
+						</template>
+					</div>
+				</div>
+			</section>
+			<ul class="mt-2 text-xs text-muted-foreground list-disc pl-5 space-y-1">
+				<li><kbd class="px-1 rounded border">←</kbd> <kbd class="px-1 rounded border">↑</kbd> previous</li>
+				<li><kbd class="px-1 rounded border">→</kbd> <kbd class="px-1 rounded border">↓</kbd> next</li>
+				<li><kbd class="px-1 rounded border">Home</kbd> / <kbd class="px-1 rounded border">End</kbd> first / last</li>
+			</ul>
+		</div>
+	</div>
+</DemoSection>

@@ -2,7 +2,7 @@
 
 Modular **Alpine.js toolkit** — lazy plugin init, headless stores and magics, TypeScript-first DX. Framework-agnostic: works with Vite, Astro, static HTML, or any ESM bundler.
 
-Built by **ailuracode**. Nineteen independent npm packages; install only what you need.
+Built by **ailuracode**. Twenty-six independent npm packages; install only what you need.
 
 ## Why this exists
 
@@ -81,6 +81,18 @@ Start here for most Alpine apps.
 | [`@ailuracode/alpine-transfer`](./packages/transfer/README.md) | `$clipboard`, `$share`, `$export` | Outbound data transfer |
 | [`@ailuracode/alpine-toggle`](./packages/toggle/README.md) | `$toggle` | Binary and ternary toggle state |
 | [`@ailuracode/alpine-child`](./packages/child/README.md) | `x-child` | asChild-style attribute transfer to first child |
+
+### Headless UI
+
+| Package | API | Description |
+|---------|-----|-------------|
+| [`@ailuracode/alpine-dialog`](./packages/dialog/README.md) | `$store.dialog` | Accessible modal state and focus trap |
+| [`@ailuracode/alpine-menu`](./packages/menu/README.md) | `$store.menu` | Dropdown/context menu keyboard navigation |
+| [`@ailuracode/alpine-tooltip`](./packages/tooltip/README.md) | `$store.tooltip` | Tooltip positioning and delays |
+| [`@ailuracode/alpine-tabs`](./packages/tabs/README.md) | `$store.tabs` | Accessible tabs with URL sync |
+| [`@ailuracode/alpine-accordion`](./packages/accordion/README.md) | `$store.accordion` | Single/multi accordion state |
+| [`@ailuracode/alpine-command`](./packages/command/README.md) | `$store.command` | Command palette / Spotlight |
+| [`@ailuracode/alpine-carousel`](./packages/carousel/README.md) | `$store.carousel` | Embla-powered accessible carousel |
 
 ### Advanced
 

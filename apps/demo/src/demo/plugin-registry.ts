@@ -141,6 +141,76 @@ export function registerDemoPlugins(): void {
     })
   );
 
+  registerPlugin(
+    "dialog",
+    lazyPlugin({
+      kind: "both",
+      stores: ["dialog"],
+      magics: ["dialog"],
+      import: () => import("@ailuracode/alpine-dialog"),
+    })
+  );
+
+  registerPlugin(
+    "menu",
+    lazyPlugin({
+      kind: "both",
+      stores: ["menu"],
+      magics: ["menu"],
+      import: () => import("@ailuracode/alpine-menu"),
+    })
+  );
+
+  registerPlugin(
+    "tooltip",
+    lazyPlugin({
+      kind: "both",
+      stores: ["tooltip"],
+      magics: ["tooltip"],
+      import: () => import("@ailuracode/alpine-tooltip"),
+    })
+  );
+
+  registerPlugin(
+    "tabs",
+    lazyPlugin({
+      kind: "both",
+      stores: ["tabs"],
+      magics: ["tabs"],
+      import: () => import("@ailuracode/alpine-tabs"),
+    })
+  );
+
+  registerPlugin(
+    "accordion",
+    lazyPlugin({
+      kind: "both",
+      stores: ["accordion"],
+      magics: ["accordion"],
+      import: () => import("@ailuracode/alpine-accordion"),
+    })
+  );
+
+  registerPlugin(
+    "command",
+    lazyPlugin({
+      kind: "both",
+      stores: ["command"],
+      magics: ["command"],
+      import: () => import("@ailuracode/alpine-command"),
+    })
+  );
+
+  registerPlugin(
+    "carousel",
+    lazyPlugin({
+      kind: "both",
+      stores: ["carousel"],
+      magics: ["carousel"],
+      import: () => import("@ailuracode/alpine-carousel"),
+    })
+  );
+
   // Advanced — lazy dynamic imports
   registerPlugin(
     "calendar",

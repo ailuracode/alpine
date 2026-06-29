@@ -1,0 +1,112 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { startAlpine } from "../../../test/helpers.js";
+import dialogPlugin, { createDialogStore, createFocusTrap } from "../src/index.js";
+
+describe("@ailuracode/alpine-dialog", () => {
+  let store: ReturnType<typeof createDialogStore>;
+
+  beforeEach(() => {
+    store = createDialogStore({ onLockChange: vi.fn() });
+  });
+
+  it("starts closed for unknown dialogs", () => {
+    expect(store.isOpen("settings")).toBe(false);
+  });
+
+  it("opens, toggles, and closes by id", () => {
+    store.open("settings");
+    expect(store.isOpen("settings")).toBe(true);
+
+    store.toggle("settings");
+    expect(store.isOpen("settings")).toBe(false);
+
+    store.toggle("settings");
+    expect(store.isOpen("settings")).toBe(true);
+
+    store.close("settings");
+    expect(store.isOpen("settings")).toBe(false);
+  });
+
+  it("tracks multiple dialog instances independently", () => {
+    store.open("a");
+    store.open("b");
+
+    expect(store.isOpen("a")).toBe(true);
+    expect(store.isOpen("b")).toBe(true);
+
+    store.close("a");
+    expect(store.isOpen("a")).toBe(false);
+    expect(store.isOpen("b")).toBe(true);
+  });
+
+  it("calls onOpen and onClose callbacks", () => {
+    const onOpen = vi.fn();
+    const onClose = vi.fn();
+
+    store.register("settings", { onOpen, onClose });
+    store.open("settings");
+    expect(onOpen).toHaveBeenCalledOnce();
+
+    store.close("settings");
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("closes on Escape when enabled", () => {
+    store.register("settings", { closeOnEscape: true });
+    store.open("settings");
+
+    store.handleKeydown("settings", new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(store.isOpen("settings")).toBe(false);
+  });
+
+  it("exposes dialog ARIA props", () => {
+    store.register("settings", { labelledBy: "settings-title", describedBy: "settings-desc" });
+    store.open("settings");
+
+    expect(store.dialogProps("settings")).toMatchObject({
+      role: "dialog",
+      "aria-modal": true,
+      "aria-labelledby": "settings-title",
+      "aria-describedby": "settings-desc",
+    });
+  });
+
+  it("traps focus inside a container", () => {
+    const container = document.createElement("div");
+    const first = document.createElement("button");
+    const last = document.createElement("button");
+    container.append(first, last);
+    document.body.append(container);
+
+    const trap = createFocusTrap(container);
+    trap.activate();
+    expect(document.activeElement).toBe(first);
+
+    last.focus();
+    const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true });
+    container.dispatchEvent(event);
+    expect(document.activeElement).toBe(first);
+
+    trap.deactivate();
+    container.remove();
+  });
+
+  it("registers with Alpine store", () => {
+    const Alpine = startAlpine(dialogPlugin());
+    const dialog = Alpine.store("dialog") as ReturnType<typeof createDialogStore>;
+
+    dialog.open("demo");
+    expect(dialog.isOpen("demo")).toBe(true);
+  });
+
+  it("cleans up on destroy", () => {
+    const onLockChange = vi.fn();
+    store = createDialogStore({ onLockChange, scrollLock: true });
+    store.register("settings", { scrollLock: true });
+    store.open("settings");
+    store.destroy();
+
+    expect(store.isOpen("settings")).toBe(false);
+    expect(onLockChange).toHaveBeenLastCalledWith(false);
+  });
+});

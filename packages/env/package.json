@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-env",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Browser environment magics: network, visibility, battery, and platform",
   "type": "module",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-tabs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpine.js headless accessible tabs store",
   "type": "module",
   "license": "MIT",

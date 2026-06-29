@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-tooltip",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpine.js headless tooltip store — open/close, delays, Escape dismiss",
   "type": "module",
   "license": "MIT",

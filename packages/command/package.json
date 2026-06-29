@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-command",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpine.js headless command palette store",
   "type": "module",
   "license": "MIT",

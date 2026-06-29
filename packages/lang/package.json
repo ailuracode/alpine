@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-lang",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Alpine.js language store: detect, query, and manage the current application language.",
   "type": "module",
   "license": "MIT",

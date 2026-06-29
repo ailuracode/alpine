@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-sidebar",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Alpine.js sidebar store for visibility state, overlay, keyboard navigation, and responsive breakpoints",
   "type": "module",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@ailuracode/alpine-transfer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Outbound data transfer magics: clipboard, share, and export",
   "type": "module",
   "license": "MIT",

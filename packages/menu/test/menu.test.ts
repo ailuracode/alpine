@@ -141,4 +141,27 @@ describe("@ailuracode/alpine-menu", () => {
     menu.open("demo");
     expect(menu.isOpen("demo")).toBe(true);
   });
+
+  it("notifies onLockChange while menus with scroll lock are open", () => {
+    const onLockChange = vi.fn();
+    store = createMenuStore({ onLockChange, defaultScrollLock: true });
+    store.register("user-menu", { scrollLock: true });
+    store.open("user-menu");
+
+    expect(onLockChange).toHaveBeenLastCalledWith(true);
+
+    store.close("user-menu");
+    expect(onLockChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("cleans up scroll lock on destroy", () => {
+    const onLockChange = vi.fn();
+    store = createMenuStore({ onLockChange, defaultScrollLock: true });
+    store.register("user-menu", { scrollLock: true });
+    store.open("user-menu");
+    store.destroy();
+
+    expect(store.isOpen("user-menu")).toBe(false);
+    expect(onLockChange).toHaveBeenLastCalledWith(false);
+  });
 });

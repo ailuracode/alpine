@@ -23,6 +23,16 @@ Alpine.plugin(menu());
 Alpine.start();
 ```
 
+Compose scroll locking with `@ailuracode/alpine-scroll`:
+
+```js
+menu({
+  onLockChange(locked) {
+    locked ? Alpine.store("scroll").lock() : Alpine.store("scroll").unlock();
+  },
+});
+```
+
 ## Store API
 
 | Method | Description |
@@ -44,6 +54,7 @@ Alpine.start();
 |--------|---------|-------------|
 | `orientation` | `"vertical"` | Arrow key axis |
 | `closeOnSelect` | `true` | Close after `selectItem()` |
+| `scrollLock` | `true` | Notify `onLockChange` while open |
 | `onOpen` / `onClose` | — | Lifecycle callbacks |
 | `onSelect` | — | Fired when an item is chosen (click, Enter, or Space) |
 

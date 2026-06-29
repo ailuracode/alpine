@@ -39,6 +39,17 @@ const mediaIntervals = [
   { name: "desktop", maxWidth: Number.POSITIVE_INFINITY },
 ] as const;
 
+function scrollLockHandler(Alpine: AlpineInstance) {
+  return (locked: boolean) => {
+    const scroll = Alpine.store("scroll") as { lock(): void; unlock(): void };
+    if (locked) {
+      scroll.lock();
+    } else {
+      scroll.unlock();
+    }
+  };
+}
+
 function applyTheme({ resolved }: { resolved: "light" | "dark" }) {
   document.documentElement.classList.toggle("dark", resolved === "dark");
   document.documentElement.style.colorScheme = resolved;
@@ -143,21 +154,29 @@ export function registerDemoPlugins(): void {
 
   registerPlugin(
     "dialog",
-    lazyPlugin({
-      kind: "both",
+    defineHybridPlugin({
       stores: ["dialog"],
       magics: ["dialog"],
-      import: () => import("@ailuracode/alpine-dialog"),
+      plugin: async () => {
+        const { default: dialog } = await import("@ailuracode/alpine-dialog");
+        return (Alpine: AlpineInstance) => {
+          dialog({ onLockChange: scrollLockHandler(Alpine) })(Alpine);
+        };
+      },
     })
   );
 
   registerPlugin(
     "menu",
-    lazyPlugin({
-      kind: "both",
+    defineHybridPlugin({
       stores: ["menu"],
       magics: ["menu"],
-      import: () => import("@ailuracode/alpine-menu"),
+      plugin: async () => {
+        const { default: menu } = await import("@ailuracode/alpine-menu");
+        return (Alpine: AlpineInstance) => {
+          menu({ onLockChange: scrollLockHandler(Alpine) })(Alpine);
+        };
+      },
     })
   );
 

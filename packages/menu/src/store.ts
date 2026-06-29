@@ -11,6 +11,7 @@ export type MenuInstance = {
   activeItemId: string | null;
   orientation: MenuOrientation;
   closeOnSelect: boolean;
+  scrollLock: boolean;
   items: MenuItemState[];
   container: HTMLElement | null;
   trigger: HTMLElement | null;
@@ -27,6 +28,7 @@ export type MenuItemOptions = {
 export type MenuInstanceOptions = {
   orientation?: MenuOrientation;
   closeOnSelect?: boolean;
+  scrollLock?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   onSelect?: (itemId: string) => void;
@@ -53,6 +55,11 @@ export type MenuStore = {
   itemProps(menuId: string, itemId: string): Record<string, string | number | boolean | undefined>;
   menuProps(menuId: string): Record<string, string | boolean | undefined>;
   destroy(): void;
+};
+
+type MenuStoreConfig = {
+  onLockChange?: (locked: boolean) => void;
+  defaultScrollLock?: boolean;
 };
 
 function enabledItems(instance: MenuInstance): MenuItemState[] {
@@ -83,12 +90,13 @@ function lastItem(instance: MenuInstance): string | null {
   return items[items.length - 1]?.id ?? null;
 }
 
-function createInstance(options: MenuInstanceOptions = {}): MenuInstance {
+function createInstance(options: MenuInstanceOptions = {}, defaultScrollLock = true): MenuInstance {
   return {
     open: false,
     activeItemId: null,
     orientation: options.orientation ?? "vertical",
     closeOnSelect: options.closeOnSelect ?? true,
+    scrollLock: options.scrollLock ?? defaultScrollLock,
     items: [],
     container: null,
     trigger: null,
@@ -185,9 +193,31 @@ function handleMenuKeydown(
 }
 
 /** Creates the headless menu store. */
-export function createMenuStore(): MenuStore {
+export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
+  const defaultScrollLock = config.defaultScrollLock ?? true;
+  let lockCount = 0;
+
+  function setLock(locked: boolean): void {
+    if (locked) {
+      if (lockCount === 0) {
+        config.onLockChange?.(true);
+      }
+      lockCount++;
+      return;
+    }
+
+    if (lockCount === 0) {
+      return;
+    }
+
+    lockCount--;
+    if (lockCount === 0) {
+      config.onLockChange?.(false);
+    }
+  }
+
   function getOrCreate(store: MenuStore, id: string): MenuInstance {
-    store.instances[id] ??= createInstance();
+    store.instances[id] ??= createInstance(undefined, defaultScrollLock);
     return store.instances[id];
   }
 
@@ -195,7 +225,7 @@ export function createMenuStore(): MenuStore {
     instances: {},
 
     register(id, options = {}) {
-      this.instances[id] = createInstance(options);
+      this.instances[id] = createInstance(options, defaultScrollLock);
     },
 
     unregister(id) {
@@ -243,6 +273,11 @@ export function createMenuStore(): MenuStore {
       if (!instance.activeItemId) {
         instance.activeItemId = firstItem(instance);
       }
+
+      if (instance.scrollLock) {
+        setLock(true);
+      }
+
       instance.onOpen?.();
       queueMicrotask(() => syncMenuLayout(instance));
     },
@@ -254,6 +289,11 @@ export function createMenuStore(): MenuStore {
       }
 
       instance.open = false;
+
+      if (instance.scrollLock) {
+        setLock(false);
+      }
+
       instance.onClose?.();
     },
 
@@ -372,7 +412,11 @@ export function createMenuStore(): MenuStore {
     },
 
     destroy() {
-      this.instances = {};
+      for (const id of Object.keys(this.instances)) {
+        this.unregister(id);
+      }
+      lockCount = 0;
+      config.onLockChange?.(false);
     },
   };
 

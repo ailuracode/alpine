@@ -4,6 +4,8 @@ Screen Wake Lock and Idle Detection magics for Alpine.js.
 
 **[Full documentation →](../../docs/plugins/attention.md)**
 
+For tab visibility (`$visibility`), use [`@ailuracode/alpine-env`](../env/README.md).
+
 ## Install
 
 ```bash

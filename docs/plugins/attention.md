@@ -5,7 +5,9 @@ description: "Package: @ailuracode/alpine-attention"
 
 Package: `@ailuracode/alpine-attention`
 
-Reactive Screen Wake Lock and Idle Detection via the `$wakelock` and `$idle` magics. Wraps the [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API) and [Idle Detection API](https://developer.mozilla.org/en-US/docs/Web/API/Idle_Detection_API) when available.
+Reactive Screen Wake Lock and Idle Detection via `$wakelock` and `$idle`. Wraps the [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API) and [Idle Detection API](https://developer.mozilla.org/en-US/docs/Web/API/Idle_Detection_API) when available.
+
+For tab visibility, use [`@ailuracode/alpine-env`](./env.md) (`$visibility`).
 
 ## Install
 

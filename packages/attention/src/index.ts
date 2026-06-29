@@ -460,12 +460,3 @@ export default function attentionPlugin(Alpine: AlpineType.Alpine): void {
   registerWakeLockMagic(Alpine);
   registerIdleMagic(Alpine);
 }
-
-declare global {
-  namespace Alpine {
-    interface Magics<T> {
-      $wakelock: WakeLockMagic;
-      $idle: IdleMagic;
-    }
-  }
-}

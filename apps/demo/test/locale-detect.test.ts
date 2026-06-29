@@ -3,6 +3,7 @@ import {
   isPlaygroundPath,
   localeFromPathname,
   localizedPath,
+  localizedPlaygroundRedirectTarget,
   preferredBrowserLocale,
   shouldSkipLocaleDetect,
 } from "../src/locale-detect";
@@ -37,5 +38,13 @@ describe("locale-detect", () => {
   it("builds localized paths", () => {
     expect(localizedPath("/", "es")).toBe("/es/");
     expect(localizedPath("/query/", "pt")).toBe("/pt/query/");
+  });
+
+  it("maps localized playground paths to locale-neutral routes", () => {
+    expect(localizedPlaygroundRedirectTarget("/es/playground")).toBe("/playground/");
+    expect(localizedPlaygroundRedirectTarget("/es/playground/")).toBe("/playground/");
+    expect(localizedPlaygroundRedirectTarget("/es/playground/child/")).toBe("/playground/child/");
+    expect(localizedPlaygroundRedirectTarget("/pt/playground/theme/")).toBe("/playground/theme/");
+    expect(localizedPlaygroundRedirectTarget("/playground/")).toBeNull();
   });
 });

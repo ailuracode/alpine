@@ -43,6 +43,16 @@ export function preferredBrowserLocale(languages: readonly string[]): DocsLocale
   return "en";
 }
 
+export function localizedPlaygroundRedirectTarget(pathname: string): string | null {
+  const match = pathname.match(/^\/(es|pt)\/playground(?:\/(.*))?$/);
+  if (!match) {
+    return null;
+  }
+
+  const rest = match[2] ? `/${match[2]}` : "/";
+  return `/playground${rest}`;
+}
+
 export function localizedPath(pathname: string, locale: Exclude<DocsLocale, "en">): string {
   if (pathname === "/") {
     return `/${locale}/`;

@@ -72,14 +72,6 @@ const sidebar = [
 // https://astro.build/config
 export default defineConfig({
   site: "https://alpine-demo-ten.vercel.app",
-  redirects: {
-    "/es/playground": "/playground/",
-    "/es/playground/": "/playground/",
-    "/es/playground/[...path]": "/playground/[...path]",
-    "/pt/playground": "/playground/",
-    "/pt/playground/": "/playground/",
-    "/pt/playground/[...path]": "/playground/[...path]",
-  },
   integrations: [
     starlight({
       title: {

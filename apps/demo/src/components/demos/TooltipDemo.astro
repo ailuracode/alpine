@@ -63,8 +63,8 @@ const tooltipClasses =
 				</template>
 			</div>
 
-			<template x-teleport="body">
-				<template x-if="activeDemo && activeDemo.placement === 'top'">
+			<template x-if="activeDemo?.placement === 'top'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -74,7 +74,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'top-start'">
+			</template>
+			<template x-if="activeDemo?.placement === 'top-start'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -84,7 +86,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'top-end'">
+			</template>
+			<template x-if="activeDemo?.placement === 'top-end'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -94,7 +98,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'bottom'">
+			</template>
+			<template x-if="activeDemo?.placement === 'bottom'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -104,7 +110,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'bottom-start'">
+			</template>
+			<template x-if="activeDemo?.placement === 'bottom-start'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -114,7 +122,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'bottom-end'">
+			</template>
+			<template x-if="activeDemo?.placement === 'bottom-end'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -124,7 +134,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'left'">
+			</template>
+			<template x-if="activeDemo?.placement === 'left'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
@@ -134,7 +146,9 @@ const tooltipClasses =
 						x-text="activeDemo?.text"
 					></div>
 				</template>
-				<template x-if="activeDemo && activeDemo.placement === 'right'">
+			</template>
+			<template x-if="activeDemo?.placement === 'right'">
+				<template x-teleport="body">
 					<div
 						id="tip-grid-tooltip"
 						x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"

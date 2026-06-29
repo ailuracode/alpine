@@ -10,6 +10,7 @@ describe("@ailuracode/alpine-tooltip playground markup", () => {
         x-data="{
           demos: [
             { id: 'tip-top', placement: 'top', label: 'Top', text: 'Top placement' },
+            { id: 'tip-bottom', placement: 'bottom', label: 'Bottom', text: 'Bottom placement' },
           ],
           activeDemo: null,
           activeTrigger: null,
@@ -30,18 +31,30 @@ describe("@ailuracode/alpine-tooltip playground markup", () => {
           <button
             type="button"
             class="trigger"
+            x-bind:data-placement="demo.placement"
             @mouseenter="showDemo(demo, $el)"
             @mouseleave="hideDemo(demo)"
             x-text="demo.label"
           ></button>
         </template>
 
-        <template x-teleport="body">
-          <template x-if="activeDemo && activeDemo.placement === 'top'">
+        <template x-if="activeDemo?.placement === 'top'">
+          <template x-teleport="body">
             <div
               id="tooltip-panel"
               x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
               x-anchor.top.fixed.noflip.offset.8="activeTrigger"
+              role="tooltip"
+              x-text="activeDemo?.text"
+            ></div>
+          </template>
+        </template>
+        <template x-if="activeDemo?.placement === 'bottom'">
+          <template x-teleport="body">
+            <div
+              id="tooltip-panel-bottom"
+              x-show="activeDemo && $store.tooltip.isOpen(activeDemo.id)"
+              x-anchor.bottom.fixed.noflip.offset.8="activeTrigger"
               role="tooltip"
               x-text="activeDemo?.text"
             ></div>
@@ -79,5 +92,17 @@ describe("@ailuracode/alpine-tooltip playground markup", () => {
     expect(panel).not.toBeNull();
     expect(panel?.style.display).not.toBe("none");
     expect(panel?.textContent).toBe("Top placement");
+  });
+
+  it("opens bottom placement when x-if wraps x-teleport", async () => {
+    const trigger = document.querySelector('[data-placement="bottom"]') as HTMLButtonElement;
+    trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+    await Alpine.nextTick();
+
+    const panel = document.getElementById("tooltip-panel-bottom");
+    expect(panel).not.toBeNull();
+    expect(panel?.style.display).not.toBe("none");
+    expect(panel?.textContent).toBe("Bottom placement");
+    expect(document.getElementById("active")?.textContent).toBe("bottom");
   });
 });

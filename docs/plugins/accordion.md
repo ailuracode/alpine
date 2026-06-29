@@ -64,7 +64,7 @@ $store.accordion.register("faq", { mode: "single" });
       ></button>
       <div
         x-show="$store.accordion.isOpen('faq', id)"
-        x-transition
+        x-collapse
         x-bind="$store.accordion.panelProps('faq', id)"
       >
         <p>Answer for <span x-text="id"></span></p>
@@ -124,20 +124,26 @@ Read open ids reactively:
 
 Use `x-show="$store.accordion.isOpen(...)"` for panel visibility. `panelProps()` does not set `hidden` — that attribute does not react reliably when bound via a store helper.
 
-Optional transition:
+Animate expand/collapse with [`@alpinejs/collapse`](https://alpinejs.dev/plugins/collapse) — `x-collapse` must sit on the same element as `x-show`:
+
+```bash
+npm install @alpinejs/collapse
+```
+
+```js
+import collapse from "@alpinejs/collapse";
+Alpine.plugin(collapse);
+```
 
 ```html
 <div
   x-show="$store.accordion.isOpen('faq', id)"
-  x-transition:enter="transition ease-out duration-200"
-  x-transition:enter-start="opacity-0 -translate-y-1"
-  x-transition:enter-end="opacity-100 translate-y-0"
-  x-transition:leave="transition ease-in duration-150"
-  x-transition:leave-start="opacity-100 translate-y-0"
-  x-transition:leave-end="opacity-0 -translate-y-1"
+  x-collapse
   x-bind="$store.accordion.panelProps('faq', id)"
 >
 ```
+
+Optional duration modifier: `x-collapse.duration.300ms`. See the [Collapse plugin docs](https://alpinejs.dev/plugins/collapse) for `.min` and other modifiers.
 
 ## SSR
 

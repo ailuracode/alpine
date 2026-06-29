@@ -143,7 +143,7 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         kind: "directive",
         tier: "extended",
         description:
-          "asChild-style directive that merges wrapper attributes onto the first child and removes the wrapper.",
+          "asChild-style directive — merges wrapper attributes onto the first child via Alpine.morph(). Requires @alpinejs/morph.",
       },
     ],
   },
@@ -179,7 +179,7 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         kind: "store",
         tier: "headless",
         description:
-          "Tooltip and popover positioning with hover/focus delays. Optional Floating UI for advanced placement.",
+          "Tooltip open/close state with hover/focus delays. Pair with @alpinejs/anchor for placement.",
       },
       {
         id: "tabs",
@@ -199,7 +199,7 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         kind: "store",
         tier: "headless",
         description:
-          "Single or multi-open accordion state with keyboard focus and ARIA expanded/controls helpers.",
+          "Single or multi-open accordion state with keyboard focus and ARIA helpers. Pair with @alpinejs/collapse for panel animation.",
       },
       {
         id: "command",

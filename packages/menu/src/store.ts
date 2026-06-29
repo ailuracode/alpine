@@ -11,7 +11,6 @@ export type MenuInstance = {
   activeItemId: string | null;
   orientation: MenuOrientation;
   closeOnSelect: boolean;
-  scrollLock: boolean;
   items: MenuItemState[];
   container: HTMLElement | null;
   trigger: HTMLElement | null;
@@ -28,7 +27,6 @@ export type MenuItemOptions = {
 export type MenuInstanceOptions = {
   orientation?: MenuOrientation;
   closeOnSelect?: boolean;
-  scrollLock?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
   onSelect?: (itemId: string) => void;
@@ -59,7 +57,6 @@ export type MenuStore = {
 
 type MenuStoreConfig = {
   onLockChange?: (locked: boolean) => void;
-  defaultScrollLock?: boolean;
 };
 
 function enabledItems(instance: MenuInstance): MenuItemState[] {
@@ -90,13 +87,12 @@ function lastItem(instance: MenuInstance): string | null {
   return items[items.length - 1]?.id ?? null;
 }
 
-function createInstance(options: MenuInstanceOptions = {}, defaultScrollLock = true): MenuInstance {
+function createInstance(options: MenuInstanceOptions = {}): MenuInstance {
   return {
     open: false,
     activeItemId: null,
     orientation: options.orientation ?? "vertical",
     closeOnSelect: options.closeOnSelect ?? true,
-    scrollLock: options.scrollLock ?? defaultScrollLock,
     items: [],
     container: null,
     trigger: null,
@@ -115,22 +111,7 @@ function focusActiveItem(container: HTMLElement | null): void {
   active?.focus();
 }
 
-function syncMenuPosition(instance: MenuInstance): void {
-  if (!(instance.container && instance.trigger)) {
-    return;
-  }
-
-  const rect = instance.trigger.getBoundingClientRect();
-  Object.assign(instance.container.style, {
-    position: "fixed",
-    top: `${rect.bottom + 8}px`,
-    left: `${rect.left}px`,
-    minWidth: `${Math.max(rect.width, 192)}px`,
-  });
-}
-
-function syncMenuLayout(instance: MenuInstance): void {
-  syncMenuPosition(instance);
+function focusActiveMenu(instance: MenuInstance): void {
   focusActiveItem(instance.container);
 }
 
@@ -194,7 +175,6 @@ function handleMenuKeydown(
 
 /** Creates the headless menu store. */
 export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
-  const defaultScrollLock = config.defaultScrollLock ?? true;
   let lockCount = 0;
 
   function setLock(locked: boolean): void {
@@ -217,7 +197,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
   }
 
   function getOrCreate(store: MenuStore, id: string): MenuInstance {
-    store.instances[id] ??= createInstance(undefined, defaultScrollLock);
+    store.instances[id] ??= createInstance();
     return store.instances[id];
   }
 
@@ -225,7 +205,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
     instances: {},
 
     register(id, options = {}) {
-      this.instances[id] = createInstance(options, defaultScrollLock);
+      this.instances[id] = createInstance(options);
     },
 
     unregister(id) {
@@ -274,12 +254,10 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
         instance.activeItemId = firstItem(instance);
       }
 
-      if (instance.scrollLock) {
-        setLock(true);
-      }
+      setLock(true);
 
       instance.onOpen?.();
-      queueMicrotask(() => syncMenuLayout(instance));
+      queueMicrotask(() => focusActiveMenu(instance));
     },
 
     close(id) {
@@ -290,9 +268,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
 
       instance.open = false;
 
-      if (instance.scrollLock) {
-        setLock(false);
-      }
+      setLock(false);
 
       instance.onClose?.();
     },
@@ -331,17 +307,13 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
       instance.container = container;
 
       if (instance.open) {
-        queueMicrotask(() => syncMenuLayout(instance));
+        queueMicrotask(() => focusActiveMenu(instance));
       }
     },
 
     bindTrigger(menuId, trigger) {
       const instance = getOrCreate(this, menuId);
       instance.trigger = trigger;
-
-      if (instance.open) {
-        queueMicrotask(() => syncMenuLayout(instance));
-      }
     },
 
     handleOutsideClick(menuId, event) {
@@ -387,7 +359,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
           this.selectItem.bind(this),
           this.close.bind(this)
         );
-        queueMicrotask(() => syncMenuLayout(instance));
+        queueMicrotask(() => focusActiveMenu(instance));
       }
     },
 

@@ -11,7 +11,6 @@ export {
 
 export interface MenuPluginOptions {
   onLockChange?: (locked: boolean) => void;
-  scrollLock?: boolean;
 }
 
 /** Builds typed menu plugin options. */
@@ -24,7 +23,6 @@ export default function menuPlugin(options: MenuPluginOptions = {}): AlpineType.
   return function registerMenu(Alpine) {
     const store = createMenuStore({
       onLockChange: options.onLockChange,
-      defaultScrollLock: options.scrollLock,
     });
     Alpine.store("menu", store);
     Alpine.magic("menu", () => Alpine.store("menu"));

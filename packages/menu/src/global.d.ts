@@ -30,14 +30,10 @@ export interface MenuStore {
 
 export interface MenuPluginOptions {
   onLockChange?: (locked: boolean) => void;
-  scrollLock?: boolean;
 }
 
 export function menuOptions<const T extends MenuPluginOptions>(options: T): T;
-export function createMenuStore(config?: {
-  onLockChange?: (locked: boolean) => void;
-  defaultScrollLock?: boolean;
-}): MenuStore;
+export function createMenuStore(config?: { onLockChange?: (locked: boolean) => void }): MenuStore;
 
 export default function menuPlugin(options?: MenuPluginOptions): import("alpinejs").PluginCallback;
 

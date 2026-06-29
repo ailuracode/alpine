@@ -12,13 +12,14 @@ import MessageSquare from "@lucide/astro/icons/message-square";
 import Monitor from "@lucide/astro/icons/monitor";
 import Palette from "@lucide/astro/icons/palette";
 import PanelLeft from "@lucide/astro/icons/panel-left";
-import Replace from "@lucide/astro/icons/replace";
 import Puzzle from "@lucide/astro/icons/puzzle";
+import Replace from "@lucide/astro/icons/replace";
 import Send from "@lucide/astro/icons/send";
 import ToggleLeft from "@lucide/astro/icons/toggle-left";
-import type { AstroComponent } from "astro";
 
-const PLUGIN_NAV_ICONS: Record<string, AstroComponent> = {
+type PluginNavIcon = typeof Puzzle;
+
+const PLUGIN_NAV_ICONS: Record<string, PluginNavIcon> = {
   overview: LayoutDashboard,
   theme: Palette,
   sidebar: PanelLeft,
@@ -39,6 +40,6 @@ const PLUGIN_NAV_ICONS: Record<string, AstroComponent> = {
   "json-api": Braces,
 };
 
-export function getPluginNavIcon(id: string): AstroComponent {
+export function getPluginNavIcon(id: string): PluginNavIcon {
   return PLUGIN_NAV_ICONS[id] ?? Puzzle;
 }

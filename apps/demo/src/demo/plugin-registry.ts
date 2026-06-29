@@ -52,8 +52,6 @@ export function registerDemoPlugins(): void {
     return;
   }
 
-  pluginsRegistered = true;
-
   // Essentials — eager sync loaders (shell needs these immediately)
   registerPlugin("theme", defineStorePlugin(["theme"], theme({ onChange: applyTheme })));
 
@@ -137,7 +135,8 @@ export function registerDemoPlugins(): void {
   registerPlugin(
     "child",
     lazyPlugin({
-      kind: "magic",
+      kind: "directive",
+      directives: ["child"],
       import: () => import("@ailuracode/alpine-child"),
     })
   );
@@ -229,6 +228,8 @@ export function registerDemoPlugins(): void {
       return jsonApi(jsonApiDemoOptions);
     })
   );
+
+  pluginsRegistered = true;
 }
 
 /** Demo-specific Alpine.data handlers and devtools — run after initPlugins(). */

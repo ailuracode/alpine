@@ -12,6 +12,7 @@ import MessageSquare from "@lucide/astro/icons/message-square";
 import Monitor from "@lucide/astro/icons/monitor";
 import Palette from "@lucide/astro/icons/palette";
 import PanelLeft from "@lucide/astro/icons/panel-left";
+import Replace from "@lucide/astro/icons/replace";
 import Puzzle from "@lucide/astro/icons/puzzle";
 import Send from "@lucide/astro/icons/send";
 import ToggleLeft from "@lucide/astro/icons/toggle-left";
@@ -28,6 +29,7 @@ const PLUGIN_NAV_ICONS: Record<string, AstroComponent> = {
   env: Globe,
   transfer: Send,
   toggle: ToggleLeft,
+  child: Replace,
   toast: MessageSquare,
   attention: Focus,
   notify: Bell,

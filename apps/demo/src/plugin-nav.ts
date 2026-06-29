@@ -1,4 +1,4 @@
-export type PluginKind = "store" | "magic" | "core";
+export type PluginKind = "store" | "magic" | "directive" | "core";
 
 export type PluginTier = "essential" | "extended" | "advanced";
 
@@ -140,7 +140,7 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         title: "Child",
         package: "@ailuracode/alpine-child",
         api: "x-child",
-        kind: "magic",
+        kind: "directive",
         tier: "extended",
         description:
           "asChild-style directive that merges wrapper attributes onto the first child and removes the wrapper.",

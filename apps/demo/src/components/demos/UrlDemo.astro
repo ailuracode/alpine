@@ -1,0 +1,92 @@
+---
+import { badgeVariants } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { segmentButtonActiveClass } from "../../lib/button-styles";
+import { getPluginNavItem } from "../../plugin-nav";
+import DemoButton from "../astro/DemoButton.astro";
+import DemoSection from "../DemoSection.astro";
+
+const plugin = getPluginNavItem("url")!;
+const tabs = ["overview", "settings", "billing"] as const;
+const tabBtnActive = segmentButtonActiveClass;
+---
+
+<DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
+	<div class="grid gap-6" x-data>
+		<div class="rounded-lg border border-border p-4">
+			<p class="text-sm text-muted-foreground mb-3">
+				Current URL query (reactive): <code class="text-xs" x-text="$store.url.search || '(empty)'"></code>
+			</p>
+			<nav class="flex flex-wrap gap-2 mb-4" aria-label="Tabs">
+				{
+					tabs.map((tab) => (
+						<DemoButton
+							class={tabBtnActive}
+							@click={`$store.url.set('tab', '${tab}')`}
+							x-bind:data-active={`$store.url.get('tab') === '${tab}' ? 'true' : null`}
+						>
+							{tab}
+						</DemoButton>
+					))
+				}
+			</nav>
+			<div class="grid gap-2 sm:grid-cols-2">
+				<label class="text-sm">
+					Search
+					<input
+						type="search"
+						class="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+						placeholder="Filter…"
+						:value="$store.url.get('search') ?? ''"
+						@input.debounce.300ms="$store.url.set('search', $event.target.value || null)"
+					/>
+				</label>
+				<label class="text-sm flex items-center gap-2 mt-6 sm:mt-0">
+					<input
+						type="checkbox"
+						:checked="$store.url.get('active') === true"
+						@change="$store.url.set('active', $event.target.checked)"
+					/>
+					Active only
+				</label>
+			</div>
+			<div class="flex flex-wrap items-center gap-2 mt-4">
+				<DemoButton @click="$store.url.set('page', Math.max(1, ($store.url.get('page') ?? 1) - 1))">
+					Prev page
+				</DemoButton>
+				<span
+					class={cn(badgeVariants({ variant: "secondary" }))}
+					x-text="`Page ${$store.url.get('page') ?? 1}`"
+				></span>
+				<DemoButton @click="$store.url.set('page', ($store.url.get('page') ?? 1) + 1)">Next page</DemoButton>
+				<DemoButton variant="outline" @click="$store.url.push({ tags: ['demo', 'alpine'] })">
+					push() tags
+				</DemoButton>
+				<DemoButton variant="outline" @click="$store.url.replace({ search: null, page: 1 })">
+					replace() reset filters
+				</DemoButton>
+			</div>
+			<dl class="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+				<div>
+					<dt class="text-muted-foreground">tab</dt>
+					<dd x-text="$store.url.get('tab') ?? '—'"></dd>
+				</div>
+				<div>
+					<dt class="text-muted-foreground">page</dt>
+					<dd x-text="$store.url.get('page') ?? '—'"></dd>
+				</div>
+				<div>
+					<dt class="text-muted-foreground">search</dt>
+					<dd x-text="$store.url.get('search') ?? '—'"></dd>
+				</div>
+				<div>
+					<dt class="text-muted-foreground">tags</dt>
+					<dd x-text="JSON.stringify($store.url.get('tags') ?? [])"></dd>
+				</div>
+			</dl>
+		</div>
+	</div>
+	<p class="text-xs text-muted-foreground mt-3">
+		Package: <code>{plugin.package}</code>
+	</p>
+</DemoSection>

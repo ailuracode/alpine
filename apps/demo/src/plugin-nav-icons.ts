@@ -7,6 +7,7 @@ import Focus from "@lucide/astro/icons/focus";
 import Globe from "@lucide/astro/icons/globe";
 import Languages from "@lucide/astro/icons/languages";
 import LayoutDashboard from "@lucide/astro/icons/layout-dashboard";
+import Link from "@lucide/astro/icons/link";
 import MapPin from "@lucide/astro/icons/map-pin";
 import MessageSquare from "@lucide/astro/icons/message-square";
 import Monitor from "@lucide/astro/icons/monitor";
@@ -23,6 +24,7 @@ const PLUGIN_NAV_ICONS: Record<string, AstroComponent> = {
   sidebar: PanelLeft,
   media: Monitor,
   scroll: ArrowDownUp,
+  url: Link,
   geo: MapPin,
   lang: Languages,
   env: Globe,

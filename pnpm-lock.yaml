@@ -39,6 +39,9 @@ importers:
       vitest:
         specifier: ^4.1.9
         version: 4.1.9(@types/node@26.0.0)(@vitest/coverage-v8@4.1.9)(happy-dom@20.10.6)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.27.7)(jiti@2.7.0))
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
 
   apps/demo:
     dependencies:
@@ -99,6 +102,9 @@ importers:
       '@ailuracode/alpine-transfer':
         specifier: workspace:*
         version: link:../../packages/transfer
+      '@ailuracode/alpine-url':
+        specifier: workspace:*
+        version: link:../../packages/url
       '@alpinejs/persist':
         specifier: ^3.15.12
         version: 3.15.12
@@ -367,6 +373,19 @@ importers:
       alpinejs:
         specifier: ^3.0.0
         version: 3.15.12
+
+  packages/url:
+    dependencies:
+      '@types/alpinejs':
+        specifier: ^3.13.11
+        version: 3.13.11
+      alpinejs:
+        specifier: ^3.0.0
+        version: 3.15.12
+    devDependencies:
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
 
 packages:
 

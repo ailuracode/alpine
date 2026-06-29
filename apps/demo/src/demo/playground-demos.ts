@@ -15,6 +15,7 @@ import ThemeDemo from "../components/demos/ThemeDemo.astro";
 import ToastDemo from "../components/demos/ToastDemo.astro";
 import ToggleDemo from "../components/demos/ToggleDemo.astro";
 import TransferDemo from "../components/demos/TransferDemo.astro";
+import UrlDemo from "../components/demos/UrlDemo.astro";
 import { PLUGIN_NAV_ITEMS, type PluginNavItem } from "../plugin-nav";
 
 export const PLAYGROUND_DEMOS: Record<string, AstroComponentFactory> = {
@@ -22,6 +23,7 @@ export const PLAYGROUND_DEMOS: Record<string, AstroComponentFactory> = {
   sidebar: SidebarDemo,
   media: MediaDemo,
   scroll: ScrollDemo,
+  url: UrlDemo,
   geo: GeoDemo,
   lang: LangDemo,
   toggle: ToggleDemo,

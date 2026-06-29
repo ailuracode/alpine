@@ -2,7 +2,7 @@
 
 Modular **Alpine.js toolkit** — lazy plugin init, headless stores and magics, TypeScript-first DX. Framework-agnostic: works with Vite, Astro, static HTML, or any ESM bundler.
 
-Built by **ailuracode**. Nineteen independent npm packages; install only what you need.
+Built by **ailuracode**. Twenty independent npm packages; install only what you need.
 
 ## Why this exists
 
@@ -69,6 +69,7 @@ Start here for most Alpine apps.
 | [`@ailuracode/alpine-theme`](./packages/theme/README.md) | `$store.theme` | Light / dark / system preference |
 | [`@ailuracode/alpine-media`](./packages/media/README.md) | `$store.media` | Viewport breakpoints and media features |
 | [`@ailuracode/alpine-scroll`](./packages/scroll/README.md) | `$store.scroll` | Scroll tracking and body lock |
+| [`@ailuracode/alpine-url`](./packages/url/README.md) | `$store.url` | Typed reactive query-param state |
 | [`@ailuracode/alpine-sidebar`](./packages/sidebar/README.md) | `$store.sidebar` | Sidebar / drawer shell state |
 | [`@ailuracode/alpine-lang`](./packages/lang/README.md) | `$store.lang` | Browser-language detection and reactive current-language store |
 | [`@ailuracode/alpine-toast`](./packages/toast/README.md) | `$toast` | Headless toast queue; `fromPayload` for plain objects |
@@ -118,7 +119,7 @@ See [AGENTS.md](./AGENTS.md) for the full checklist when adding a plugin.
 
 - [Getting started](./docs/getting-started.md) — lazy init, essentials, HTML usage
 - [Core](./docs/core.md) — plugin registry
-- **Essentials** — [theme](./docs/plugins/theme.md), [media](./docs/plugins/media.md), [scroll](./docs/plugins/scroll.md), [sidebar](./docs/plugins/sidebar.md), [lang](./docs/plugins/lang.md), [toast](./docs/plugins/toast.md)
+- **Essentials** — [theme](./docs/plugins/theme.md), [media](./docs/plugins/media.md), [scroll](./docs/plugins/scroll.md), [url](./docs/plugins/url.md), [sidebar](./docs/plugins/sidebar.md), [lang](./docs/plugins/lang.md), [toast](./docs/plugins/toast.md)
 - [Query](./docs/query.md) · [Query devtools](./docs/plugins/query-kit.md#devtools)
 - [AGENTS.md](./AGENTS.md) — guide for AI agents and maintainers
 

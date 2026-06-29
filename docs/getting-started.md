@@ -147,7 +147,7 @@ See [`$toast.fromPayload`](./plugins/toast.md) for the full payload shape.
 
 | Tier | Packages | When to add |
 |------|----------|-------------|
-| **Essentials** | theme, media, scroll, sidebar, toast | Most Alpine apps |
+| **Essentials** | theme, media, scroll, url, sidebar, toast | Most Alpine apps |
 | **Extended** | network, attention, clipboard, platform, toggle | Connectivity, clipboard, device hints |
 | **Advanced** | geo, battery, export, share, attention, notify, calendar, json-api | Specialized browser APIs |
 | **Query** | query + adapter + devtools | Client-side data cache (see [Query](./query.md)) |
@@ -182,5 +182,5 @@ Or import the plugin module — generated types augment globals automatically.
 ## Next steps
 
 - [Core](./core.md) — lazy registry and dynamic imports
-- Essentials — [theme](./plugins/theme.md), [media](./plugins/media.md), [scroll](./plugins/scroll.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
+- Essentials — [theme](./plugins/theme.md), [media](./plugins/media.md), [scroll](./plugins/scroll.md), [url](./plugins/url.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
 - [Playground](/playground/) — interactive demos

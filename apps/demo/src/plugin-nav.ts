@@ -55,6 +55,16 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
           "Scroll position, direction, progress, and body scroll lock. The sticky header progress bar and sidebar overlay lock both use this store.",
       },
       {
+        id: "url",
+        title: "URL",
+        package: "@ailuracode/alpine-url",
+        api: "$store.url",
+        kind: "store",
+        tier: "essential",
+        description:
+          "Typed, reactive query-param state synced with the browser URL. Schema inference for pagination, filters, tabs, and arrays.",
+      },
+      {
         id: "sidebar",
         title: "Sidebar",
         package: "@ailuracode/alpine-sidebar",

@@ -37,6 +37,7 @@ Start with **Essentials** — the modules most apps need first. Add **Extended**
 | [Theme](./plugins/theme.md) | `$store.theme` | Light / dark / system preference |
 | [Media](./plugins/media.md) | `$store.media` | Viewport breakpoints and media features |
 | [Scroll](./plugins/scroll.md) | `$store.scroll` | Scroll progress, body lock for overlays |
+| [URL](./plugins/url.md) | `$store.url` | Typed reactive query-param state |
 | [Sidebar](./plugins/sidebar.md) | `$store.sidebar` | Drawer / nav shell state |
 | [Toast](./plugins/toast.md) | `$toast` | In-app messages; [`fromPayload`](./plugins/toast.md) for plain objects |
 

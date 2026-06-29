@@ -1,3 +1,4 @@
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
@@ -7,7 +8,7 @@ import { getLocaleDetectScript } from "./src/locale-detect.ts";
 import { pluginDocsSidebarItems } from "./src/plugin-nav.ts";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
-const pkg = (name: string) => `${root}../../packages/${name}/src/index.ts`;
+const pkg = (name: string) => path.resolve(root, `../../packages/${name}/src/index.ts`);
 
 const sidebar = [
   {
@@ -120,28 +121,36 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      alias: {
-        "@": `${root}src`,
-        "@ailuracode/alpine-env": pkg("env"),
-        "@ailuracode/alpine-transfer": pkg("transfer"),
-        "@ailuracode/alpine-query-kit": pkg("query-kit"),
-        "@ailuracode/alpine-attention": pkg("attention"),
-        "@ailuracode/alpine-calendar": pkg("calendar"),
-        "@ailuracode/alpine-core": pkg("core"),
-        "@ailuracode/alpine-toast": pkg("toast"),
-        "@ailuracode/alpine-geo": pkg("geo"),
-        "@ailuracode/alpine-json-api": pkg("json-api"),
-        "@ailuracode/alpine-lang": pkg("lang"),
-        "@ailuracode/alpine-notify": pkg("notify"),
-        "@ailuracode/alpine-query": pkg("query"),
-        "@ailuracode/alpine-query-adapter-alpine": pkg("query-adapter-alpine"),
-        "@ailuracode/alpine-query-adapter-zustand": pkg("query-adapter-zustand"),
-        "@ailuracode/alpine-media": pkg("media"),
-        "@ailuracode/alpine-sidebar": pkg("sidebar"),
-        "@ailuracode/alpine-scroll": pkg("scroll"),
-        "@ailuracode/alpine-theme": pkg("theme"),
-        "@ailuracode/alpine-toggle": pkg("toggle"),
-      },
+      alias: [
+        // Subpath before package root — Vite otherwise resolves via package exports → missing dist/
+        { find: "@", replacement: path.join(root, "src") },
+        { find: "@ailuracode/alpine-env", replacement: pkg("env") },
+        { find: "@ailuracode/alpine-transfer", replacement: pkg("transfer") },
+        { find: "@ailuracode/alpine-query-kit", replacement: pkg("query-kit") },
+        { find: "@ailuracode/alpine-attention", replacement: pkg("attention") },
+        { find: "@ailuracode/alpine-calendar", replacement: pkg("calendar") },
+        { find: "@ailuracode/alpine-core", replacement: pkg("core") },
+        { find: "@ailuracode/alpine-toast", replacement: pkg("toast") },
+        { find: "@ailuracode/alpine-geo", replacement: pkg("geo") },
+        { find: "@ailuracode/alpine-json-api", replacement: pkg("json-api") },
+        { find: "@ailuracode/alpine-lang", replacement: pkg("lang") },
+        { find: "@ailuracode/alpine-notify", replacement: pkg("notify") },
+        { find: "@ailuracode/alpine-query", replacement: pkg("query") },
+        {
+          find: "@ailuracode/alpine-query-adapter-alpine",
+          replacement: pkg("query-adapter-alpine"),
+        },
+        {
+          find: "@ailuracode/alpine-query-adapter-zustand",
+          replacement: pkg("query-adapter-zustand"),
+        },
+        { find: "@ailuracode/alpine-media", replacement: pkg("media") },
+        { find: "@ailuracode/alpine-sidebar", replacement: pkg("sidebar") },
+        { find: "@ailuracode/alpine-scroll", replacement: pkg("scroll") },
+        { find: "@ailuracode/alpine-url", replacement: pkg("url") },
+        { find: "@ailuracode/alpine-theme", replacement: pkg("theme") },
+        { find: "@ailuracode/alpine-toggle", replacement: pkg("toggle") },
+      ],
     },
   },
 });

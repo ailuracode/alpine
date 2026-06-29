@@ -31,6 +31,7 @@
     "@ailuracode/alpine-query-adapter-zustand": "workspace:*",
     "@ailuracode/alpine-query-kit": "workspace:*",
     "@ailuracode/alpine-scroll": "workspace:*",
+    "@ailuracode/alpine-url": "workspace:*",
     "@ailuracode/alpine-sidebar": "workspace:*",
     "@ailuracode/alpine-theme": "workspace:*",
     "@ailuracode/alpine-toast": "workspace:*",
@@ -53,7 +54,8 @@
     "react-dom": "^19.2.7",
     "shadcn": "^4.11.0",
     "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0"
+    "tw-animate-css": "^1.4.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.1",

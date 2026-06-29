@@ -101,7 +101,7 @@ Alpine.start();
 
 | Nivel | Paquetes | Cuándo añadir |
 |-------|----------|---------------|
-| **Esenciales** | theme, media, scroll, sidebar, toast | La mayoría de apps Alpine |
+| **Esenciales** | theme, media, scroll, url, sidebar, toast | La mayoría de apps Alpine |
 | **Extendidos** | network, attention, clipboard, platform, toggle | Conectividad, portapapeles, hints de dispositivo |
 | **Avanzados** | geo, battery, export, share, attention, notify, calendar, json-api | APIs de navegador especializadas |
 | **Query** | query + adapter + devtools | Caché de datos en cliente (ver [Query](./query.md)) |
@@ -109,5 +109,5 @@ Alpine.start();
 ## Siguientes pasos
 
 - [Core](./core.md) — registro lazy e imports dinámicos
-- Esenciales — [theme](./plugins/theme.md), [media](./plugins/media.md), [scroll](./plugins/scroll.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
+- Esenciales — [theme](./plugins/theme.md), [media](./plugins/media.md), [scroll](./plugins/scroll.md), [url](./plugins/url.md), [sidebar](./plugins/sidebar.md), [toast](./plugins/toast.md)
 - [Playground](/playground/) — demos interactivas

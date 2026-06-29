@@ -37,6 +37,7 @@ Comece com **Essenciais** — os módulos que a maioria dos apps precisa primeir
 | [Theme](./plugins/theme.md) | `$store.theme` | Preferência claro / escuro / sistema |
 | [Media](./plugins/media.md) | `$store.media` | Breakpoints e media features em templates |
 | [Scroll](./plugins/scroll.md) | `$store.scroll` | Progresso de scroll, body lock para overlays |
+| [URL](./plugins/url.md) | `$store.url` | Query params reativos e tipados |
 | [Sidebar](./plugins/sidebar.md) | `$store.sidebar` | Estado de drawer / nav shell |
 | [Toast](./plugins/toast.md) | `$toast` | Mensagens in-app; [`fromPayload`](./plugins/toast.md) para objetos simples |
 

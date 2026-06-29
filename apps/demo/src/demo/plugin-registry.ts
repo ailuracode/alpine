@@ -6,11 +6,13 @@ import {
   registerPlugin,
 } from "@ailuracode/alpine-core";
 import media from "@ailuracode/alpine-media";
-import queryDevtoolsPlugin from "@ailuracode/alpine-query-kit";
+import { queryDevtoolsPlugin } from "@ailuracode/alpine-query-kit";
 import scroll from "@ailuracode/alpine-scroll";
 import sidebar from "@ailuracode/alpine-sidebar";
 import theme from "@ailuracode/alpine-theme";
 import toast, { toastPositions, toastVariants } from "@ailuracode/alpine-toast";
+import createUrlPlugin from "@ailuracode/alpine-url";
+import { z } from "zod";
 import type { AlpineInstance } from "../types/alpine.js";
 import { registerCalendarDemo } from "./calendar-demo.js";
 import { registerDemoShell, registerToastDemoHandlers } from "./demo-shell.js";
@@ -28,6 +30,18 @@ export const toastDemoVariants = toastVariants([
 ] as const);
 
 export const toastDemoPositions = toastPositions(["top-center", "bottom-right"] as const);
+
+export const urlDemoSchema = z.object({
+  page: z.coerce.number().optional(),
+  search: z.string().optional(),
+  active: z.coerce.boolean().optional(),
+  tags: z.array(z.string()).optional(),
+  tab: z.enum(["overview", "settings", "billing"]).optional(),
+});
+
+export type UrlDemoStore = import("@ailuracode/alpine-url").UrlStoreFor<
+  z.infer<typeof urlDemoSchema>
+>;
 
 export type ToastDemoContent =
   | { kind: "badge"; label: string; seats?: number }
@@ -62,6 +76,15 @@ export function registerDemoPlugins(): void {
   registerPlugin("scroll", defineStorePlugin(["scroll"], scroll()));
 
   registerPlugin(
+    "url",
+    defineStorePlugin(["url"], () =>
+      createUrlPlugin({
+        schema: urlDemoSchema,
+      })
+    )
+  );
+
+  registerPlugin(
     "sidebar",
     defineHybridPlugin({
       stores: ["sidebar"],
@@ -71,7 +94,7 @@ export function registerDemoPlugins(): void {
           onShow() {
             document.documentElement.setAttribute("data-sidebar", "");
             document.documentElement.style.scrollbarGutter = "stable";
-            (Alpine.store("scroll") as { lock(): void }).lock();
+            Alpine.store("scroll").lock();
           },
           onHide() {
             document.documentElement.removeAttribute("data-sidebar");

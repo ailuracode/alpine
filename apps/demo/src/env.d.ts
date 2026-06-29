@@ -5,6 +5,7 @@
 type ThemeStore = import("@ailuracode/alpine-theme").ThemeStore;
 type MediaStore = import("@ailuracode/alpine-media").MediaStore;
 type ScrollStore = import("@ailuracode/alpine-scroll").ScrollStore;
+type UrlStore = import("./demo/plugin-registry").UrlDemoStore;
 type SidebarStore = import("@ailuracode/alpine-sidebar").SidebarStore;
 type GeoStore = import("@ailuracode/alpine-geo").GeoStore;
 type QueryStore = import("@ailuracode/alpine-query").QueryStore;
@@ -45,6 +46,7 @@ declare module "alpinejs" {
       theme: ThemeStore;
       media: MediaStore;
       scroll: ScrollStore;
+      url: UrlStore;
       sidebar: SidebarStore;
       geo: GeoStore;
       query: QueryStore;
@@ -54,6 +56,7 @@ declare module "alpinejs" {
       $theme: ThemeStore;
       $media: MediaStore;
       $scroll: ScrollStore;
+      $url: UrlStore;
       $sidebar: SidebarStore;
       $geo: GeoStore;
       $network: NetworkMagic;

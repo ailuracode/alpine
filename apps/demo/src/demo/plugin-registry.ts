@@ -6,7 +6,7 @@ import {
   registerPlugin,
 } from "@ailuracode/alpine-core";
 import media from "@ailuracode/alpine-media";
-import queryDevtoolsPlugin from "@ailuracode/alpine-query-kit";
+import { queryDevtoolsPlugin } from "@ailuracode/alpine-query-kit";
 import scroll from "@ailuracode/alpine-scroll";
 import sidebar from "@ailuracode/alpine-sidebar";
 import theme from "@ailuracode/alpine-theme";

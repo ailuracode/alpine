@@ -22,8 +22,12 @@ type AlpineElement = Element & {
   _x_ignoreSelf?: boolean;
 };
 
+type MorphOptions = {
+  added?: (node: Node) => void;
+};
+
 type AlpineWithMorph = AlpineType.Alpine & {
-  morph?: (el: Element, newHtml: string | Element, options?: Record<string, unknown>) => Element;
+  morph?: (el: Element, newHtml: string | Element, options?: MorphOptions) => Element;
 };
 
 function warnChild(message: string): void {
@@ -35,7 +39,7 @@ function warnChild(message: string): void {
 export default function childPlugin(Alpine: AlpineType.Alpine): void {
   Alpine.addInitSelector(() => `[${Alpine.prefixed("child")}]`);
 
-  Alpine.interceptInit((el, skip) => {
+  Alpine.interceptInit((el: Element, skip: () => void) => {
     const config = parseChildDirective(el);
     if (!config) {
       return;

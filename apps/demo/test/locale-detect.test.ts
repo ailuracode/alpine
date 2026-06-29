@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isPlaygroundPath,
   localeFromPathname,
   localizedPath,
   preferredBrowserLocale,
@@ -18,6 +19,10 @@ describe("locale-detect", () => {
   it("skips playground and static assets", () => {
     expect(shouldSkipLocaleDetect("/playground/")).toBe(true);
     expect(shouldSkipLocaleDetect("/playground/theme/")).toBe(true);
+    expect(shouldSkipLocaleDetect("/es/playground/")).toBe(true);
+    expect(shouldSkipLocaleDetect("/es/playground/child/")).toBe(true);
+    expect(shouldSkipLocaleDetect("/pt/playground/")).toBe(true);
+    expect(isPlaygroundPath("/es/playground/child/")).toBe(true);
     expect(shouldSkipLocaleDetect("/_astro/page.js")).toBe(true);
     expect(shouldSkipLocaleDetect("/favicon.ico")).toBe(true);
     expect(shouldSkipLocaleDetect("/getting-started/")).toBe(false);

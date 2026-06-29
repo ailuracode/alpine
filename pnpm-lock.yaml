@@ -48,6 +48,9 @@ importers:
       '@ailuracode/alpine-calendar':
         specifier: workspace:*
         version: link:../../packages/calendar
+      '@ailuracode/alpine-child':
+        specifier: workspace:*
+        version: link:../../packages/child
       '@ailuracode/alpine-core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -187,6 +190,15 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.4.0
+
+  packages/child:
+    dependencies:
+      '@types/alpinejs':
+        specifier: ^3.13.11
+        version: 3.13.11
+      alpinejs:
+        specifier: ^3.0.0
+        version: 3.15.12
 
   packages/core:
     dependencies:

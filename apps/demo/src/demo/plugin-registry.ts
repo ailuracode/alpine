@@ -134,6 +134,14 @@ export function registerDemoPlugins(): void {
     })
   );
 
+  registerPlugin(
+    "child",
+    lazyPlugin({
+      kind: "magic",
+      import: () => import("@ailuracode/alpine-child"),
+    })
+  );
+
   // Advanced — lazy dynamic imports
   registerPlugin(
     "calendar",

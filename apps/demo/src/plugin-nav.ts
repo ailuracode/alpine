@@ -135,6 +135,16 @@ export const PLUGIN_NAV_GROUPS: PluginNavGroup[] = [
         description:
           "Binary and ternary toggle state factories for segmented controls and filters.",
       },
+      {
+        id: "child",
+        title: "Child",
+        package: "@ailuracode/alpine-child",
+        api: "x-child",
+        kind: "magic",
+        tier: "extended",
+        description:
+          "asChild-style directive that merges wrapper attributes onto the first child and removes the wrapper.",
+      },
     ],
   },
   {

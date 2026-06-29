@@ -19,6 +19,7 @@
   "dependencies": {
     "@ailuracode/alpine-attention": "workspace:*",
     "@ailuracode/alpine-calendar": "workspace:*",
+    "@ailuracode/alpine-child": "workspace:*",
     "@ailuracode/alpine-core": "workspace:*",
     "@ailuracode/alpine-env": "workspace:*",
     "@ailuracode/alpine-geo": "workspace:*",

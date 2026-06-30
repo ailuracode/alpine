@@ -139,4 +139,106 @@ describe("@ailuracode/alpine-menu", () => {
     expect(store.isOpen("user-menu")).toBe(false);
     expect(onLockChange).toHaveBeenLastCalledWith(false);
   });
+
+  it("closes other menus when opening one (exclusive default)", () => {
+    store.register("actions");
+    store.open("user-menu");
+    store.open("actions");
+
+    expect(store.isOpen("user-menu")).toBe(false);
+    expect(store.isOpen("actions")).toBe(true);
+  });
+
+  it("closes other menus when toggling one open (exclusive default)", () => {
+    store.register("actions");
+    store.open("user-menu");
+    store.toggle("actions");
+
+    expect(store.isOpen("user-menu")).toBe(false);
+    expect(store.isOpen("actions")).toBe(true);
+  });
+
+  it("allows multiple open menus when exclusive is false", () => {
+    store = createMenuStore({ exclusive: false });
+    store.register("user-menu");
+    store.register("actions");
+    store.open("user-menu");
+    store.open("actions");
+
+    expect(store.isOpen("user-menu")).toBe(true);
+    expect(store.isOpen("actions")).toBe(true);
+  });
+
+  it("closes only menus in the same group when exclusive is false", () => {
+    store = createMenuStore({ exclusive: false });
+    store.register("file", { group: "menubar-1" });
+    store.register("edit", { group: "menubar-1" });
+    store.register("help", { group: "menubar-2" });
+    store.register("account");
+
+    store.open("file");
+    store.open("help");
+    store.open("account");
+    expect(store.isOpen("file")).toBe(true);
+    expect(store.isOpen("help")).toBe(true);
+    expect(store.isOpen("account")).toBe(true);
+
+    store.open("edit");
+    expect(store.isOpen("file")).toBe(false);
+    expect(store.isOpen("edit")).toBe(true);
+    expect(store.isOpen("help")).toBe(true);
+    expect(store.isOpen("account")).toBe(true);
+  });
+
+  it("routes window keydown to the open menu and closes on Escape", () => {
+    store.open("user-menu");
+
+    store.handleWindowKeydown(new KeyboardEvent("keydown", { key: "Escape" }), [
+      "user-menu",
+      "actions-menu",
+    ]);
+
+    expect(store.isOpen("user-menu")).toBe(false);
+  });
+
+  it("closes on window outside click for the requested menu ids", () => {
+    const trigger = document.createElement("button");
+    const container = document.createElement("ul");
+    const outside = document.createElement("div");
+    document.body.append(outside, trigger, container);
+
+    store.bindTrigger("user-menu", trigger);
+    store.bindMenu("user-menu", container);
+    store.open("user-menu");
+
+    store.handleWindowOutsideClick({ target: outside } as unknown as MouseEvent, [
+      "user-menu",
+      "actions-menu",
+    ]);
+
+    expect(store.isOpen("user-menu")).toBe(false);
+
+    outside.remove();
+    trigger.remove();
+    container.remove();
+  });
+
+  it("keeps scroll lock in sync when exclusive closes other menus", () => {
+    const onLockChange = vi.fn();
+    store = createMenuStore({ onLockChange });
+    store.register("user-menu");
+    store.register("actions");
+
+    store.open("user-menu");
+    expect(onLockChange).toHaveBeenLastCalledWith(true);
+
+    store.open("actions");
+    expect(store.isOpen("user-menu")).toBe(false);
+    expect(store.isOpen("actions")).toBe(true);
+    expect(onLockChange).toHaveBeenLastCalledWith(true);
+    expect(onLockChange).not.toHaveBeenCalledWith(false);
+
+    store.close("actions");
+    expect(onLockChange).toHaveBeenLastCalledWith(false);
+  });
 });

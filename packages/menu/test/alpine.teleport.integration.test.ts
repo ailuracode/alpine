@@ -1,6 +1,12 @@
 import Alpine from "alpinejs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import menuPlugin from "../src/index.js";
+import menuPlugin, { type MenuStore } from "../src/index.js";
+
+function startMenuAlpine(): MenuStore {
+  Alpine.plugin(menuPlugin());
+  Alpine.start();
+  return Alpine.store("menu") as MenuStore;
+}
 
 describe("@ailuracode/alpine-menu teleported menu", () => {
   afterEach(() => {
@@ -15,7 +21,7 @@ describe("@ailuracode/alpine-menu teleported menu", () => {
           $store.menu.register('user-menu');
           ids.forEach(id => $store.menu.registerItem('user-menu', id));
         "
-        @click.window="$store.menu.handleOutsideClick('user-menu', $event)"
+        @click.window="$store.menu.handleWindowOutsideClick($event, ['user-menu'])"
       >
         <div id="trigger-wrap" x-init="$store.menu.bindTrigger('user-menu', $el)">
           <button id="trigger" type="button" @click="$store.menu.toggle('user-menu')">Account</button>
@@ -28,8 +34,7 @@ describe("@ailuracode/alpine-menu teleported menu", () => {
       </div>
     `;
 
-    Alpine.plugin(menuPlugin());
-    Alpine.start();
+    const store = startMenuAlpine();
 
     const trigger = document.getElementById("trigger-wrap");
     if (!trigger) {
@@ -52,7 +57,39 @@ describe("@ailuracode/alpine-menu teleported menu", () => {
     document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     await Alpine.nextTick();
 
-    const store = Alpine.store("menu") as { isOpen(id: string): boolean };
     expect(store.isOpen("user-menu")).toBe(false);
+  });
+
+  it("closes the previous menu when opening another through the Alpine store proxy", async () => {
+    document.body.innerHTML = `
+      <div
+        x-data
+        x-init="
+          $store.menu.register('user-menu');
+          $store.menu.register('actions-menu');
+        "
+        @keydown.window="$store.menu.handleWindowKeydown($event, ['user-menu', 'actions-menu'])"
+      >
+        <button id="account" type="button" @click="$store.menu.toggle('user-menu')">Account</button>
+        <button id="actions" type="button" @click="$store.menu.toggle('actions-menu')">Actions</button>
+      </div>
+    `;
+
+    const store = startMenuAlpine();
+
+    document.getElementById("account")?.click();
+    await Alpine.nextTick();
+    expect(store.isOpen("user-menu")).toBe(true);
+
+    document.getElementById("actions")?.click();
+    await Alpine.nextTick();
+
+    expect(store.isOpen("user-menu")).toBe(false);
+    expect(store.isOpen("actions-menu")).toBe(true);
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await Alpine.nextTick();
+
+    expect(store.isOpen("actions-menu")).toBe(false);
   });
 });

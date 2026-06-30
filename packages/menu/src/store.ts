@@ -53,6 +53,10 @@ export type MenuStore = {
   setActiveItem(menuId: string, itemId: string | null): void;
   selectItem(menuId: string, itemId: string): void;
   handleKeydown(menuId: string, event: KeyboardEvent): void;
+  /** Close open menus on outside click — pass `menuIds` when wiring multiple menus on one page. */
+  handleWindowOutsideClick(event: MouseEvent, menuIds?: readonly string[]): void;
+  /** Route keyboard events to the first open menu in `menuIds` (defaults to all registered). */
+  handleWindowKeydown(event: KeyboardEvent, menuIds?: readonly string[]): void;
   itemProps(menuId: string, itemId: string): Record<string, string | number | boolean | undefined>;
   menuProps(menuId: string): Record<string, string | boolean | undefined>;
   destroy(): void;
@@ -208,8 +212,8 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
     return store.instances[id];
   }
 
-  function closeMenu(id: string, suppressLock = false): void {
-    const instance = store.instances[id];
+  function closeMenu(menuStore: MenuStore, id: string, suppressLock = false): void {
+    const instance = menuStore.instances[id];
     if (!instance?.open) {
       return;
     }
@@ -223,22 +227,22 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
     instance.onClose?.();
   }
 
-  function closeOtherMenus(openingId: string): number {
-    const opening = store.instances[openingId];
+  function closeOtherMenus(menuStore: MenuStore, openingId: string): number {
+    const opening = menuStore.instances[openingId];
     const openingGroup = opening?.group ?? null;
     let closedCount = 0;
 
-    for (const menuId of Object.keys(store.instances)) {
-      if (menuId === openingId || !store.isOpen(menuId)) {
+    for (const menuId of Object.keys(menuStore.instances)) {
+      if (menuId === openingId || !menuStore.isOpen(menuId)) {
         continue;
       }
 
-      const other = store.instances[menuId];
+      const other = menuStore.instances[menuId];
       const shouldClose =
         exclusive !== false || (openingGroup !== null && other.group === openingGroup);
 
       if (shouldClose) {
-        closeMenu(menuId, true);
+        closeMenu(menuStore, menuId, true);
         closedCount++;
       }
     }
@@ -294,7 +298,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
         return;
       }
 
-      const closedCount = closeOtherMenus(id);
+      const closedCount = closeOtherMenus(this, id);
 
       instance.open = true;
       if (!instance.activeItemId) {
@@ -310,7 +314,7 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
     },
 
     close(id) {
-      closeMenu(id);
+      closeMenu(this, id);
     },
 
     toggle(id) {
@@ -400,6 +404,23 @@ export function createMenuStore(config: MenuStoreConfig = {}): MenuStore {
           this.close.bind(this)
         );
         queueMicrotask(() => focusActiveMenu(instance));
+      }
+    },
+
+    handleWindowOutsideClick(event, menuIds) {
+      const ids = menuIds ?? Object.keys(this.instances);
+      for (const menuId of ids) {
+        this.handleOutsideClick(menuId, event);
+      }
+    },
+
+    handleWindowKeydown(event, menuIds) {
+      const ids = menuIds ?? Object.keys(this.instances);
+      for (const menuId of ids) {
+        if (this.isOpen(menuId)) {
+          this.handleKeydown(menuId, event);
+          return;
+        }
       }
     },
 

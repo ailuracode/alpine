@@ -6,34 +6,37 @@ import DemoSection from "../DemoSection.astro";
 const plugin = getPluginNavItem("menu")!;
 const itemClasses =
   "block w-full text-left rounded-md px-3 py-2 text-sm hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-const menuData = `{ userIds: ['profile', 'settings', 'billing', 'logout'], actionIds: ['save', 'duplicate', 'delete'] }`;
-const menuInit = `
-	$store.menu.register('user-menu', {
-		orientation: 'vertical',
-		onSelect: (id) => $toast('Selected ' + id),
-	});
-	userIds.forEach((id) => $store.menu.registerItem('user-menu', id));
-	$store.menu.register('actions-menu', {
-		orientation: 'vertical',
-		onSelect: (id) => $toast('Action: ' + id),
-	});
-	actionIds.forEach((id) => $store.menu.registerItem('actions-menu', id));
-`;
-const menuKeydown =
-  "if ($store.menu.isOpen('user-menu')) $store.menu.handleKeydown('user-menu', $event); else if ($store.menu.isOpen('actions-menu')) $store.menu.handleKeydown('actions-menu', $event)";
-const menuOutsideClick =
-  "$store.menu.handleOutsideClick('user-menu', $event); $store.menu.handleOutsideClick('actions-menu', $event)";
-const activeMenuItem =
-  "$store.menu.isOpen('user-menu') ? $store.menu.activeItem('user-menu') : ($store.menu.isOpen('actions-menu') ? $store.menu.activeItem('actions-menu') : '—')";
+const menuIds = "['user-menu', 'actions-menu']";
+const menuData = `{
+	userIds: ['profile', 'settings', 'billing', 'logout'],
+	actionIds: ['save', 'duplicate', 'delete'],
+	init() {
+		$store.menu.register('user-menu', {
+			orientation: 'vertical',
+			onSelect: (id) => $toast('Selected ' + id),
+		});
+		this.userIds.forEach((id) => $store.menu.registerItem('user-menu', id));
+		$store.menu.register('actions-menu', {
+			orientation: 'vertical',
+			onSelect: (id) => $toast('Action: ' + id),
+		});
+		this.actionIds.forEach((id) => $store.menu.registerItem('actions-menu', id));
+	},
+	activeMenuItem() {
+		for (const id of ${menuIds}) {
+			if ($store.menu.isOpen(id)) return $store.menu.activeItem(id);
+		}
+		return '—';
+	},
+}`;
 ---
 
 <DemoSection id={plugin.id} title={plugin.title} api={plugin.api} description={plugin.description}>
 	<div
 		class="grid gap-6"
 		x-data={menuData}
-		x-init={menuInit}
-		x-on:keydown.window={menuKeydown}
-		x-on:click.window={menuOutsideClick}
+		@keydown.window={`$store.menu.handleWindowKeydown($event, ${menuIds})`}
+		x-on:click.window={`$store.menu.handleWindowOutsideClick($event, ${menuIds})`}
 	>
 		<div>
 			<h3 class="text-sm font-medium mb-2">Exclusive dropdowns</h3>
@@ -41,7 +44,7 @@ const activeMenuItem =
 				By default, opening one menu closes any other. Account:
 				<strong x-text="$store.menu.isOpen('user-menu')"></strong> · Actions:
 				<strong x-text="$store.menu.isOpen('actions-menu')"></strong> · Active:
-				<strong x-text={activeMenuItem}></strong>
+				<strong x-text="activeMenuItem()"></strong>
 			</p>
 			<div class="flex flex-wrap gap-2">
 				<div x-ref="userMenuTrigger" x-init="$store.menu.bindTrigger('user-menu', $el)">

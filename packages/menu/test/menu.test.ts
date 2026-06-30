@@ -190,6 +190,39 @@ describe("@ailuracode/alpine-menu", () => {
     expect(store.isOpen("account")).toBe(true);
   });
 
+  it("routes window keydown to the open menu and closes on Escape", () => {
+    store.open("user-menu");
+
+    store.handleWindowKeydown(new KeyboardEvent("keydown", { key: "Escape" }), [
+      "user-menu",
+      "actions-menu",
+    ]);
+
+    expect(store.isOpen("user-menu")).toBe(false);
+  });
+
+  it("closes on window outside click for the requested menu ids", () => {
+    const trigger = document.createElement("button");
+    const container = document.createElement("ul");
+    const outside = document.createElement("div");
+    document.body.append(outside, trigger, container);
+
+    store.bindTrigger("user-menu", trigger);
+    store.bindMenu("user-menu", container);
+    store.open("user-menu");
+
+    store.handleWindowOutsideClick({ target: outside } as unknown as MouseEvent, [
+      "user-menu",
+      "actions-menu",
+    ]);
+
+    expect(store.isOpen("user-menu")).toBe(false);
+
+    outside.remove();
+    trigger.remove();
+    container.remove();
+  });
+
   it("keeps scroll lock in sync when exclusive closes other menus", () => {
     const onLockChange = vi.fn();
     store = createMenuStore({ onLockChange });

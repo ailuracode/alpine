@@ -99,7 +99,9 @@ $store.menu.register("account"); // no group — never auto-closed by group logi
 | `bindMenu(menuId, element)` | Attach the menu root for roving focus |
 | `bindTrigger(menuId, element)` | Attach the trigger for outside-click detection |
 | `handleOutsideClick(menuId, event)` | Close when clicking outside trigger + menu |
+| `handleWindowOutsideClick(event, menuIds?)` | Outside-click helper for multiple menus on one page |
 | `handleKeydown(menuId, event)` | Keyboard navigation |
+| `handleWindowKeydown(event, menuIds?)` | Route keyboard events to the first open menu |
 | `itemProps(menuId, itemId)` | `role`, `tabindex`, `aria-disabled` |
 | `menuProps(menuId)` | `role`, `aria-orientation` |
 
@@ -119,8 +121,8 @@ $store.menu.register("account"); // no group — never auto-closed by group logi
 <div
   x-data
   x-init="$store.menu.register('user-menu', { onSelect: (id) => console.log(id) }); ['profile','settings','logout'].forEach(id => $store.menu.registerItem('user-menu', id))"
-  @keydown.window="$store.menu.isOpen('user-menu') && $store.menu.handleKeydown('user-menu', $event)"
-  @click.window="$store.menu.handleOutsideClick('user-menu', $event)"
+  @keydown.window="$store.menu.handleWindowKeydown($event, ['user-menu'])"
+  x-on:click.window="$store.menu.handleWindowOutsideClick($event, ['user-menu'])"
 >
   <div x-ref="menuTrigger" x-init="$store.menu.bindTrigger('user-menu', $el)">
     <button @click="$store.menu.toggle('user-menu')" aria-haspopup="menu">Account</button>
@@ -165,6 +167,7 @@ Register items during `x-init` on the client. Control visibility with `x-show` (
 - Put `@click.outside` on a wrapper that includes the trigger — not on the menu panel alone, or opening clicks will dismiss immediately
 - For teleported menus, use `@click.window` + `handleOutsideClick()` so outside clicks ignore both trigger and panel
 - Wire `@keydown.window` while the menu is open; `@keydown` on the panel alone misses keys when focus stays on the trigger
+- With multiple menus on one page, use `handleWindowOutsideClick($event, menuIds)` and `handleWindowKeydown($event, menuIds)` on `@keydown.window` / `x-on:click.window`
 - Use `<template x-teleport="body">` with `bindTrigger()` + `bindMenu()` when the menu sits inside `overflow-hidden` ancestors
 - Call `bindMenu()` on the menu root so arrow keys move roving focus to the active item
 - Position with `@alpinejs/anchor` — the store does not set `top` / `left`
